@@ -10,6 +10,8 @@
 import "../styles/main.scss";
 
 import FullscreenPlugin from "@jspsych/plugin-fullscreen";
+import audioKeyboardResponse from '@jspsych/plugin-audio-keyboard-response';
+import audioButtonResponse from '@jspsych/plugin-audio-button-response';
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import SurveyTextPlugin from "@jspsych/plugin-survey-text";
@@ -21,6 +23,7 @@ import { initJsPsych } from "jspsych";
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
  * @type {import("jspsych-builder").RunFunction}
+ * 
  */
 export async function run({ assetPaths, input = {}, environment, title, version,stimulus, record_data }) {
   const jsPsych = initJsPsych();
@@ -33,17 +36,23 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     images: assetPaths.images,
     audio: assetPaths.audio,
     video: assetPaths.video,
+    
   });
+  
 
   // Welcome screen
   timeline.push({
     type: HtmlKeyboardResponsePlugin,
     stimulus: "<p>Welcome to IDP!<p/>",
   });
+  timeline.push({
+    type: HtmlKeyboardResponsePlugin,
+    stimulus: "<p>You will now hear an audio.<p/>",
+  });
    timeline.push({ // Prior
-    type: HtmlButtonResponsePlugin, //TODO: Replace dummy stimulus with actual audio output.
-    stimulus: jsPsych.timelineVariable('stimulus'),
-    choices: ['Ok'],
+    type: audioKeyboardResponse, //TODO: Replace dummy stimulus with actual audio output.
+    stimulus: 'assets/audio/Schimpanse.mp3', // audio file here
+    choices: "ALL_KEYS",
     record_data: false // We do not record data here because this is a dummy, also the prior will probably not need to record data.
   });
   timeline.push({ // Clarity
@@ -66,8 +75,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   
  
 
- 
-
+  
+  
   await jsPsych.run(timeline);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
