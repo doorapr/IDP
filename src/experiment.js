@@ -63,7 +63,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: 'How confident are you that your answer is correct?',
     record_data: record_data
   });
-
+  
  
 
  
