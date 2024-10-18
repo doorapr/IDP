@@ -46,6 +46,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: "<p>Welcome to IDP!<p/>",
   });
   timeline.push({
+    type: HtmlButtonResponsePlugin,
+    stimulus: '<p style="font-size:48px; color:red;">GREEN</p>',
+    choices: ['Red', 'Green', 'Blue'],
+    prompt: "<p>What color is the ink?</p>"
+  });
+  timeline.push({
     type: HtmlKeyboardResponsePlugin,
     stimulus: "<p>You will now hear an audio.<p/>",
   });
@@ -53,7 +59,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: audioKeyboardResponse, //TODO: Replace dummy stimulus with actual audio output.
     stimulus: 'assets/audio/Schimpanse.mp3', // audio file here
     choices: "ALL_KEYS",
-    record_data: false // We do not record data here because this is a dummy, also the prior will probably not need to record data.
+    trial_ends_after_audio: true,
+    //record_data: false // We do not record data here because this is a dummy, also the prior will probably not need to record data.
   });
   timeline.push({ // Clarity
     type: HtmlSliderResponsePlugin,
