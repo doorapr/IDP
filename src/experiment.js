@@ -19,13 +19,25 @@ import HtmlSliderResponsePlugin from "@jspsych/plugin-html-slider-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import { initJsPsych } from "jspsych";
 
+
+// TODO: Testen mit verschiedenen Browsern und OSs
+// TODO: viele Daten -> kann der Browser das handhaben?
+// TODO: Einlesen und handeln von randomisation files
+// TODO: NACHFRAGEN: Hübscheres CSS
+
+// TODO: Text / Symbol / Fixation Cross während Audio Playback anzeigen, dor
+// TODO: Aufnahme & Transcription, dor
+
+// TODO: english / german prompts, beh
+// TODO: Tutorial / Anleitung, beh
+
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
  * @type {import("jspsych-builder").RunFunction}
  * 
  */
-export async function run({ assetPaths, input = {}, environment, title, version,stimulus, record_data }) {
+export async function run({ assetPaths, input = {}, environment, title, version, stimulus, record_data }) {
   const jsPsych = initJsPsych();
 
   const timeline = [];
@@ -40,9 +52,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     images: assetPaths.images,
     audio: assetPaths.audio,
     video: assetPaths.video,
-    
+
   });
-  
 
   // Welcome screen
   timeline.push({
@@ -50,17 +61,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: "<p>Welcome to IDP!<p/>",
   });
   timeline.push({
-    type: HtmlButtonResponsePlugin,
-    stimulus: '<p style="font-size:48px; color:red;">GREEN</p>',
-    choices: ['Red', 'Green', 'Blue'],
-    prompt: "<p>What color is the ink?</p>"
-  });
-  timeline.push({
     type: HtmlKeyboardResponsePlugin,
     stimulus: "<p>You will now hear an audio.<p/>",
   });
-   timeline.push({ // Prior
-    type: audioKeyboardResponse, //TODO: Replace dummy stimulus with actual audio output.
+  timeline.push({ // Prior
+    type: audioKeyboardResponse,
     stimulus: 'assets/audio/Schimpanse.mp3', // audio file here
     choices: "ALL_KEYS",
     trial_ends_after_audio: true,
@@ -68,13 +73,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push({ // Clarity
     type: HtmlSliderResponsePlugin,
-    stimulus: 'How clearly did you understand the presented word?', //TODO: english / german prompts
+    stimulus: 'How clearly did you understand the presented word?',
     record_data: record_data
   });
   timeline.push({ // Which word?
     type: SurveyTextPlugin,
     questions: [
-        { prompt: 'Which word did you hear?' }
+      { prompt: 'Which word did you hear?' }
     ],
     record_data: record_data
   });
@@ -83,11 +88,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: 'How confident are you that your answer is correct?',
     record_data: record_data
   });
-  
-  
 
-  
-  
+
+
+
+
   await jsPsych.run(node);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
