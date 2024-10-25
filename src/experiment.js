@@ -17,6 +17,8 @@ import PreloadPlugin from "@jspsych/plugin-preload";
 import SurveyTextPlugin from "@jspsych/plugin-survey-text";
 import HtmlSliderResponsePlugin from "@jspsych/plugin-html-slider-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
+import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
+import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { initJsPsych } from "jspsych";
 
 
@@ -41,11 +43,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   const jsPsych = initJsPsych();
 
   const timeline = [];
+  const explain=[];
   var node = {
     timeline: timeline,
     repetitions: 2
   }
-
+  explain.push({type: initializeMicrophone});
   // Preload assets
   timeline.push({
     type: PreloadPlugin,
@@ -60,6 +63,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: HtmlKeyboardResponsePlugin,
     stimulus: "<p>Welcome to IDP!<p/>",
   });
+
   timeline.push({
     type: HtmlKeyboardResponsePlugin,
     stimulus: "<p>You will now hear an audio.<p/>",
@@ -67,33 +71,34 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   timeline.push({ // Prior
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/Schimpanse.mp3', // audio file here
-    choices: "ALL_KEYS",
+    choices: "",
+    prompt:"<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: false // We do not record data here because this is a dummy, also the prior will probably not need to record data.
   });
   timeline.push({ // Clarity
-    type: HtmlSliderResponsePlugin,
-    stimulus: 'How clearly did you understand the presented word?',
-    record_data: record_data
+      type: htmlAudioResponse,
+      stimulus: `
+          <p>Please say what you heard</p>
+      `,
+      recording_duration: 15000,
+      show_done_button: true,
+      done_button_label:"Done",
+      //record_data:record_data,
+      on_finish: function(data){
+        fetch('/save-my-data.php', { audio_base64: data.response })
+            .then((audio_id)=>{
+                data.response = audio_id;
+            });
+    }
   });
-  timeline.push({ // Which word?
-    type: SurveyTextPlugin,
-    questions: [
-      { prompt: 'Which word did you hear?' }
-    ],
-    record_data: record_data
-  });
-  timeline.push({ // Confidence
-    type: HtmlSliderResponsePlugin,
-    stimulus: 'How confident are you that your answer is correct?',
-    record_data: record_data
-  });
+ 
 
 
 
 
 
-  await jsPsych.run(node);
+  await jsPsych.run([explain,node]);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
