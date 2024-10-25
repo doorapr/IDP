@@ -29,6 +29,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   const jsPsych = initJsPsych();
 
   const timeline = [];
+  var node = {
+    timeline: timeline,
+    repetitions: 2
+  }
 
   // Preload assets
   timeline.push({
@@ -60,7 +64,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: 'assets/audio/Schimpanse.mp3', // audio file here
     choices: "ALL_KEYS",
     trial_ends_after_audio: true,
-    //record_data: false // We do not record data here because this is a dummy, also the prior will probably not need to record data.
+    record_data: false // We do not record data here because this is a dummy, also the prior will probably not need to record data.
   });
   timeline.push({ // Clarity
     type: HtmlSliderResponsePlugin,
@@ -80,11 +84,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     record_data: record_data
   });
   
- 
+  
 
   
   
-  await jsPsych.run(timeline);
+  await jsPsych.run(node);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
