@@ -20,7 +20,7 @@
     "@jspsych/plugin-survey-text": "^2.0.0",
     "fs": "^0.0.1-security",
     "jspsych": "^8.0.2",
-    "openai": "^4.68.4"
+    "openai": "^4.71.0"
   },
   "devDependencies": {
     "jspsych-builder": "^4.4.0"

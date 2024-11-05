@@ -21,7 +21,7 @@ import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { initJsPsych } from "jspsych";
-import fs from "fs";
+//import fs from "fs";
 import OpenAI from "openai";
 
 
@@ -93,8 +93,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   //const apiKey = 'your-api-key';        // Replace with your actual API key
   //const openai = new OpenAI({apiKey});
-  const openai = new OpenAI();
-  const language = "en"
+  //const openai = new OpenAI();
+  //const { OpenAIApi } = require('openai');
+  //const language = "en"
+  client = new OpenAI({
+    organization:'org-I6GaMaeyU8VpH7cqQSdWqRAn',
+    project:'IDP',
+  })
   
   const jsPsych = initJsPsych();
 
@@ -161,7 +166,19 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       done_button_label:"Done",
       //record_data:record_data,
       on_finish: function(data){
-        fetch('/save-my-data.php', { audio_base64: data.response })
+        audio_file = open(data.response, "rb")
+        transcript = client.audio.transcriptions.create(
+        model="whisper-1",
+        language=selected_language,
+        file=audio_file
+        )
+        //var fs = require('fs');
+        writeFile("transcription.txt", transcript.text, function(err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+        fetch('output/audio.php', { audio_base64: data.response })
             .then((audio_id)=>{
                 data.response = audio_id;
             });
