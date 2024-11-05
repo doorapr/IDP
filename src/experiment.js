@@ -20,6 +20,10 @@ import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { initJsPsych } from "jspsych";
+import fs from "fs";
+import OpenAI from "openai";
+
+
 
 
 // TODO: Testen mit verschiedenen Browsern und OSs
@@ -40,6 +44,14 @@ import { initJsPsych } from "jspsych";
  * 
  */
 export async function run({ assetPaths, input = {}, environment, title, version, stimulus, record_data }) {
+  //const fs = require('fs');
+  //const OpenAI = require('openai');
+
+  //const apiKey = 'your-api-key';        // Replace with your actual API key
+  //const openai = new OpenAI({apiKey});
+  const openai = new OpenAI();
+  const language = "en"
+  
   const jsPsych = initJsPsych();
 
   const timeline = [];
@@ -76,7 +88,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     trial_ends_after_audio: true,
     record_data: false // We do not record data here because this is a dummy, also the prior will probably not need to record data.
   });
-  timeline.push({ // Clarity
+  timeline.push({ 
       type: htmlAudioResponse,
       stimulus: `
           <p>Please say what you heard</p>
@@ -86,7 +98,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       done_button_label:"Done",
       //record_data:record_data,
       on_finish: function(data){
-        fetch('/save-my-data.php', { audio_base64: data.response })
+        const transcription = openai.audio.transcriptions.create({
+          file: fs.createReadStream(data.response),
+          model: "whisper-1",
+          language:language, // set language
+        });
+        saveAs(transcription.text,'output/transcription.txt');
+        fetch('output/audio.php', { audio_base64: data.response })
             .then((audio_id)=>{
                 data.response = audio_id;
             });
