@@ -90,7 +90,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: HtmlButtonResponsePlugin,
     stimulus: '<p>Please choose the language you would like to take the experiment in. / Bitte wählen Sie die Sprache in der Sie das Experiment absolvieren möchten.</p>',
     choices: Object.keys(langs),
-    button_html: (choice) => `<button class="jspsych-btn"><img src="/assets/images/flag-${choice}.svg" style="width: 100%"></img></button>`
+    button_html: (choice) => `<button class="jspsych-btn"><img src="assets/images/flag-${choice}.svg" style="width: 100%"></img></button>`
   }])
 
   const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
