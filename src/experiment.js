@@ -173,7 +173,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     choices: "NO_KEYS",
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
-    record_data: true
+    record_data: true,
+    
   });
   timeline.push({ // Which word was understood?
     type: htmlAudioResponse,
@@ -181,6 +182,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     recording_duration: 15000,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
+    on_finish: function(data) {
+      
+      jatos.uploadResultFile(data.response, "response_data.txt")
+      .then(() => console.log("File was successfully uploaded"))
+      .catch(() => console.log("File upload failed"));
+    }
   });
   timeline.push({ // Clarity
     type: HtmlSliderResponsePlugin,
