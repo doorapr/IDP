@@ -74,7 +74,14 @@ const langs = {
     },
     "first-tutorial-stimulus": "<p>Sie hören jetzt einen Satz in dem das letzte Wort nicht verzerrt wurde.</p>"
   }
-}
+};
+var S1 = require('/assets/text/S1_ALL.js');
+var S2 = require('/assets/text/S2_ALL.js');
+var S3 = require('/assets/text/S3_ALL.js');
+var S4 = require('/assets/text/S4_ALL.js');
+
+
+
 
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
@@ -140,11 +147,16 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     trial_ends_after_audio: true,
     record_data: false
   });
+
+  var participant = S1.ALL;
   
   const timeline = [];
   var node = {
     timeline: timeline,
+    timeline_variables: participant,
+    randomize_order: true
   }
+  console.log(participant)
   // Preload assets
   timeline.push({
     type: PreloadPlugin,
@@ -152,9 +164,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     audio: assetPaths.audio,
     record_data: false
   });
+  console.log(jsPsych.timelineVariable('Sentences'))
   timeline.push({ // Prior (first part of the sentence)
     type: audioKeyboardResponse,
-    stimulus: 'assets/audio/stimuli/el_076p.wav', // audio file here
+    stimulus: 'assets/audio/stimuli/'+jsPsych.timelineVariable('Web_Audio'), // audio file here
     choices: "NO_KEYS",
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
@@ -183,10 +196,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
     on_finish: function(data) {
-      
-      jatos.uploadResultFile(data.response, "response_data.txt")
-      .then(() => console.log("File was successfully uploaded"))
-      .catch(() => console.log("File upload failed"));
+      //When in Jatos:
+      //jatos.uploadResultFile(data.response, "response_data.txt")
+      //.then(() => console.log("File was successfully uploaded"))
+      //.catch(() => console.log("File upload failed"));
     }
   });
   timeline.push({ // Clarity
@@ -199,7 +212,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['confidence-question'],
     button_label: selected_language['done-button']
   });
-
+  
   await jsPsych.run([explain, node]);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this

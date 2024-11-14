@@ -18,9 +18,13 @@
     "@jspsych/plugin-instructions": "^2.0.0",
     "@jspsych/plugin-preload": "^1.1.2",
     "@jspsych/plugin-survey-text": "^2.0.0",
+    "convert-csv-to-json": "^2.49.0",
+    "csv-reader": "^1.0.12",
     "fs": "^0.0.1-security",
     "jspsych": "^8.0.2",
-    "openai": "^4.71.0"
+    "openai": "^4.71.0",
+    "papaparse": "^5.4.1",
+    "read-excel-file": "^5.8.6"
   },
   "devDependencies": {
     "jspsych-builder": "^4.4.0"
