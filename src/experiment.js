@@ -34,11 +34,11 @@ const langs = {
     "title": "Language Task",
     "welcome-and-mic-select-text": "<h1>Welcome to this language based task.</h1><p>Since your verbal input will be required during the experiment, please grant the site access to your microphone and select the device you want to use.</p>",
     "welcome-and-mic-select-button": "Select this device.",
-    "word-response-stimulus": "Which word did you understand at the end of the sentence?",
+    "word-response-stimulus": "<p>Which word did you understand at the end of the sentence?</p>",
     "done-button": "Done",
-    "word-question": "Please repeat the last word of the sentence you just heard.",
-    "clarity-question": "How clearly did you understand the presented word?",
-    "confidence-question": "How confident are you that your answer is correct?",
+    "word-question": "<p>Please repeat the last word of the sentence you just heard.</p>",
+    "clarity-question": "<p>How clearly did you understand the presented word?</p>",
+    "confidence-question": "<p>How confident are you that your answer is correct?</p>",
     "instructions": {
       "pages": [
         `<p>In the following pages the basic procedure of the experiment will be explained. You will then have the opportunity to practice three times on example sentences. Then the actual experiment will begin.</p>
@@ -50,17 +50,20 @@ const langs = {
       "button-previous": "Previous",
       "button-next": "Next"
     },
-    "first-tutorial-stimulus": "<p>You will now hear a sentence where the last word is not distorted.</p>"
+    "first-tutorial-stimulus": "<p>You will now hear an example sentence where the last word has not been distorted.</p>",
+    "second-tutorial-stimulus": "<p>For the next sentence the last word <b>has</b> been distorted.</p>",
+    "third-tutorial-stimulus": "<p>In the experiment you will have to answer the following questions after hearing each sentence.</p>",
+    "end-of-tutorial-stimulus": "<p>This is the end of the tutorial and the start of the experiment. Good Luck!</p>"
   },
   "de": {
     "title": "Sprachbasierter Task",
     "welcome-and-mic-select-text": "<h1>Willkommen zum sprach-basierten Task</h1><p>Da im Laufe des Experiments ihre Sprache aufgenommen wird geben Sie bitte der Seite Zugriff auf Ihr Mikrofon. Wählen Sie das Mikrofon, das verwendet werden soll.</p>",
     "welcome-and-mic-select-button": "Dieses Mikrofon verwenden",
-    "word-response-stimulus": "Welches Wort haben Sie am Ende des Satzes verstanden?",
+    "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "done-button": "Weiter",
-    "word-question": "Bitte wiederholen Sie das letzte Wort des Satzes den Sie eben gehört haben.",
-    "clarity-question": "Wie gut haben Sie das letze Wort verstanden?",
-    "confidence-question": "Wie sicher sind Sie sich dass Sie das richtige Wort verstanden haben?",
+    "word-question": "<p>Bitte wiederholen Sie das letzte Wort des Satzes den Sie eben gehört haben.</p>",
+    "clarity-question": "<p>Wie gut haben Sie das letze Wort verstanden?</p>",
+    "confidence-question": "<p>Wie sicher sind Sie sich dass Sie das richtige Wort verstanden haben?</p>",
     "instructions": {
       "pages": [
         "<p>Auf den folgenden Seiten wird der Ablauf des Experimentes erklärt. Im Anschluss daran werden Sie die Möglichkeit haben an drei Beispielen den Ablauf auszuprobieren. Danach startet das Experiment.</p>",
@@ -72,7 +75,10 @@ const langs = {
       "button-previous": "Vorherige Seite",
       "button-next": "Nächste Seite"
     },
-    "first-tutorial-stimulus": "<p>Sie hören jetzt einen Satz in dem das letzte Wort nicht verzerrt wurde.</p>"
+    "first-tutorial-stimulus": "<p>Sie hören jetzt einen Satz in dem das letzte Wort nicht verzerrt wurde.</p>",
+    "second-tutorial-stimulus": "<p>Jetzt hören Sie einen Satz in dem das letzte Wort verzerrt wurde.</p>",
+    "third-tutorial-stimulus": "<p>Die folgenden Fragen werden Ihnen nach jedem Satz gestellt.</p>",
+    "end-of-tutorial-stimulus": "<p>Dies ist das Ende der Einführung und der Beginn des Experiments. Viel Erfolg!</p>"
   }
 }
 
@@ -95,52 +101,97 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
 
-  const explain = [];
-
-  explain.push({
+  const explain = [{
     type: initializeMicrophone,
     button_label: selected_language['welcome-and-mic-select-button'],
     device_select_message: selected_language['welcome-and-mic-select-text'],
     record_data: false
-  });
-  explain.push({
+  }, {
     type: InstructionsPlugin,
     pages: selected_language.instructions.pages,
     show_clickable_nav: true,
     button_label_previous: selected_language['instructions']['button-previous'],
     button_label_next: selected_language['instructions']['button-next'],
     record_data: false
-  });
-  explain.push({
+  }, {
     type: HtmlButtonResponsePlugin,
     stimulus: selected_language['first-tutorial-stimulus'],
     choices: [selected_language['done-button']],
     record_data: false
-  });
-  explain.push({ // Prior (first part of the sentence)
+  }, { // Prior (first part of the sentence)
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/training/t_382p.wav', // audio file here
     choices: "NO_KEYS",
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: false
-  });
-  explain.push({
+  }, {
     type: HtmlKeyboardResponsePlugin,
     stimulus: '+',
     choices: "NO_KEYS",
     trial_duration: 150,
     record_data: false
-  });
-  explain.push({ // Stimulus (last word of the sentence + distortion)
+  }, { // Stimulus (last word of the sentence + distortion)
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/training/t_382tw.wav', // audio file here
     choices: "NO_KEYS",
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: false
-  });
-  
+  }, {
+    type: HtmlButtonResponsePlugin,
+    stimulus: selected_language['second-tutorial-stimulus'],
+    choices: [selected_language['done-button']],
+    record_data: false
+  }, { // Prior (first part of the sentence)
+    type: audioKeyboardResponse,
+    stimulus: 'assets/audio/training/t_380p.wav', // audio file here
+    choices: "NO_KEYS",
+    prompt: "<img src='assets/images/volume.png'>",
+    trial_ends_after_audio: true,
+    record_data: false
+  }, {
+    type: HtmlKeyboardResponsePlugin,
+    stimulus: '+',
+    choices: "NO_KEYS",
+    trial_duration: 150,
+    record_data: false
+  }, { // Stimulus (last word of the sentence + distortion)
+    type: audioKeyboardResponse,
+    stimulus: 'assets/audio/training/t_380tw_6.wav', // audio file here
+    choices: "NO_KEYS",
+    prompt: "<img src='assets/images/volume.png'>",
+    trial_ends_after_audio: true,
+    record_data: false
+  }, {
+    type: HtmlButtonResponsePlugin,
+    stimulus: selected_language['third-tutorial-stimulus'],
+    choices: [selected_language['done-button']],
+    record_data: false
+  }, { // Which word was understood?
+    type: htmlAudioResponse,
+    stimulus: selected_language['word-question'] + "<img src='assets/images/microphone.png'></img>",
+    recording_duration: 5000,
+    show_done_button: true,
+    done_button_label: selected_language['done-button'],
+    record_data: false
+  }, { // Clarity
+    type: HtmlSliderResponsePlugin,
+    stimulus: selected_language['clarity-question'],
+    button_label: selected_language['done-button'],
+    record_data: false
+  }, { // Confidence
+    type: HtmlSliderResponsePlugin,
+    stimulus: selected_language['confidence-question'],
+    button_label: selected_language['done-button'],
+    record_data: false
+  }, {
+    type: HtmlButtonResponsePlugin,
+    stimulus: selected_language['end-of-tutorial-stimulus'],
+    choices: [selected_language['done-button']],
+    record_data: false
+  },];
+
   const timeline = [];
   var node = {
     timeline: timeline,
@@ -174,7 +225,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: true,
-    
   });
   timeline.push({ // Which word was understood?
     type: htmlAudioResponse,
@@ -182,11 +232,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     recording_duration: 15000,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
-    on_finish: function(data) {
-      
+    on_finish: function (data) {
+      if (!jatos)
+        return
+
       jatos.uploadResultFile(data.response, "response_data.txt")
-      .then(() => console.log("File was successfully uploaded"))
-      .catch(() => console.log("File upload failed"));
+        .then(() => console.log("File was successfully uploaded"))
+        .catch(() => console.log("File upload failed"));
     }
   });
   timeline.push({ // Clarity
