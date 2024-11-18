@@ -3,7 +3,8 @@
  * @description 
  * @version 0.1.0
  *
- * @assets assets/
+ * @assets Stimuli/,assets/images,assets/audio/training
+ * 
  */
 
 // You can import stylesheets (.scss or .css).
