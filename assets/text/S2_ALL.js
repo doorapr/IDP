@@ -1,4 +1,4 @@
-[
+var ALL=[
   {
     Sentence: "Zum 20-j\ufffdhrigen Jubil\ufffdum bekam die Sekr\ufffdterin von ihrem Chef eine Schachtel",
     Target_word: "pralinen",
@@ -4800,3 +4800,6 @@
     randomize_2: "0,999279294"
   }
 ]
+module.exports ={
+  ALL
+}

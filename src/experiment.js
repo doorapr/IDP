@@ -75,7 +75,7 @@ const langs = {
     "first-tutorial-stimulus": "<p>Sie hören jetzt einen Satz in dem das letzte Wort nicht verzerrt wurde.</p>"
   }
 };
-var S1 = require('/assets/text/S1_ALL.js');
+var S1 = require('/assets/text/S1.js');
 var S2 = require('/assets/text/S2_ALL.js');
 var S3 = require('/assets/text/S3_ALL.js');
 var S4 = require('/assets/text/S4_ALL.js');
@@ -91,7 +91,8 @@ var S4 = require('/assets/text/S4_ALL.js');
  */
 export async function run({ assetPaths, input = {}, environment, title, version, stimulus, record_data }) {
 
-  const jsPsych = initJsPsych();
+  const jsPsych = initJsPsych(
+  );
 
   await jsPsych.run([{
     type: HtmlButtonResponsePlugin,
@@ -154,9 +155,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   var node = {
     timeline: timeline,
     timeline_variables: participant,
-    randomize_order: true
+    randomize_order: true,
+    on_timeline_finish: function() { // Python transkription file hier maybe connecten
+      console.log('This timeline has finished.');
+    },
   }
-  console.log(participant)
+  //console.log(participant)
   // Preload assets
   timeline.push({
     type: PreloadPlugin,
@@ -164,7 +168,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     audio: assetPaths.audio,
     record_data: false
   });
-  console.log(jsPsych.timelineVariable('Sentences'))
+  //console.log(jsPsych.evaluateTimelineVariable('Sentence'))
   timeline.push({ // Prior (first part of the sentence)
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/stimuli/'+jsPsych.timelineVariable('Web_Audio'), // audio file here
