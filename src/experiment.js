@@ -201,17 +201,41 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   },];
 
   var participant = S1.ALL;
-  
+  var testTimelineVariable =[{
+    Sentence: 'Am Montag h\ufffdlt Karim ein Referat \ufffdber',
+    Target_word: 'tiere',
+    WordPredictions: 4,
+    wn: 52,
+    nwords: 58,
+    nprt: 67,
+    nw: 8,
+    sn: 9,
+    cloze: '0,059701493',
+    entropy: '3,997783013',
+    condition: 'eh',
+    sn_rand: 10,
+    sn_0: '010',
+    Prior: 'eh',
+    Sentences: 's_eh_010p.wav',
+    Target_word__1: 's_eh_010tw',
+    randomization: '0,231716919',
+    Web_Audio: 's_eh_010p.wav',
+    Single_Word: 's_eh_010tw_3.wav',
+    sentence: 'Stimuli/s_eh_010p.wav',
+    word: 'Stimuli/s_eh_010tw_3.wav',
+    randomize_1: '0,564116256'
+  }];
   const timeline = [];
+ 
   var node = {
     timeline: timeline,
-    timeline_variables: participant,
+    timeline_variables:testTimelineVariable,
     randomize_order: true,
     on_timeline_finish: function() { // Python transkription file hier maybe connecten
       console.log('This timeline has finished.');
     },
   }
-  //console.log(participant)
+
   // Preload assets
   timeline.push({
     type: PreloadPlugin,
@@ -219,10 +243,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     audio: assetPaths.audio,
     record_data: false
   });
-  //console.log(jsPsych.evaluateTimelineVariable('Sentence'))
+  
+
   timeline.push({ // Prior (first part of the sentence)
     type: audioKeyboardResponse,
-    stimulus: 'assets/audio/stimuli/'+jsPsych.timelineVariable('Web_Audio'), // audio file here
+   
+    stimulus: jsPsych.timelineVariable('sentence'), // audio file here
     choices: "NO_KEYS",
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
@@ -237,7 +263,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push({ // Stimulus (last word of the sentence + distortion)
     type: audioKeyboardResponse,
-    stimulus: 'assets/audio/stimuli/el_076tw_12.wav', // audio file here
+    stimulus: jsPsych.timelineVariable('word'), // audio file here
     choices: "NO_KEYS",
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
@@ -268,8 +294,16 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['confidence-question'],
     button_label: selected_language['done-button']
   });
-  
-  await jsPsych.run([explain, node]);
+ 
+  //JUST FOR TESTING
+  const test = [{
+    type: initializeMicrophone,
+    button_label: selected_language['welcome-and-mic-select-button'],
+    device_select_message: selected_language['welcome-and-mic-select-text'],
+    record_data: false
+  },]
+  await jsPsych.run([test,node])
+  //await jsPsych.run([explain, node]);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
