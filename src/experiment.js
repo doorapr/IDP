@@ -202,6 +202,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   },];
 
   var participant = S1.ALL;
+  var filename_for_upload;
   var testTimelineVariable =[{
     Sentence: 'Am Montag h\ufffdlt Karim ein Referat \ufffdber',
     Target_word: 'tiere',
@@ -248,7 +249,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   timeline.push({ // Prior (first part of the sentence)
     type: audioKeyboardResponse,
-   
     stimulus: jsPsych.timelineVariable('sentence'), // audio file here
     choices: "NO_KEYS",
     prompt: "<img src='assets/images/volume.png'>",
@@ -269,6 +269,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     prompt: "<img src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: true,
+    on_finish: function (data) {
+      var path = data.stimulus
+      filename_for_upload=path.substr(8).split(".")[0] + ".txt"
+    }
   });
   timeline.push({ // Which word was understood?
     type: htmlAudioResponse,
@@ -279,8 +283,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     on_finish: function (data) {
       if (!jatos)
         return
-
-      jatos.uploadResultFile(data.response, "response_data.txt")
+      
+      console.log(filename_for_upload)
+      jatos.uploadResultFile(data.response, filename_for_upload)
         .then(() => console.log("File was successfully uploaded"))
         .catch(() => console.log("File upload failed"));
     }
@@ -303,8 +308,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     device_select_message: selected_language['welcome-and-mic-select-text'],
     record_data: false
   },]
-  await jsPsych.run([test,node])
-  //await jsPsych.run([explain, node]);
+  //await jsPsych.run([test,node])
+  await jsPsych.run([explain, node]);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
