@@ -56,7 +56,8 @@ const langs = {
     "first-tutorial-stimulus": "<p>You will now hear an example sentence where the last word has not been distorted.</p>",
     "second-tutorial-stimulus": "<p>For the next sentence the last word <b>has</b> been distorted.</p>",
     "third-tutorial-stimulus": "<p>In the experiment you will have to answer the following questions after hearing each sentence.</p>",
-    "end-of-tutorial-stimulus": "<p>This is the end of the tutorial and the start of the experiment. Good Luck!</p>"
+    "end-of-tutorial-stimulus": "<p>This is the end of the tutorial and the start of the experiment. Good Luck!</p>",
+    "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>"
   },
   "de": {
     "title": "Sprachbasierter Task",
@@ -83,16 +84,14 @@ const langs = {
     "first-tutorial-stimulus": "<p>Sie hören jetzt einen Satz in dem das letzte Wort nicht verzerrt wurde.</p>",
     "second-tutorial-stimulus": "<p>Jetzt hören Sie einen Satz in dem das letzte Wort verzerrt wurde.</p>",
     "third-tutorial-stimulus": "<p>Die folgenden Fragen werden Ihnen nach jedem Satz gestellt.</p>",
-    "end-of-tutorial-stimulus": "<p>Dies ist das Ende der Einführung und der Beginn des Experiments. Viel Erfolg!</p>"
+    "end-of-tutorial-stimulus": "<p>Dies ist das Ende der Einführung und der Beginn des Experiments. Viel Erfolg!</p>",
+    "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>"
   }
 };
 var S1 = require('/assets/text/S1.js');
 var S2 = require('/assets/text/S2_ALL.js');
 var S3 = require('/assets/text/S3_ALL.js');
 var S4 = require('/assets/text/S4_ALL.js');
-
-
-
 
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
@@ -207,52 +206,33 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     record_data: false
   },];
 
-  var participant = S1.ALL;
+  var participant = require('/assets/text/out.js').ALL;
   var filename_for_upload;
-  var testTimelineVariable =[{
-    Sentence: 'Am Montag h\ufffdlt Karim ein Referat \ufffdber',
-    Target_word: 'tiere',
-    WordPredictions: 4,
-    wn: 52,
-    nwords: 58,
-    nprt: 67,
-    nw: 8,
-    sn: 9,
-    cloze: '0,059701493',
-    entropy: '3,997783013',
-    condition: 'eh',
-    sn_rand: 10,
-    sn_0: '010',
-    Prior: 'eh',
-    Sentences: 's_eh_010p.wav',
-    Target_word__1: 's_eh_010tw',
-    randomization: '0,231716919',
-    Web_Audio: 's_eh_010p.wav',
-    Single_Word: 's_eh_010tw_3.wav',
-    sentence: 'Stimuli/s_eh_010p.wav',
-    word: 'Stimuli/s_eh_010tw_3.wav',
-    randomize_1: '0,564116256'
-  }];
   const timeline = [];
  
+  console.log(participant)
+
   var node = {
     timeline: timeline,
-    timeline_variables:testTimelineVariable,
+    timeline_variables: participant,
     randomize_order: true,
-    on_timeline_finish: function() { // Python transkription file hier maybe connecten
-      console.log('This timeline has finished.');
-    },
   }
 
   // Preload assets
   timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
-    audio: assetPaths.audio,
+    audio: () => [jsPsych.evaluateTimelineVariable('sentence'), jsPsych.evaluateTimelineVariable('word')],
     record_data: false
   });
   
 
+  timeline.push({
+    type: HtmlButtonResponsePlugin,
+    stimulus: selected_language['ready-for-next-stimulus'],
+    choices: [selected_language['done-button']],
+    record_data: false
+  });
   timeline.push({ // Prior (first part of the sentence)
     type: audioKeyboardResponse,
     stimulus: jsPsych.timelineVariable('sentence'), // audio file here
@@ -283,17 +263,15 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   timeline.push({ // Which word was understood?
     type: htmlAudioResponse,
     stimulus: "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" +  selected_language['word-question'],
-    recording_duration: 15000,
+    recording_duration: 5000,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
     on_finish: function (data) {
-      if (!jatos)
-        return
-      
-      console.log(filename_for_upload)
-      jatos.uploadResultFile(data.response, filename_for_upload)
-        .then(() => console.log("File was successfully uploaded"))
-        .catch(() => console.log("File upload failed"));
+      if (typeof jatos !== 'undefined') {
+        jatos.uploadResultFile(data.response, filename_for_upload)
+          .then(() => console.log("File was successfully uploaded"))
+          .catch(() => console.log("File upload failed"));
+      }
     }
   });
   timeline.push({ // Clarity
@@ -309,14 +287,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     labels:selected_language['confidence-labels']
   });
  
-  //JUST FOR TESTING
-  const test = [{
-    type: initializeMicrophone,
-    button_label: selected_language['welcome-and-mic-select-button'],
-    device_select_message: selected_language['welcome-and-mic-select-text'],
-    record_data: false
-  },]
-  //await jsPsych.run([test,node])
   await jsPsych.run([explain, node]);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
