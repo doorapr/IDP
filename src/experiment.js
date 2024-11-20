@@ -28,7 +28,7 @@ import { initJsPsych } from "jspsych";
 // TODO: Einlesen und handeln von randomisation files
 // TODO: NACHFRAGEN: Hübscheres CSS
 
-// TODO: Aufnahme & Transcription, dor
+// TODO: Transcription, dor
 
 const langs = {
   "en": {
@@ -39,6 +39,8 @@ const langs = {
     "done-button": "Done",
     "word-question": "<p>Please repeat the last word of the sentence you just heard.</p>",
     "clarity-question": "<p>How clearly did you understand the presented word?</p>",
+    "clarity-labels":["Very unclear","Very clear"],
+    "confidence-labels":["Very unconfident","Very confident"],
     "confidence-question": "<p>How confident are you that your answer is correct?</p>",
     "instructions": {
       "pages": [
@@ -65,6 +67,8 @@ const langs = {
     "word-question": "<p>Bitte wiederholen Sie das letzte Wort des Satzes den Sie eben gehört haben.</p>",
     "clarity-question": "<p>Wie gut haben Sie das letze Wort verstanden?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich dass Sie das richtige Wort verstanden haben?</p>",
+    "clarity-labels":["Sehr unklar","Sehr klar"],
+    "confidence-labels":["Sehr unsicher","Sehr sicher"],
     "instructions": {
       "pages": [
         "<p>Auf den folgenden Seiten wird der Ablauf des Experimentes erklärt. Im Anschluss daran werden Sie die Möglichkeit haben an drei Beispielen den Ablauf auszuprobieren. Danach startet das Experiment.</p>",
@@ -131,7 +135,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/training/t_382p.wav', // audio file here
     choices: "NO_KEYS",
-    prompt: "<img src='assets/images/volume.png'>",
+    prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: false
   }, {
@@ -144,7 +148,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/training/t_382tw.wav', // audio file here
     choices: "NO_KEYS",
-    prompt: "<img src='assets/images/volume.png'>",
+    prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: false
   }, {
@@ -156,7 +160,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/training/t_380p.wav', // audio file here
     choices: "NO_KEYS",
-    prompt: "<img src='assets/images/volume.png'>",
+    prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: false
   }, {
@@ -169,7 +173,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/training/t_380tw_6.wav', // audio file here
     choices: "NO_KEYS",
-    prompt: "<img src='assets/images/volume.png'>",
+    prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: false
   }, {
@@ -179,7 +183,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     record_data: false
   }, { // Which word was understood?
     type: htmlAudioResponse,
-    stimulus: selected_language['word-question'] + "<img src='assets/images/microphone.png'></img>",
+    stimulus:  "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" + selected_language['word-question'],
     recording_duration: 5000,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
@@ -188,12 +192,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: HtmlSliderResponsePlugin,
     stimulus: selected_language['clarity-question'],
     button_label: selected_language['done-button'],
-    record_data: false
+    record_data: false,
+    labels:selected_language['clarity-labels']
   }, { // Confidence
     type: HtmlSliderResponsePlugin,
     stimulus: selected_language['confidence-question'],
     button_label: selected_language['done-button'],
-    record_data: false
+    record_data: false,
+    labels:selected_language['confidence-labels']
   }, {
     type: HtmlButtonResponsePlugin,
     stimulus: selected_language['end-of-tutorial-stimulus'],
@@ -251,7 +257,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: audioKeyboardResponse,
     stimulus: jsPsych.timelineVariable('sentence'), // audio file here
     choices: "NO_KEYS",
-    prompt: "<img src='assets/images/volume.png'>",
+    prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: true
   });
@@ -266,7 +272,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: audioKeyboardResponse,
     stimulus: jsPsych.timelineVariable('word'), // audio file here
     choices: "NO_KEYS",
-    prompt: "<img src='assets/images/volume.png'>",
+    prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: true,
     on_finish: function (data) {
@@ -276,7 +282,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push({ // Which word was understood?
     type: htmlAudioResponse,
-    stimulus: selected_language['word-question'],
+    stimulus: "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" +  selected_language['word-question'],
     recording_duration: 15000,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
@@ -293,12 +299,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   timeline.push({ // Clarity
     type: HtmlSliderResponsePlugin,
     stimulus: selected_language['clarity-question'],
-    button_label: selected_language['done-button']
+    button_label: selected_language['done-button'],
+    labels:selected_language['clarity-labels']
   });
   timeline.push({ // Confidence
     type: HtmlSliderResponsePlugin,
     stimulus: selected_language['confidence-question'],
-    button_label: selected_language['done-button']
+    button_label: selected_language['done-button'],
+    labels:selected_language['confidence-labels']
   });
  
   //JUST FOR TESTING
