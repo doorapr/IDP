@@ -26,7 +26,8 @@ import { initJsPsych } from "jspsych";
 // TODO: Testen mit verschiedenen Browsern und OSs
 // TODO: viele Daten -> kann der Browser das handhaben?
 // TODO: Einlesen und handeln von randomisation files
-// TODO: NACHFRAGEN: Hübscheres CSS
+// TODO: NACHFRAGEN: Hübscheres CSS -> Erklärung zentrieren
+
 
 // TODO: Transcription, dor
 
@@ -88,10 +89,14 @@ const langs = {
     "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>"
   }
 };
-var S1 = require('/assets/text/S1.js');
-var S2 = require('/assets/text/S2_ALL.js');
-var S3 = require('/assets/text/S3_ALL.js');
-var S4 = require('/assets/text/S4_ALL.js');
+
+
+const randomisation_lists = {
+  S1: require('/assets/text/S1.js'),
+  S2: require('/assets/text/S2_ALL.js'),
+  S3: require('/assets/text/S3_ALL.js'),
+  S4: require('/assets/text/S4_ALL.js'),
+}
 
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
@@ -104,7 +109,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   const jsPsych = initJsPsych(
   );
 
-  await jsPsych.run([{
+  await jsPsych.run([{ // Instead of choosing the language this will probably come from the input / environment from JATOS
     type: HtmlButtonResponsePlugin,
     stimulus: '<p>Please choose the language you would like to take the experiment in. / Bitte wählen Sie die Sprache in der Sie das Experiment absolvieren möchten.</p>',
     choices: Object.keys(langs),
@@ -113,7 +118,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
 
-  const explain = [{
+  const explain = [{ // 
     type: initializeMicrophone,
     button_label: selected_language['welcome-and-mic-select-button'],
     device_select_message: selected_language['welcome-and-mic-select-text'],
@@ -155,7 +160,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['second-tutorial-stimulus'],
     choices: [selected_language['done-button']],
     record_data: false
-  }, { // Prior (first part of the sentence)
+  }, { // Audio Symbol vor Anfang vom Satz -> (150ms?) Prior (first part of the sentence)
     type: audioKeyboardResponse,
     stimulus: 'assets/audio/training/t_380p.wav', // audio file here
     choices: "NO_KEYS",
@@ -164,7 +169,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     record_data: false
   }, {
     type: HtmlKeyboardResponsePlugin,
-    stimulus: '+',
+    stimulus: '+', // -> Normales Bild, Kein Flackern
     choices: "NO_KEYS",
     trial_duration: 150,
     record_data: false
@@ -180,6 +185,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['third-tutorial-stimulus'],
     choices: [selected_language['done-button']],
     record_data: false
+  }, { // Clarity
+    type: HtmlSliderResponsePlugin,
+    stimulus: selected_language['clarity-question'],
+    button_label: selected_language['done-button'],
+    record_data: false,
+    labels:selected_language['clarity-labels']
   }, { // Which word was understood?
     type: htmlAudioResponse,
     stimulus:  "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" + selected_language['word-question'],
@@ -187,12 +198,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
     record_data: false
-  }, { // Clarity
-    type: HtmlSliderResponsePlugin,
-    stimulus: selected_language['clarity-question'],
-    button_label: selected_language['done-button'],
-    record_data: false,
-    labels:selected_language['clarity-labels']
   }, { // Confidence
     type: HtmlSliderResponsePlugin,
     stimulus: selected_language['confidence-question'],
@@ -206,18 +211,18 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     record_data: false
   },];
 
-  var participant = require('/assets/text/out.js').ALL;
+  const selected_randomisation = jsPsych.randomization.sampleWithoutReplacement(Object.keys(randomisation_lists), 1)[0]
+
+  var participant = require('/assets/text/out.js').ALL; // replace this with const participant = randomisation_lists[selected_randomisation].ALL;
   var filename_for_upload;
   const timeline = [];
- 
-  console.log(participant)
 
   var node = {
     timeline: timeline,
     timeline_variables: participant,
     randomize_order: true,
   }
-
+  // 4 Blöcke â 50 Sätze
   // Preload assets
   timeline.push({
     type: PreloadPlugin,
@@ -225,8 +230,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     audio: () => [jsPsych.evaluateTimelineVariable('sentence'), jsPsych.evaluateTimelineVariable('word')],
     record_data: false
   });
-  
-
   timeline.push({
     type: HtmlButtonResponsePlugin,
     stimulus: selected_language['ready-for-next-stimulus'],
@@ -250,31 +253,35 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push({ // Stimulus (last word of the sentence + distortion)
     type: audioKeyboardResponse,
-    stimulus: jsPsych.timelineVariable('word'), // audio file here
+    stimulus: jsPsych.timelineVariable('word')+, // audio file here
     choices: "NO_KEYS",
     prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
     record_data: true,
     on_finish: function (data) {
-      var path = data.stimulus
-      filename_for_upload=path.substr(8).split(".")[0] + ".txt"
+      const path = data.stimulus;
+      filename_for_upload = path.substr(8).split(".")[0] + ".txt";
     }
   });
+  // Zwischenseite mit dem Hinweis "Gleich wird das Wort abgefragt"
   timeline.push({ // Which word was understood?
     type: htmlAudioResponse,
     stimulus: "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" +  selected_language['word-question'],
-    recording_duration: 5000,
+    recording_duration: 7500,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
     on_finish: function (data) {
       if (typeof jatos !== 'undefined') {
         jatos.uploadResultFile(data.response, filename_for_upload)
-          .then(() => console.log("File was successfully uploaded"))
-          .catch(() => console.log("File upload failed"));
+          .then(() => {
+            console.log("File was successfully uploaded");
+            data.response = filename_for_upload; // Remove response data from RAM, we already saved it to the server.
+          })
+          .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
       }
     }
   });
-  timeline.push({ // Clarity
+  timeline.push({ // Clarity Sliders require movement
     type: HtmlSliderResponsePlugin,
     stimulus: selected_language['clarity-question'],
     button_label: selected_language['done-button'],
