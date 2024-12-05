@@ -24,9 +24,7 @@ import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { initJsPsych } from "jspsych";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
-// TODO: viele Daten -> kann der Browser das handhaben?
-// TODO: Einlesen und handeln von randomisation files
-// TODO: NACHFRAGEN: Hübscheres CSS -> Erklärung zentrieren
+// TODO: Slider ticks oder Wert anzeigen
 
 
 // TODO: Transcription, dor
@@ -40,8 +38,8 @@ const langs = {
     "done-button": "Done",
     "word-question": "<p>Please repeat the last word of the sentence you just heard.</p>",
     "clarity-question": "<p>How clearly did you understand the presented word?</p>",
-    "clarity-labels":["Very unclear","Very clear"],
-    "confidence-labels":["Very unconfident","Very confident"],
+    "clarity-labels": ["Very unclear", "Very clear"],
+    "confidence-labels": ["Very unconfident", "Very confident"],
     "confidence-question": "<p>How confident are you that your answer is correct?</p>",
     "instructions": {
       "pages": [
@@ -58,7 +56,8 @@ const langs = {
     "second-tutorial-stimulus": "<p>For the next sentence the last word <b>has</b> been distorted.</p>",
     "third-tutorial-stimulus": "<p>In the experiment you will have to answer the following questions after hearing each sentence.</p>",
     "end-of-tutorial-stimulus": "<p>This is the end of the tutorial and the start of the experiment. Good Luck!</p>",
-    "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>"
+    "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
+    "pause-stimulus": "<p>Time for a short break. Click the next button when you're ready for the next block of questions.</p>"
   },
   "de": {
     "title": "Sprachbasierter Task",
@@ -69,8 +68,8 @@ const langs = {
     "word-question": "<p>Bitte wiederholen Sie das letzte Wort des Satzes den Sie eben gehört haben.</p>",
     "clarity-question": "<p>Wie gut haben Sie das letze Wort verstanden?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich dass Sie das richtige Wort verstanden haben?</p>",
-    "clarity-labels":["Sehr unklar","Sehr klar"],
-    "confidence-labels":["Sehr unsicher","Sehr sicher"],
+    "clarity-labels": ["Sehr unklar", "Sehr klar"],
+    "confidence-labels": ["Sehr unsicher", "Sehr sicher"],
     "instructions": {
       "pages": [
         "<p>Auf den folgenden Seiten wird der Ablauf des Experimentes erklärt. Im Anschluss daran werden Sie die Möglichkeit haben an drei Beispielen den Ablauf auszuprobieren. Danach startet das Experiment.</p>",
@@ -86,7 +85,8 @@ const langs = {
     "second-tutorial-stimulus": "<p>Jetzt hören Sie einen Satz in dem das letzte Wort verzerrt wurde.</p>",
     "third-tutorial-stimulus": "<p>Die folgenden Fragen werden Ihnen nach jedem Satz gestellt.</p>",
     "end-of-tutorial-stimulus": "<p>Dies ist das Ende der Einführung und der Beginn des Experiments. Viel Erfolg!</p>",
-    "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>"
+    "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>",
+    "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für den nächsten Block sind klicken sie auf weiter.</p>"
   }
 };
 
@@ -118,19 +118,37 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
 
-  const explain = [{ // 
-    type: initializeMicrophone,
-    button_label: selected_language['welcome-and-mic-select-button'],
-    device_select_message: selected_language['welcome-and-mic-select-text'],
-    record_data: false
-  }, {
-    type: InstructionsPlugin,
-    pages: selected_language.instructions.pages,
-    show_clickable_nav: true,
-    button_label_previous: selected_language['instructions']['button-previous'],
-    button_label_next: selected_language['instructions']['button-next'],
-    record_data: false
-  }, {
+  const configure_microphone = {
+    timeline: [
+      {
+        type: initializeMicrophone,
+        button_label: selected_language['welcome-and-mic-select-button'],
+        device_select_message: selected_language['welcome-and-mic-select-text'],
+        record_data: false
+      },
+      {
+        type: htmlAudioResponse,
+        stimulus: "<img style='width:10em; height:10em;' src='assets/images/microphone2.png'>" + "<p>Say a test word, speak loudly and clearly.</p>",
+        record_data: true,
+        save_audio_url: true,
+        allow_playback: true
+      },
+      {
+        type: HtmlButtonResponsePlugin, // Nicht abspielen, nur abfragen
+        stimulus: "Did the recording work?",
+        choices: ["Yes", "No"]
+      }
+    ],
+    loop_function: function(data) {
+      const should_loop = data.values()[1].response == 1;
+      URL.revokeObjectURL(data.values()[0].audio_url);
+      return should_loop;
+    }
+  }
+
+  const explain = [
+    configure_microphone,
+  {
     type: HtmlButtonResponsePlugin,
     stimulus: selected_language['first-tutorial-stimulus'],
     choices: [selected_language['done-button']],
@@ -144,7 +162,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     record_data: false
   }, {
     type: HtmlKeyboardResponsePlugin,
-    stimulus: '+',
+    stimulus: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     choices: "NO_KEYS",
     trial_duration: 150,
     record_data: false
@@ -165,13 +183,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: 'assets/audio/training/t_380p.wav', // audio file here
     choices: "NO_KEYS",
     prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
-    trial_ends_after_audio: true,
-    record_data: false
-  }, {
-    type: HtmlKeyboardResponsePlugin,
-    stimulus: '+', // -> Normales Bild, Kein Flackern
-    choices: "NO_KEYS",
-    trial_duration: 150,
+    trial_ends_after_audio: true, 
     record_data: false
   }, { // Stimulus (last word of the sentence + distortion)
     type: audioKeyboardResponse,
@@ -190,11 +202,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['clarity-question'],
     button_label: selected_language['done-button'],
     record_data: false,
-    labels:selected_language['clarity-labels']
-  }, { // Which word was understood?
+    labels: selected_language['clarity-labels'],
+    require_movement: true
+  },
+  { // Which word was understood?
     type: htmlAudioResponse,
-    stimulus:  "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" + selected_language['word-question'],
-    recording_duration: 5000,
+    stimulus: "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" + selected_language['word-question'],
+    recording_duration: 7500,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
     record_data: false
@@ -203,25 +217,41 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['confidence-question'],
     button_label: selected_language['done-button'],
     record_data: false,
-    labels:selected_language['confidence-labels']
+    labels: selected_language['confidence-labels'],
+    require_movement: true
   }, {
     type: HtmlButtonResponsePlugin,
     stimulus: selected_language['end-of-tutorial-stimulus'],
     choices: [selected_language['done-button']],
-    record_data: false
+    record_data: false,
+    require_movement: true
   },];
 
   const selected_randomisation = jsPsych.randomization.sampleWithoutReplacement(Object.keys(randomisation_lists), 1)[0]
 
-  var participant = require('/assets/text/out.js').ALL; // replace this with const participant = randomisation_lists[selected_randomisation].ALL;
+  jsPsych.data.addProperties({
+    selected_randomisation,
+    subject_id: "invalid"
+  });
+
+  const randomisation = jsPsych.randomization.shuffle(jsPsych.randomization.sampleWithReplacement(require('/assets/text/out.js').ALL, 200)); // replace this with const participant = randomisation_lists[selected_randomisation].ALL;
+
+  const blocks = [
+    randomisation.slice(0, 50),
+    randomisation.slice(50, 100),
+    randomisation.slice(100, 150),
+    randomisation.slice(150, 200)
+  ]
+
   var filename_for_upload;
   const timeline = [];
+  // timeline.push({ // 
+  //   type: initializeMicrophone,
+  //   button_label: selected_language['welcome-and-mic-select-button'],
+  //   device_select_message: selected_language['welcome-and-mic-select-text'],
+  //   record_data: false
+  // });
 
-  var node = {
-    timeline: timeline,
-    timeline_variables: participant,
-    randomize_order: true,
-  }
   // 4 Blöcke â 50 Sätze
   // Preload assets
   timeline.push({
@@ -246,14 +276,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push({
     type: HtmlKeyboardResponsePlugin,
-    stimulus: '+',
+    stimulus: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     choices: "NO_KEYS",
     trial_duration: 150,
     record_data: false
   });
   timeline.push({ // Stimulus (last word of the sentence + distortion)
     type: audioKeyboardResponse,
-    stimulus: jsPsych.timelineVariable('word')+, // audio file here
+    stimulus: jsPsych.timelineVariable('word'),
     choices: "NO_KEYS",
     prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
@@ -263,10 +293,22 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       filename_for_upload = path.substr(8).split(".")[0] + ".txt";
     }
   });
-  // Zwischenseite mit dem Hinweis "Gleich wird das Wort abgefragt"
+  timeline.push({
+    type: HtmlSliderResponsePlugin,
+    stimulus: selected_language['clarity-question'],
+    button_label: selected_language['done-button'],
+    labels: selected_language['clarity-labels'],
+    require_movement: true
+  });
+   
+  timeline.push({
+    type: HtmlButtonResponsePlugin,
+    stimulus: "Klicken Sie auf \"Weiter\", dann sagen Sie das Wort dass sie verstanden haben. Wenn Sie kein Wort verstanden haben sagen sie \"Nichts\".",
+    choices: ["Weiter"]
+  }),
   timeline.push({ // Which word was understood?
     type: htmlAudioResponse,
-    stimulus: "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" +  selected_language['word-question'],
+    stimulus: "<img style='width:5em; height:5em;' src='assets/images/microphone2.png'></img>" + selected_language['word-question'],
     recording_duration: 7500,
     show_done_button: true,
     done_button_label: selected_language['done-button'],
@@ -281,20 +323,45 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       }
     }
   });
-  timeline.push({ // Clarity Sliders require movement
-    type: HtmlSliderResponsePlugin,
-    stimulus: selected_language['clarity-question'],
-    button_label: selected_language['done-button'],
-    labels:selected_language['clarity-labels']
-  });
   timeline.push({ // Confidence
     type: HtmlSliderResponsePlugin,
     stimulus: selected_language['confidence-question'],
     button_label: selected_language['done-button'],
-    labels:selected_language['confidence-labels']
+    labels: selected_language['confidence-labels'],
+    require_movement: true
   });
- 
-  await jsPsych.run([explain, node]);
+
+  const pause = {
+    type: HtmlButtonResponsePlugin,
+    stimulus: selected_language['pause-stimulus'],
+    button_label: selected_language['done-button']
+  }
+
+  await jsPsych.run([
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: "Wilkommens-seite & Einverständnis",
+      keys: "ALL",
+      choices: ["Ok"]
+    },
+    explain,
+  {
+    timeline,
+    timeline_variables: blocks[0],
+    randomize_order: true
+  }, pause, {
+    timeline,
+    timeline_variables: blocks[1],
+    randomize_order: true
+  }, pause, {
+    timeline,
+    timeline_variables: blocks[2],
+    randomize_order: true
+  }, pause, {
+    timeline,
+    timeline_variables: blocks[3],
+    randomize_order: true 
+  }]);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)

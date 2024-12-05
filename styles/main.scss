@@ -3,3 +3,10 @@
 .jspsych-display-element {
   background-color: #ffffff;
 }
+
+#jspsych-content {
+  width: 800px;
+  max-width: calc(100% - 20px);
+  margin: 0 auto;
+  padding: 0 10px;  
+}
