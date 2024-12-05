@@ -32,7 +32,7 @@ import { initJsPsych } from "jspsych";
 const langs = {
   "en": {
     "title": "Language Task",
-    "mic-select-text": "<span class=\"heading\">Welcome to this language based task.</span><br><p>Since your verbal input will be required during the experiment, please grant the site access to your microphone and select the device you want to use.</p>",
+    "mic-select-text": "<p>Please choose the microphone you would like to use for the experiment. You will be able to test it and return here if it doesn't work.</p>",
     "mic-select-button": "Select this device.",
     "word-response-stimulus": "<p>Which word did you understand at the end of the sentence?</p>",
     "done-button": "Done",
@@ -51,11 +51,14 @@ const langs = {
     "did-not-accept-message": "You did not accept the consent form. This tab will close now.",
     "consent-form": "Welcome & Consent Text",
     "yes-button": "Yes",
-    "no-button": "No"
+    "no-button": "No",
+    "mic-test": "<p>Say a test word, speak loudly and clearly.</p>",
+    "speaker-check": "<p>You will hear a sample sentence, adjust the volume so you can understand the sentence clearly.</p>",
+    "speaker-check-restart": "<p>Do you want to hear the sentence again?</p>",
   },
   "de": {
     "title": "Sprachbasierter Task",
-    "mic-select-text": "<span class=\"heading\">Willkommen zum sprach-basierten Task</span><br><p>Da im Laufe des Experiments ihre Sprache aufgenommen wird geben Sie bitte der Seite Zugriff auf Ihr Mikrofon. Wählen Sie das Mikrofon, das verwendet werden soll.</p>",
+    "mic-select-text": "<p>Bitte suchen Sie das Mikrofon aus das verwendet werden soll. Sie werden es gleich testen und können hierher zurückkehren, falls es nicht funktioniert.</p>",
     "mic-select-button": "Dieses Mikrofon verwenden",
     "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "done-button": "Weiter",
@@ -74,7 +77,10 @@ const langs = {
     "did-not-accept-message": "Sie haben die Einverständniserklärung nicht akzeptiert. Dieser Tab wird sich jetzt schließen.",
     "consent-form": "Wilkommen & Einverständniserklärung",
     "yes-button": "Ja",
-    "no-button": "Nein"
+    "no-button": "Nein",
+    "mic-test": "<p>Bitte sagen Sie ein Wort. Sprechen Sie laut und deutlich.</p>",
+    "speaker-check": "<p>Sie hören jetzt einen Satz. Stellen Sie Ihre Lautstärke so ein dass der Satz klar verständlich ist.</p>",
+    "speaker-check-restart": "<p>Möchten Sie den Satz noch einmal hören?</p>",
   }
 };
 
@@ -116,7 +122,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       },
       {
         type: htmlAudioResponse,
-        stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'>" + "<p>Say a test word, speak loudly and clearly.</p>",
+        stimulus: selected_language['mic-test'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'>",
+        recording_duration: 7500,
         record_data: true,
         save_audio_url: true,
         allow_playback: true
@@ -138,22 +145,22 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     timeline: [
       {
         type: HtmlButtonResponsePlugin,
-        stimulus: "You will hear a sample sentence, configure your setup so you can understand the sentence clearly.",
-        choices: ["Next"],
+        stimulus: selected_language['speaker-check'],
+        choices: [selected_language['next-button']],
         record_data: false
       },
       { // Prior (first part of the sentence)
         type: audioKeyboardResponse,
         stimulus: 'assets/audio/training/t_382p.wav', // audio file here
         choices: "NO_KEYS",
-        prompt: "<img style='width:10em; height:10em;' src='assets/images/volume.png'>",
+        prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
         trial_ends_after_audio: true,
         record_data: false
       },
       {
         type: HtmlButtonResponsePlugin,
-        stimulus: "Would you like to hear the sentence again?",
-        choices: ["Yes", "No"]
+        stimulus: selected_language['speaker-check-restart'],
+        choices: [selected_language['yes-button'], selected_language['no-button']]
       }
     ],
     loop_function: function (data) {
