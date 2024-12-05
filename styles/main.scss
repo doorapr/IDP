@@ -8,5 +8,17 @@
   width: 800px;
   max-width: calc(100% - 20px);
   margin: 0 auto;
-  padding: 0 10px;  
+  padding: 0 10px;
+  font-size: 2rem;
+  line-height: 2rem;
+}
+
+.heading {
+  font-size: larger;
+  font-weight: bolder;
+}
+
+.main-symbol {
+  width: 10rem;
+  height: 10rem;
 }
