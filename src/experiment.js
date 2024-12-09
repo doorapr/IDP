@@ -55,6 +55,13 @@ const langs = {
     "mic-test": "<p>Say a test word, speak loudly and clearly.</p>",
     "speaker-check": "<p>You will hear a sample sentence, adjust the volume so you can understand the sentence clearly.</p>",
     "speaker-check-restart": "<p>Do you want to hear the sentence again?</p>",
+    "id-questions": [
+      "First Name",
+      "Favorite Fruit",
+      "Sex",
+      "Banana"
+    ],
+    "id-prompt": "<p>Please answer the following questions:</p>"
   },
   "de": {
     "title": "Sprachbasierter Task",
@@ -81,6 +88,13 @@ const langs = {
     "mic-test": "<p>Bitte sagen Sie ein Wort. Sprechen Sie laut und deutlich.</p>",
     "speaker-check": "<p>Sie hören jetzt einen Satz. Stellen Sie Ihre Lautstärke so ein dass der Satz klar verständlich ist.</p>",
     "speaker-check-restart": "<p>Möchten Sie den Satz noch einmal hören?</p>",
+    "id-questions": [
+      "Vorname",
+      "Lieblingsfrucht",
+      "Geschlecht",
+      "Banane"
+    ],
+    "id-prompt": "<p>Bitte beantworten Sie die folgenden Fragen:</p>"
   }
 };
 
@@ -134,7 +148,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         choices: [selected_language['yes-button'], selected_language['no-button']]
       }
     ],
-    loop_function: function (data) {
+    loop_function(data) {
       const should_loop = data.values()[1].response == 1;
       URL.revokeObjectURL(data.values()[0].audio_url);
       return should_loop;
@@ -163,11 +177,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         choices: [selected_language['yes-button'], selected_language['no-button']]
       }
     ],
-    loop_function: function (data) {
+    loop_function(data) {
       return data.values()[0].response == 0;
     }
   }
 
+  var filename_for_upload;
   function make_sentence_playback(first_stimulus, second_stimulus) {
     return [{
       type: HtmlKeyboardResponsePlugin,
@@ -195,11 +210,23 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
       trial_ends_after_audio: true,
       record_data: true,
-      on_finish: function (data) {
+      on_finish(data) {
         const path = data.stimulus;
         filename_for_upload = path.substr(8).split(".")[0] + ".txt";
       }
     }];
+  }
+
+  function make_id_input() {
+    return {
+      type: SurveyTextPlugin,
+      questions: selected_language['id-questions'],
+      preabmle: selected_language['id-prompt'],
+      button_label: selected_language['next-button'],
+      on_finish(data) {
+
+      }
+    }
   }
 
   function make_clarity_question(record_data) {
@@ -237,7 +264,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       show_done_button: true,
       done_button_label: selected_language['done-button'],
       record_data,
-      on_finish: function (data) {
+      on_finish(data) {
         if (typeof jatos !== 'undefined' && record_data) {
           jatos.uploadResultFile(data.response, filename_for_upload)
             .then(() => {
@@ -341,8 +368,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     randomisation.slice(3 * block_size, 4 * block_size)
   ]
 
-  var filename_for_upload;
-  const timeline = [];
   // timeline.push({ // 
   //   type: initializeMicrophone,
   //   button_label: selected_language['mic-select-button'],
@@ -352,6 +377,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   // 4 Blöcke â 50 Sätze
   // Preload assets
+  
+  const timeline = [];
   timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
@@ -374,7 +401,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['consent-form'],
       choices: [selected_language['yes-button'], selected_language['no-button']],
-      on_finish: function (data) {
+      on_finish(data) {
         if (data.response == 1) { // Rejected
           window.alert(selected_language['word-question']);
           window.close();
