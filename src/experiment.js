@@ -27,6 +27,7 @@ import { initJsPsych } from "jspsych";
 // TODO: Slider ticks oder Wert anzeigen
 
 
+
 // TODO: Transcription, dor
 
 const langs = {
@@ -35,7 +36,7 @@ const langs = {
     "mic-select-text": "<p>Please choose the microphone you would like to use for the experiment. You will be able to test it and return here if it doesn't work.</p>",
     "mic-select-button": "Select this device.",
     "word-response-stimulus": "<p>Which word did you understand at the end of the sentence?</p>",
-    "done-button": "Done",
+    "done-button": "Next",
     "word-question": "<p>What word did you understand?</p><br><p>Press \"Next\" and immediately say the word that you understood. Also say the word if it's just a guess. If you didn't understand anything, please say \"NOTHING\".</p>",
     "clarity-question": "<p>How clearly did you understand the presented word?</p>",
     "clarity-labels": ["Very unclear", "Very clear"],
@@ -146,7 +147,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       {
         type: HtmlButtonResponsePlugin,
         stimulus: selected_language['speaker-check'],
-        choices: [selected_language['next-button']],
+        choices: [selected_language['done-button']],
         record_data: false
       },
       { // Prior (first part of the sentence)
