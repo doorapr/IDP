@@ -62,7 +62,8 @@ const langs = {
       "Sex",
       "Banana"
     ],
-    "id-prompt": "<p>Please answer the following questions:</p>"
+    "id-prompt": "<p>Please answer the following questions:</p>",
+    "record-again-button": "Record again"
   },
   "de": {
     "title": "Sprachbasierter Task",
@@ -73,7 +74,7 @@ const langs = {
     "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich das Wort, welches Sie gehört haben. Es kann auch nur eine VERMUTUNG sein. Wenn sie tatsächlich gar nichts gehört haben, sagen sie bitte \"NICHTS\".</p>",
     "clarity-question": "<p>Wie deutlich haben sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
-    "clarity-labels": ["Sehr deutlich", "Sehr undeutlich"],
+    "clarity-labels": ["Sehr undeutlich", "Sehr deutlich"],
     "confidence-labels": ["Sehr unsicher", "Sehr sicher"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
     "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</p>",
@@ -95,7 +96,8 @@ const langs = {
       "Geschlecht",
       "Banane"
     ],
-    "id-prompt": "<p>Bitte beantworten Sie die folgenden Fragen:</p>"
+    "id-prompt": "<p>Bitte beantworten Sie die folgenden Fragen:</p>",
+    "record-again-button": "Nochmal aufnehmen"
   }
 };
 
@@ -127,7 +129,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
 
-  const configure_microphone = {
+  const configure_microphone = {  
     timeline: [
       {
         type: initializeMicrophone,
@@ -138,6 +140,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       {
         type: htmlAudioResponse,
         stimulus: selected_language['mic-test'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'>",
+        record_again_button_label: selected_language['record-again-button'],
+        accept_button_label: selected_language['done-button'],
+        done_button_label: selected_language['done-button'],
         recording_duration: 7500,
         record_data: true,
         save_audio_url: true,
@@ -237,7 +242,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       button_label: selected_language['done-button'],
       record_data,
       labels: selected_language['clarity-labels'],
-      require_movement: true
+      require_movement: true,
+      slider_width: 600
     };
   }
 
@@ -248,7 +254,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       button_label: selected_language['done-button'],
       record_data,
       labels: selected_language['confidence-labels'],
-      require_movement: true
+      require_movement: true,
+      slider_width: 600
     };
   }
 
