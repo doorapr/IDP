@@ -129,7 +129,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
 
-  const configure_microphone = {  
+  const configure_microphone = {
     timeline: [
       {
         type: initializeMicrophone,
@@ -144,8 +144,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         accept_button_label: selected_language['done-button'],
         done_button_label: selected_language['done-button'],
         recording_duration: 7500,
-        record_data: true,
-        save_audio_url: true,
+        record_data: false,
         allow_playback: true
       },
       {
@@ -155,9 +154,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       }
     ],
     loop_function(data) {
-      const should_loop = data.values()[1].response == 1;
-      URL.revokeObjectURL(data.values()[0].audio_url);
-      return should_loop;
+      return data.values()[0].response == 1;
     }
   }
 
@@ -171,7 +168,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       },
       { // Prior (first part of the sentence)
         type: audioKeyboardResponse,
-        stimulus: 'assets/audio/audio_test.wav', // audio file here
+        stimulus: 'assets/audio/training/audio_test.wav', // audio file here
         choices: "NO_KEYS",
         prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
         trial_ends_after_audio: true,
@@ -202,7 +199,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       choices: "NO_KEYS",
       prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
       trial_ends_after_audio: true,
-      record_data: true
+      record_data: false
     }, {
       type: HtmlKeyboardResponsePlugin,
       stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
@@ -215,10 +212,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       choices: "NO_KEYS",
       prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
       trial_ends_after_audio: true,
-      record_data: true,
-      on_finish(data) {
-        const path = data.stimulus;
+      record_data: false,
+      on_finish() {
+        const path = (typeof second_stimulus === 'string') ? second_stimulus : jsPsych.evaluateTimelineVariable(second_stimulus.name);
         filename_for_upload = path.substr(8).split(".")[0] + ".txt";
+        console.log(filename_for_upload);
       }
     }];
   }
@@ -273,13 +271,17 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       done_button_label: selected_language['done-button'],
       record_data,
       on_finish(data) {
-        if (typeof jatos !== 'undefined' && record_data) {
-          jatos.uploadResultFile(data.response, filename_for_upload)
-            .then(() => {
-              console.log("File was successfully uploaded");
-              data.response = filename_for_upload; // Remove response data from RAM, we already saved it to the server.
-            })
-            .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
+        if (record_data) {
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(data.response, filename_for_upload)
+              .then(() => {
+                console.log("File was successfully uploaded");
+                data.response = filename_for_upload; // Remove response data from RAM, we already saved it to the server.
+              })
+              .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
+          } else {
+            data.response = filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+          }
         }
       }
     }];
@@ -385,7 +387,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   // 4 Blöcke â 50 Sätze
   // Preload assets
-  
+
   const timeline = [];
   timeline.push({
     type: PreloadPlugin,
@@ -394,9 +396,16 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     record_data: false
   });
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
-  timeline.push(make_clarity_question(true));
-  timeline.push(...make_word_question(true));
-  timeline.push(make_confidence_question(true));
+  timeline.push({
+    timeline: [
+      make_clarity_question(true),
+      ...make_word_question(true),
+      make_confidence_question(true)
+    ],
+    on_timeline_finish() {
+      console.log(jsPsych.data.get());
+    }
+  });
 
   const pause = {
     type: HtmlButtonResponsePlugin,
@@ -424,7 +433,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       timeline_variables: blocks[0],
       randomize_order: true
     },
-     pause, {
+    pause, {
       timeline,
       timeline_variables: blocks[1],
       randomize_order: true
