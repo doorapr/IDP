@@ -171,7 +171,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       },
       { // Prior (first part of the sentence)
         type: audioKeyboardResponse,
-        stimulus: 'assets/audio/training/t_382p.wav', // audio file here
+        stimulus: 'assets/audio/audio_test.wav', // audio file here
         choices: "NO_KEYS",
         prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
         trial_ends_after_audio: true,
@@ -365,7 +365,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     subject_id: "invalid"
   });
 
-  const randomisation = jsPsych.randomization.shuffle(jsPsych.randomization.sampleWithReplacement(require('/assets/text/out.js').ALL, 200)); // replace this with const participant = randomisation_lists[selected_randomisation].ALL;
+  const randomisation = randomisation_lists[selected_randomisation].ALL;
 
   const block_size = 50;
 
@@ -401,7 +401,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   const pause = {
     type: HtmlButtonResponsePlugin,
     stimulus: selected_language['pause-stimulus'],
-    button_label: selected_language['done-button']
+    choices: [selected_language['done-button']]
   }
 
   await jsPsych.run([
@@ -411,7 +411,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       choices: [selected_language['yes-button'], selected_language['no-button']],
       on_finish(data) {
         if (data.response == 1) { // Rejected
-          window.alert(selected_language['word-question']);
+          window.alert(selected_language['did-not-accept-message']);
           window.close();
         }
       }
@@ -423,7 +423,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       timeline,
       timeline_variables: blocks[0],
       randomize_order: true
-    }, pause, {
+    },
+     pause, {
       timeline,
       timeline_variables: blocks[1],
       randomize_order: true
