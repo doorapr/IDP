@@ -127,6 +127,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     button_html: (choice) => `<button class="jspsych-btn"><img src="assets/images/flag-${choice}.svg" style="width: 100%"></img></button>`
   }])
 
+
   const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
 
   const configure_microphone = {
@@ -241,7 +242,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data,
       labels: selected_language['clarity-labels'],
       require_movement: true,
-      slider_width: 600
+      slider_width: 600,
+      on_finish(data) {
+        data.fileName = filename_for_upload
+      }
     };
   }
 
@@ -253,7 +257,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data,
       labels: selected_language['confidence-labels'],
       require_movement: true,
-      slider_width: 600
+      slider_width: 600,
+      on_finish(data) {
+        data.fileName = filename_for_upload
+      }
     };
   }
 
@@ -364,7 +371,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   jsPsych.data.addProperties({
     selected_randomisation,
-    subject_id: "invalid"
+    subject_id: "invalid",
+    //fileName: filename_for_upload
   });
 
   const randomisation = randomisation_lists[selected_randomisation].ALL;
@@ -376,6 +384,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     randomisation.slice(block_size, 2 * block_size),
     randomisation.slice(2 * block_size, 3 * block_size),
     randomisation.slice(3 * block_size, 4 * block_size)
+  ]
+
+  const testing = 2;
+  const test_blocks = [
+    randomisation.slice(0, testing)
   ]
 
   // timeline.push({ // 
@@ -412,7 +425,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['pause-stimulus'],
     choices: [selected_language['done-button']]
   }
-
+ 
+  // TESTING
   await jsPsych.run([
     {
       type: HtmlButtonResponsePlugin,
@@ -423,6 +437,28 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           window.alert(selected_language['did-not-accept-message']);
           window.close();
         }
+       
+      }
+    },
+    configure_microphone,
+    configure_speakers,
+    {
+      timeline,
+      timeline_variables: test_blocks[0],
+      randomize_order: true
+    },])
+/* 
+  await jsPsych.run([
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: selected_language['consent-form'],
+      choices: [selected_language['yes-button'], selected_language['no-button']],
+      on_finish(data) {
+        if (data.response == 1) { // Rejected
+          window.alert(selected_language['did-not-accept-message']);
+          window.close();
+        }
+        saveData(jsPsych.data.get().csv());
       }
     },
     configure_microphone,
@@ -446,7 +482,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       timeline_variables: blocks[3],
       randomize_order: true
     }]);
-
+*/
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
   return jsPsych;
