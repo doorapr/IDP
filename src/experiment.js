@@ -245,6 +245,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       slider_width: 600,
       on_finish(data) {
         data.fileName = filename_for_upload
+        data.type = "clarity"
       }
     };
   }
@@ -260,6 +261,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       slider_width: 600,
       on_finish(data) {
         data.fileName = filename_for_upload
+        data.type = "confidence"
       }
     };
   }
