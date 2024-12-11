@@ -10,13 +10,10 @@
 // You can import stylesheets (.scss or .css).
 import "../styles/main.scss";
 
-import FullscreenPlugin from "@jspsych/plugin-fullscreen";
 import audioKeyboardResponse from '@jspsych/plugin-audio-keyboard-response';
-import audioButtonResponse from '@jspsych/plugin-audio-button-response';
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import SurveyTextPlugin from "@jspsych/plugin-survey-text";
-import InstructionsPlugin from "@jspsych/plugin-instructions";
 import HtmlSliderResponsePlugin from "@jspsych/plugin-html-slider-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
@@ -30,6 +27,186 @@ import { initJsPsych } from "jspsych";
 
 // TODO: Transcription, dor
 
+// Yes, this could be better. No I don't care right now.
+const survey = `
+    <label for='birth-city-first'>#birth-city-label#</label>
+    <select required='true' id="birth-city-first">
+      <option value='A'>A</option>
+      <option value='B'>B</option>
+      <option value='C'>C</option>
+      <option value='D'>D</option>
+      <option value='E'>E</option>
+      <option value='F'>F</option>
+      <option value='G'>G</option>
+      <option value='H'>H</option>
+      <option value='I'>I</option>
+      <option value='J'>J</option>
+      <option value='K'>K</option>
+      <option value='L'>L</option>
+      <option value='M'>M</option>
+      <option value='N'>N</option>
+      <option value='O'>O</option>
+      <option value='P'>P</option>
+      <option value='Q'>Q</option>
+      <option value='R'>R</option>
+      <option value='S'>S</option>
+      <option value='T'>T</option>
+      <option value='U'>U</option>
+      <option value='V'>V</option>
+      <option value='W'>W</option>
+      <option value='X'>X</option>
+      <option value='Y'>Y</option>
+      <option value='Z'>Z</option>
+    </select>
+    <select required='true' id="birth-city-second">
+      <option value='A'>A</option>
+      <option value='B'>B</option>
+      <option value='C'>C</option>
+      <option value='D'>D</option>
+      <option value='E'>E</option>
+      <option value='F'>F</option>
+      <option value='G'>G</option>
+      <option value='H'>H</option>
+      <option value='I'>I</option>
+      <option value='J'>J</option>
+      <option value='K'>K</option>
+      <option value='L'>L</option>
+      <option value='M'>M</option>
+      <option value='N'>N</option>
+      <option value='O'>O</option>
+      <option value='P'>P</option>
+      <option value='Q'>Q</option>
+      <option value='R'>R</option>
+      <option value='S'>S</option>
+      <option value='T'>T</option>
+      <option value='U'>U</option>
+      <option value='V'>V</option>
+      <option value='W'>W</option>
+      <option value='X'>X</option>
+      <option value='Y'>Y</option>
+      <option value='Z'>Z</option>
+    </select>
+    
+    <label for='birth-month'>#birth-month-label#</label>
+    <select required='true' id="birth-month">
+    #month-options#
+    </select>
+
+    <label for='mothers-name-first'>#mothers-name-label#</label>
+    <select required='true' id="mothers-name-first">
+      <option value='A'>A</option>
+      <option value='B'>B</option>
+      <option value='C'>C</option>
+      <option value='D'>D</option>
+      <option value='E'>E</option>
+      <option value='F'>F</option>
+      <option value='G'>G</option>
+      <option value='H'>H</option>
+      <option value='I'>I</option>
+      <option value='J'>J</option>
+      <option value='K'>K</option>
+      <option value='L'>L</option>
+      <option value='M'>M</option>
+      <option value='N'>N</option>
+      <option value='O'>O</option>
+      <option value='P'>P</option>
+      <option value='Q'>Q</option>
+      <option value='R'>R</option>
+      <option value='S'>S</option>
+      <option value='T'>T</option>
+      <option value='U'>U</option>
+      <option value='V'>V</option>
+      <option value='W'>W</option>
+      <option value='X'>X</option>
+      <option value='Y'>Y</option>
+      <option value='Z'>Z</option>
+    </select>
+    <select required='true' id="mothers-name-second">
+      <option value='A'>A</option>
+      <option value='B'>B</option>
+      <option value='C'>C</option>
+      <option value='D'>D</option>
+      <option value='E'>E</option>
+      <option value='F'>F</option>
+      <option value='G'>G</option>
+      <option value='H'>H</option>
+      <option value='I'>I</option>
+      <option value='J'>J</option>
+      <option value='K'>K</option>
+      <option value='L'>L</option>
+      <option value='M'>M</option>
+      <option value='N'>N</option>
+      <option value='O'>O</option>
+      <option value='P'>P</option>
+      <option value='Q'>Q</option>
+      <option value='R'>R</option>
+      <option value='S'>S</option>
+      <option value='T'>T</option>
+      <option value='U'>U</option>
+      <option value='V'>V</option>
+      <option value='W'>W</option>
+      <option value='X'>X</option>
+      <option value='Y'>Y</option>
+      <option value='Z'>Z</option>
+    </select>
+    <label for='birth-surname-first'>#birth-surname-label#</label>
+    <select required='true' id="birth-surname-first">
+      <option value='A'>A</option>
+      <option value='B'>B</option>
+      <option value='C'>C</option>
+      <option value='D'>D</option>
+      <option value='E'>E</option>
+      <option value='F'>F</option>
+      <option value='G'>G</option>
+      <option value='H'>H</option>
+      <option value='I'>I</option>
+      <option value='J'>J</option>
+      <option value='K'>K</option>
+      <option value='L'>L</option>
+      <option value='M'>M</option>
+      <option value='N'>N</option>
+      <option value='O'>O</option>
+      <option value='P'>P</option>
+      <option value='Q'>Q</option>
+      <option value='R'>R</option>
+      <option value='S'>S</option>
+      <option value='T'>T</option>
+      <option value='U'>U</option>
+      <option value='V'>V</option>
+      <option value='W'>W</option>
+      <option value='X'>X</option>
+      <option value='Y'>Y</option>
+      <option value='Z'>Z</option>
+    </select>
+    <select required='true' id="birth-surname-second">
+      <option value='A'>A</option>
+      <option value='B'>B</option>
+      <option value='C'>C</option>
+      <option value='D'>D</option>
+      <option value='E'>E</option>
+      <option value='F'>F</option>
+      <option value='G'>G</option>
+      <option value='H'>H</option>
+      <option value='I'>I</option>
+      <option value='J'>J</option>
+      <option value='K'>K</option>
+      <option value='L'>L</option>
+      <option value='M'>M</option>
+      <option value='N'>N</option>
+      <option value='O'>O</option>
+      <option value='P'>P</option>
+      <option value='Q'>Q</option>
+      <option value='R'>R</option>
+      <option value='S'>S</option>
+      <option value='T'>T</option>
+      <option value='U'>U</option>
+      <option value='V'>V</option>
+      <option value='W'>W</option>
+      <option value='X'>X</option>
+      <option value='Y'>Y</option>
+      <option value='Z'>Z</option>
+    </select>`
+
 const langs = {
   "en": {
     "title": "Language Task",
@@ -39,8 +216,8 @@ const langs = {
     "done-button": "Next",
     "word-question": "<p>What word did you understand?</p><br><p>Press \"Next\" and immediately say the word that you understood. Also say the word if it's just a guess. If you didn't understand anything, please say \"NOTHING\".</p>",
     "clarity-question": "<p>How clearly did you understand the presented word?</p>",
-    "clarity-labels": ["Very unclear", "Very clear"],
-    "confidence-labels": ["Very unconfident", "Very confident"],
+    "clarity-labels": ["Very unclear", "<span id='mark'></span>", "Very clear"],
+    "confidence-labels": ["Very unconfident", "<span id='mark'></span>", "Very confident"],
     "confidence-question": "<p>How confident are you in your answer?</p>",
     "explanation-pre-playback": "<p>You will hear a woman read a sentence where the last word is unclear. Please press \"Next\" to hear the sentence.</p>",
     "explanation-post-playback": "<p>As you've noticed, the last word was really unclear. Please listen to the sentence again. After that, rate how clearly you understood the last word.</p>",
@@ -74,8 +251,8 @@ const langs = {
     "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich das Wort, welches Sie gehört haben. Es kann auch nur eine VERMUTUNG sein. Wenn sie tatsächlich gar nichts gehört haben, sagen sie bitte \"NICHTS\".</p>",
     "clarity-question": "<p>Wie deutlich haben sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
-    "clarity-labels": ["Sehr undeutlich", "Sehr deutlich"],
-    "confidence-labels": ["Sehr unsicher", "Sehr sicher"],
+    "clarity-labels": ["Sehr undeutlich", "<span id='mark'></span>", "Sehr deutlich"],
+    "confidence-labels": ["Sehr unsicher", "<span id='mark'></span>", "Sehr sicher"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
     "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</p>",
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
@@ -97,12 +274,18 @@ const langs = {
       "Banane"
     ],
     "id-prompt": "<p>Bitte beantworten Sie die folgenden Fragen:</p>",
-    "record-again-button": "Nochmal aufnehmen"
+    "record-again-button": "Nochmal aufnehmen",
+    "survey": {
+      "birth-city-label": '',
+      "birth-month-label": '',
+      "birth-surname-label": '',
+      "mothers-name-label": ''
+    }
   }
 };
 
 
-const randomisation_lists = {
+const randomisation_lists = { // TODO: Needs localisation
   S1: require('/assets/text/S1.js'),
   S2: require('/assets/text/S2_ALL.js'),
   S3: require('/assets/text/S3_ALL.js'),
@@ -217,7 +400,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       on_finish() {
         const path = (typeof second_stimulus === 'string') ? second_stimulus : jsPsych.evaluateTimelineVariable(second_stimulus.name);
         filename_for_upload = path.substr(8).split(".")[0] + ".txt";
-        console.log(filename_for_upload);
       }
     }];
   }
@@ -242,7 +424,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data,
       labels: selected_language['clarity-labels'],
       require_movement: true,
+      prompt: 'test',
       slider_width: 600,
+      on_load() {
+        
+      },
       on_finish(data) {
         data.fileName = filename_for_upload
       }
@@ -258,6 +444,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       labels: selected_language['confidence-labels'],
       require_movement: true,
       slider_width: 600,
+      on_load() {
+        
+      },
       on_finish(data) {
         data.fileName = filename_for_upload
       }
@@ -299,7 +488,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       type: PreloadPlugin,
       images: assetPaths.images,
       audio: [
-        'assets/audio/training/t_382p.wav', // Keep these in sync with the files used in the training. Maybe make dynamic?
+        'assets/audio/training/t_382p.wav', // TODO: Needs localisation
         'assets/audio/training/t_382tw.wav',
         'assets/audio/training/t_380p.wav',
         'assets/audio/training/t_380tw_6.wav',
@@ -343,7 +532,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         ...make_word_question(false),
         make_confidence_question(false),
       ],
-      timeline_variables: [
+      timeline_variables: [ //TODO: Needs localisation
         {
           sentence: 'assets/audio/training/t_264p.wav',
           word: 'assets/audio/training/t_264tw_12.wav'
@@ -371,8 +560,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   jsPsych.data.addProperties({
     selected_randomisation,
-    subject_id: "invalid",
-    //fileName: filename_for_upload
+    subject_id: "invalid"
   });
 
   const randomisation = randomisation_lists[selected_randomisation].ALL;
@@ -390,13 +578,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   const test_blocks = [
     randomisation.slice(0, testing)
   ]
-
-  // timeline.push({ // 
-  //   type: initializeMicrophone,
-  //   button_label: selected_language['mic-select-button'],
-  //   device_select_message: selected_language['mic-select-text'],
-  //   record_data: false
-  // });
 
   // 4 Blöcke â 50 Sätze
   // Preload assets
