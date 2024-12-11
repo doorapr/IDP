@@ -19,8 +19,8 @@ recognizer.vosk_model = Model(model_path='C:\\Users\\tivor\\Desktop\\IDP\\src\\m
 
 fileName="data_test.txt"
 data_path='/Users/dorapruteanu/Downloads'
-binPath = os.path.join(data_path, fileName)
-study_data = open(binPath, "r").read()
+dataPath = os.path.join(data_path, fileName)
+study_data = open(dataPath, "r").read()
 #study_data ="{"+study_data[1:-2]+"}"
 #print(study_data)
 
@@ -59,6 +59,8 @@ with open('{subject_id}.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     field = ["audio", "transcription", "confidence","clarity"]
     writer.writerow(field)
+    for key in transcription_map:
+        writer.writerow([key,transcription_map[key]["transcription"],transcription_map[key]["confidence"],transcription_map[key]["clarity"]])
 
 #  csv file pro person
 # index, proband, target_word,  
