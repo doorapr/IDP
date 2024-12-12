@@ -46,7 +46,7 @@ const langs = {
     "explanation-post-playback": "<p>As you've noticed, the last word was really unclear. Please listen to the sentence again. After that, rate how clearly you understood the last word.</p>",
     "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Press \"Next\" to continue with the next sentence.</p>",
     "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. Now the experiment will start.</p>",
-    "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
+    "ready-for-next-stimulus": "<p>Are you ready for the next sentence?</p>",
     "pause-stimulus": "<p>Time for a short break. Click the \"Next\" button when you're ready for the next 50 sentences.</p>",
     "recording-check": "<p>Did the recording work?</p>",
     "did-not-accept-message": "You did not accept the consent form. This tab will close now.",
@@ -80,7 +80,7 @@ const langs = {
     "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</p>",
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
     "end-of-tutorial": "<p>Vielen Dank! Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
-    "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>",
+    "ready-for-next-stimulus": "<p>Sind Sie bereit für den nächsten Satz?</p>",
     "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind klicken sie auf \"Weiter\".</p>",
     "recording-check": "<p>Hat die Aufnahme funktioniert?</p>",
     "did-not-accept-message": "Sie haben die Einverständniserklärung nicht akzeptiert. Dieser Tab wird sich jetzt schließen.",
@@ -296,6 +296,17 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
+
+
+  function ready_next_sentence(record_data) {
+    return [{
+      type: HtmlButtonResponsePlugin,
+      stimulus: selected_language['ready-for-next-stimulus'],
+      choices: [selected_language['done-button']],
+      record_data: false
+    }]
+  }
+
   const explanation = [
     {
       type: PreloadPlugin,
@@ -410,12 +421,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     audio: () => [jsPsych.evaluateTimelineVariable('sentence'), jsPsych.evaluateTimelineVariable('word')],
     record_data: false
   });
+  timeline.push(ready_next_sentence(true));
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
   timeline.push({
     timeline: [
       make_clarity_question(true),
       ...make_word_question(true),
       make_confidence_question(true)
+      
     ],
     on_timeline_finish() {
       console.log(jsPsych.data.get());
