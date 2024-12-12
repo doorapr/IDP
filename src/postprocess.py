@@ -21,8 +21,7 @@ fileName="data_test.txt"
 data_path='/Users/dorapruteanu/Downloads'
 dataPath = os.path.join(data_path, fileName)
 study_data = open(dataPath, "r").read()
-#study_data ="{"+study_data[1:-2]+"}"
-#print(study_data)
+
 
 
 transcription_map = {}
@@ -38,11 +37,14 @@ for fileName in files:
     with sr.AudioFile(wavPath) as source:
         audio_data = recognizer.record(source)
         result = recognizer.recognize_vosk(audio_data, 'de')
-        transcription_map[wavPath]["transcription"]=result
+        if wavPath not in transcription_map:
+            transcription_map[wavPath] = {"transcription": result}
+        else:
+            transcription_map[wavPath]["transcription"] = result
         print("Recognized word " + result + " for file " + wavPath)
 
 json_object = json.loads(study_data)
-subject_id= json_object[0]["subject_id"]
+subject_id = json_object[0].get("subject_id", "unknown_subject")
 for x in range(0,len(json_object)):
     if "fileName" in json_object[x]:
         key=json_object[x]["fileName"].replace('.txt', '.wav')
@@ -55,12 +57,16 @@ for x in range(0,len(json_object)):
     #print(json_object[x])
 
 print(transcription_map)
-with open('{subject_id}.csv', 'w', newline='') as file:
+with open(f"{subject_id}.csv", 'w', newline='') as file:
     writer = csv.writer(file)
-    field = ["audio", "transcription", "confidence","clarity"]
+    field = ["audio", "transcription", "confidence", "clarity"]
     writer.writerow(field)
-    for key in transcription_map:
-        writer.writerow([key,transcription_map[key]["transcription"],transcription_map[key]["confidence"],transcription_map[key]["clarity"]])
-
+    for key, values in transcription_map.items():
+        writer.writerow([
+            key, 
+            values.get("transcription", ""), 
+            values.get("confidence", ""), 
+            values.get("clarity", "")
+        ])
 #  csv file pro person
 # index, proband, target_word,  
