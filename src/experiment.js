@@ -419,7 +419,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     type: PreloadPlugin,
     images: assetPaths.images,
     audio: () => [jsPsych.evaluateTimelineVariable('sentence'), jsPsych.evaluateTimelineVariable('word')],
-    record_data: false
+    record_data: false,
+    show_progress_bar:false
   });
   timeline.push(ready_next_sentence(true));
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
