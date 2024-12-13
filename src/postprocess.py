@@ -8,21 +8,56 @@ from glob import glob
 from vosk import Model
 import csv
 import json
+import sys
+from inspect import getsourcefile
+from os.path import abspath
+
+print(sys.argv)
+
+current_dir = os.path.dirname(abspath(getsourcefile(lambda: 0)))
+ffmpeg = os.path.join(current_dir, 'ffmpeg', sys.platform,
+                      'ffmpeg' + ('.exe' if sys.platform == 'win32' else ''))
+
+if not os.path.exists(ffmpeg) or not os.path.isfile(ffmpeg):
+    print(f'Your system is not supported (platform is {
+          sys.platform}, looking for {ffmpeg}).')
+    if not os.path.exists(ffmpeg):
+        print("Does not exist")
+    if not os.path.isfile(ffmpeg):
+        print("Is not a regular file")
+    exit(1)
 
 
-## Data file manuel runterladen?
-base_dir = '/Users/dorapruteanu/Downloads/study_result_27/comp-result_29/files'
-ffmpeg = 'C:\\Users\\tivor\\Desktop\\ffmpeg\\bin\\ffmpeg.exe'
-files = glob('*.txt', root_dir=base_dir)
+if len(sys.argv) == 1:
+    print('''
+          postprocess.py - post process results for a study of the LangTask experiment
+          
+          To use this script you need python >= 3.9 <= 3.12, and to install the SpeechRecognition and vosk packages.
+          
+          The script should be called like this: python3 postprocess.py [base directory of the results].
+          ''')
+    exit(0)
+
+# Data file manuel runterladen?
+base_dir = sys.argv[1]
+
+if not os.path.exists(base_dir):
+    print(f'The given location ({base_dir}) does not exist.')
+    exit(1)
+
+if not os.path.isdir(base_dir):
+    print(f'The given location ({base_dir}) is not a directory.')
+    exit(1)
+
+files = glob('**/*.txt', root_dir=base_dir, recursive=True)
+
+print(f'Found {len(files)} files to do speech recognition on.')
+
 recognizer = sr.Recognizer()
-recognizer.vosk_model = Model(model_path='C:\\Users\\tivor\\Desktop\\IDP\\src\\model')
-
-fileName="data_test.txt"
-data_path='/Users/dorapruteanu/Downloads'
-dataPath = os.path.join(data_path, fileName)
-study_data = open(dataPath, "r").read()
-
-
+recognizer.vosk_model = Model(
+    # TODO: Internationalisation, english model
+    model_path=os.path.join(current_dir, 'model')
+)
 
 transcription_map = {}
 for fileName in files:
@@ -43,18 +78,24 @@ for fileName in files:
             transcription_map[wavPath]["transcription"] = result
         print("Recognized word " + result + " for file " + wavPath)
 
+
+fileName = "data_test.txt"
+data_path = '/Users/dorapruteanu/Downloads'
+dataPath = os.path.join(data_path, fileName)
+study_data = open(dataPath, "r").read()
+
 json_object = json.loads(study_data)
 subject_id = json_object[0].get("subject_id", "unknown_subject")
-for x in range(0,len(json_object)):
+for x in range(0, len(json_object)):
     if "fileName" in json_object[x]:
-        key=json_object[x]["fileName"].replace('.txt', '.wav')
+        key = json_object[x]["fileName"].replace('.txt', '.wav')
         if json_object[x]["type"] == "clarity":
             clarity = json_object[x]["response"]
-            transcription_map[key]["clarity"]=clarity
+            transcription_map[key]["clarity"] = clarity
         if json_object[x]["type"] == "confidence":
             confidence = json_object[x]["response"]
-            transcription_map[key]["confidence"]=confidence
-    #print(json_object[x])
+            transcription_map[key]["confidence"] = confidence
+    # print(json_object[x])
 
 print(transcription_map)
 with open(f"{subject_id}.csv", 'w', newline='') as file:
@@ -63,10 +104,10 @@ with open(f"{subject_id}.csv", 'w', newline='') as file:
     writer.writerow(field)
     for key, values in transcription_map.items():
         writer.writerow([
-            key, 
-            values.get("transcription", ""), 
-            values.get("confidence", ""), 
+            key,
+            values.get("transcription", ""),
+            values.get("confidence", ""),
             values.get("clarity", "")
         ])
 #  csv file pro person
-# index, proband, target_word,  
+# index, proband, target_word,
