@@ -22,6 +22,10 @@ import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { initJsPsych } from "jspsych";
+import surveyMultiSelect from '@jspsych/plugin-survey-multi-select';
+import surveyMultiChoice from '@jspsych/plugin-survey-multi-choice';
+import survey from '@jspsych/plugin-survey';
+import '@jspsych/plugin-survey/css/survey.css'
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 // TODO: Slider ticks oder Wert anzeigen
@@ -33,71 +37,83 @@ import { initJsPsych } from "jspsych";
 const langs = {
   "en": {
     "title": "Language Task",
-    "mic-select-text": "<p>Please choose the microphone you would like to use for the experiment. You will be able to test it and return here if it doesn't work.</p>",
-    "mic-select-button": "Select this device.",
-    "word-response-stimulus": "<p>Which word did you understand at the end of the sentence?</p>",
+    "mic-select-text": "<p>Please select the microphone you want to use for the study. You will test it shortly and can return here if it doesn't work.</p>",
+    "mic-select-button": "Use this microphone",
+    "word-response-stimulus": "<p>Which word did you hear at the end of the sentence?</p>",
     "done-button": "Next",
-    "word-question": "<p>What word did you understand?</p><br><p>Press \"Next\" and immediately say the word that you understood. Also say the word if it's just a guess. If you didn't understand anything, please say \"NOTHING\".</p>",
-    "clarity-question": "<p>How clearly did you understand the presented word?</p>",
+    "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then clearly and loudly say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please say \"NOTHING\".</p>",
+    "clarity-question": "<p>How clearly did you hear the last word?</p>",
     "clarity-labels": ["Very unclear", "Very clear"],
     "confidence-labels": ["Very unconfident", "Very confident"],
     "confidence-question": "<p>How confident are you in your answer?</p>",
-    "explanation-pre-playback": "<p>You will hear a woman read a sentence where the last word is unclear. Please press \"Next\" to hear the sentence.</p>",
-    "explanation-post-playback": "<p>As you've noticed, the last word was really unclear. Please listen to the sentence again. After that, rate how clearly you understood the last word.</p>",
-    "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Press \"Next\" to continue with the next sentence.</p>",
-    "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. Now the experiment will start.</p>",
-    "ready-for-next-stimulus": "<p>Are you ready for the next sentence?</p>",
-    "pause-stimulus": "<p>Time for a short break. Click the \"Next\" button when you're ready for the next 50 sentences.</p>",
+    "explanation-pre-playback": "<p>You will hear a woman reading a sentence in which the last word will be somewhat unclear. Please press \"Next\" to hear the sentence.</p>",
+    "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then indicate how clearly you heard the last word.</p>",
+    "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Click \"Next\" to continue with the next sentence.</p>",
+    "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. The experiment will now begin.</p>",
+    "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
+    "pause-stimulus": "<p>Time for a short break. Click \"Next\" when you're ready for the next 50 sentences.</p>",
     "recording-check": "<p>Did the recording work?</p>",
-    "did-not-accept-message": "You did not accept the consent form. This tab will close now.",
-    "consent-form": "Welcome & Consent Text",
+    "did-not-accept-message": "You did not accept the consent form. This tab will now close.",
+    "consent-form": "Welcome & Consent Form",
     "yes-button": "Yes",
     "no-button": "No",
-    "mic-test": "<p>Say a test word, speak loudly and clearly.</p>",
-    "speaker-check": "<p>You will hear a sample sentence, adjust the volume so you can understand the sentence clearly.</p>",
-    "speaker-check-restart": "<p>Do you want to hear the sentence again?</p>",
-    "id-questions": [
-      "First Name",
-      "Favorite Fruit",
-      "Sex",
-      "Banana"
-    ],
-    "id-prompt": "<p>Please answer the following questions:</p>",
-    "record-again-button": "Record again"
+    "mic-test": "<p>Please say a word to test your microphone. Speak loudly and clearly.</p>",
+    "speaker-check": "<p>You will now hear a sentence. Please adjust your volume so you can understand the sentence clearly.</p>",
+    "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
+    "id":{
+      "cityFirst":"Select the first letter of the city you were born in:",
+      "citySecond":"Select the second letter of the city you were born in:",
+      "birthMonth":"Enter your birth month:",
+      "motherFirst":"Select the first letter of your Mother's first name:",
+      "motherSecond":"Select the second letter of your Mother's first name:",
+      "birthSecondLast":"Select the second last letter of your birth surname (last name):",
+      "birthLast":"Select the last letter of your birth surname (last name):",
+      "alphabeth":['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "months":[
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+    }
   },
   "de": {
     "title": "Sprachbasierter Task",
-    "mic-select-text": "<p>Bitte suchen Sie das Mikrofon aus das verwendet werden soll. Sie werden es gleich testen und können hierher zurückkehren, falls es nicht funktioniert.</p>",
+    "mic-select-text": "<p>Bitte suchen Sie das Mikrofon aus, das verwendet werden soll. Sie werden es gleich testen und können hierher zurückkehren, falls es nicht funktioniert.</p>",
     "mic-select-button": "Dieses Mikrofon verwenden",
     "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "done-button": "Weiter",
-    "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich das Wort, welches Sie gehört haben. Es kann auch nur eine VERMUTUNG sein. Wenn sie tatsächlich gar nichts gehört haben, sagen sie bitte \"NICHTS\".</p>",
+    "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich laut und deutlich das Wort, welches Sie gehört haben. Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn sie nichts verstanden haben, sagen sie bitte \"NICHTS\".</p>",
     "clarity-question": "<p>Wie deutlich haben sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
-    "clarity-labels": ["Sehr undeutlich", "Sehr deutlich"],
+    "clarity-labels": ["Sehr deutlich", "Sehr undeutlich"],
     "confidence-labels": ["Sehr unsicher", "Sehr sicher"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
     "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</p>",
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
     "end-of-tutorial": "<p>Vielen Dank! Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
-    "ready-for-next-stimulus": "<p>Sind Sie bereit für den nächsten Satz?</p>",
-    "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind klicken sie auf \"Weiter\".</p>",
+    "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>",
+    "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind, klicken sie auf \"Weiter\".</p>",
     "recording-check": "<p>Hat die Aufnahme funktioniert?</p>",
     "did-not-accept-message": "Sie haben die Einverständniserklärung nicht akzeptiert. Dieser Tab wird sich jetzt schließen.",
-    "consent-form": "Wilkommen & Einverständniserklärung",
+    "consent-form": "Willkommen & Einverständniserklärung",
     "yes-button": "Ja",
     "no-button": "Nein",
-    "mic-test": "<p>Bitte sagen Sie ein Wort. Sprechen Sie laut und deutlich.</p>",
-    "speaker-check": "<p>Sie hören jetzt einen Satz. Stellen Sie Ihre Lautstärke so ein dass der Satz klar verständlich ist.</p>",
-    "speaker-check-restart": "<p>Möchten Sie den Satz noch einmal hören?</p>",
-    "id-questions": [
-      "Vorname",
-      "Lieblingsfrucht",
-      "Geschlecht",
-      "Banane"
-    ],
-    "id-prompt": "<p>Bitte beantworten Sie die folgenden Fragen:</p>",
-    "record-again-button": "Nochmal aufnehmen"
+    "mic-test": "<p>Bitte sagen Sie ein Wort, um Ihr Mikrofon zu testen. Sprechen Sie dafür laut und deutlich.</p>",
+    "speaker-check": "<p>Sie hören jetzt einen Satz. Bitte stellen Sie Ihre Lautstärke so ein, dass der Satz klar verständlich ist.</p>",
+    "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
+    "id":{
+      "cityFirst":"Wählen Sie den ersten Buchstaben ihrere Geburtsstadt:",
+      "citySecond":"Wählen Sie den zweiten Buchstaben ihrere Geburtsstadt:",
+      "birthMonth":"Wählen Sie ihr Geburtsmonat:",
+      "motherFirst":"Wählen Sie den ersten Buchstaben des Vornamens Ihrere Mutter:",
+      "motherSecond":"Wählen Sie den zweiten Buchstaben des Vornamens Ihrere Mutter:",
+      "birthSecondLast":"Wählen Sie den vorletzen Buchstaben Ihres Geburtsnachnamen:",
+      "birthLast":"Wählen Sie den letzen Buchstaben Ihres Geburtsnachnamen:",
+      "alphabeth":['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "months":[
+        "Januar", "Februar", "März", "April", "Mai", "Juni",
+        "Juli", "August", "September", "Oktober", "November", "Dezember"
+    ]
+    }
   }
 };
 
@@ -222,16 +238,74 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
-  function make_id_input() {
-    return {
-      type: SurveyTextPlugin,
-      questions: selected_language['id-questions'],
-      preabmle: selected_language['id-prompt'],
-      button_label: selected_language['next-button'],
-      on_finish(data) {
+  const make_id_input= {
+     timeline: [{
+      type: survey,
+      survey_json: {
+      showQuestionNumbers: false,
+      elements:
+        [
+          {
+            type: 'dropdown',
+            title: selected_language['id']['cityFirst'], 
+            name: 'cityFirst', 
+            choices: selected_language['id']['alphabeth'],
+            isRequired: true
+          },
+          {
+            type: 'dropdown',
+            title: selected_language['id']['citySecond'], 
+            name: 'citySecond', 
+            choices: selected_language['id']['alphabeth'],
+            isRequired: true
+          }, 
+          {
+            type: 'dropdown',
+            title: selected_language['id']['birthMonth'], 
+            name: 'birthMonth', 
+            choices: selected_language['id']['months'],
+            isRequired: true
+          },
+          {
+            type: 'dropdown',
+            title: selected_language['id']['motherFirst'], 
+            name: 'motherFirst', 
+            choices: selected_language['id']['alphabeth'],
+            isRequired: true
+          },
+          {
+            type: 'dropdown',
+            title: selected_language['id']['motherSecond'], 
+            name: 'motherSecond', 
+            choices: selected_language['id']['alphabeth'],
+            isRequired: true
+          },
+          
+          {
+            type: 'dropdown',
+            title: selected_language['id']['birthSecondLast'], 
+            name: 'birthSecondLast', 
+            choices: selected_language['id']['alphabeth'],
+            isRequired: true
+          },
 
-      }
-    }
+          {
+            type: 'dropdown',
+            title: selected_language['id']['birthLast'], 
+            name: 'birthLast', 
+            choices: selected_language['id']['alphabeth'],
+            isRequired: true
+          }
+    ]
+  },
+  //subject_id:data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast,
+  on_finish(data) {
+    sub_id=data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast
+  jsPsych.data.addProperties({
+    subject_id: sub_id
+   })
+  }
+    }]
   }
 
   function make_clarity_question(record_data) {
@@ -243,6 +317,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       labels: selected_language['clarity-labels'],
       require_movement: true,
       slider_width: 600,
+      subject_id:sub_id,
       on_finish(data) {
         data.fileName = filename_for_upload
         data.type = "clarity"
@@ -323,8 +398,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         'assets/audio/training/t_313p.wav',
         'assets/audio/training/t_313tw_6.wav'
       ],
-      record_data: false
+      record_data: false,
+      show_progress_bar:false,
     },
+    
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['explanation-pre-playback'],
@@ -381,10 +458,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   ];
 
   const selected_randomisation = jsPsych.randomization.sampleWithoutReplacement(Object.keys(randomisation_lists), 1)[0]
-
+  var sub_id
   jsPsych.data.addProperties({
-    selected_randomisation,
-    subject_id: "invalid",
+    selected_randomisation
     //fileName: filename_for_upload
   });
 
@@ -399,7 +475,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     randomisation.slice(3 * block_size, 4 * block_size)
   ]
 
-  const testing = 2;
+  const testing = 1;
   const test_blocks = [
     randomisation.slice(0, testing)
   ]
@@ -444,6 +520,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
  
   // TESTING
   await jsPsych.run([
+    make_id_input,
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['consent-form'],
@@ -456,6 +533,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
        
       }
     },
+    
     configure_microphone,
     configure_speakers,
     {
