@@ -9,6 +9,7 @@ from vosk import Model
 import csv
 import json
 import sys
+import time
 from inspect import getsourcefile
 from os.path import abspath
 
@@ -56,18 +57,21 @@ print(f'Found {len(files)} files to do speech recognition on.')
 recognizer = sr.Recognizer()
 recognizer.vosk_model = Model(
     # TODO: Internationalisation, english model
-    model_path=os.path.join(current_dir, 'model')
+    model_path=os.path.join(current_dir, 'de-big')
 )
+
+overall_start = time.time()
 
 transcription_map = {}
 for fileName in files:
+    start = time.time()
     file = open(os.path.join(base_dir, fileName), 'r')
     binPath = os.path.join(base_dir, fileName.replace('.txt', '.bin'))
     wavPath = os.path.join(base_dir, fileName.replace('.txt', '.wav'))
     binFile = open(binPath, 'wb')
     binFile.write(base64.b64decode(file.read()))
     binFile.close()
-    subprocess.run([ffmpeg, '-i', binPath, wavPath, '-y'])
+    subprocess.run([ffmpeg, '-i', binPath, "-ar", "16000", "-ac", "1", wavPath, '-y'])
     file.close()
     with sr.AudioFile(wavPath) as source:
         audio_data = recognizer.record(source)
@@ -76,7 +80,11 @@ for fileName in files:
             transcription_map[wavPath] = {"transcription": result}
         else:
             transcription_map[wavPath]["transcription"] = result
-        print("Recognized word " + result + " for file " + wavPath)
+        end = time.time()
+        print("Recognized word " + result + " for file " + wavPath + " in " + str(end - start) + " seconds.")
+    
+overall_end = time.time()
+print("Recognized " + str(len(files)) + " words in " + str(overall_end - overall_start) + " seconds, "  + str(len(files) / (overall_end - overall_start)) + " per second.")
 
 
 fileName = "data_test.txt"
