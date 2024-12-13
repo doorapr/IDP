@@ -22,6 +22,10 @@ import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { initJsPsych } from "jspsych";
+import surveyMultiSelect from '@jspsych/plugin-survey-multi-select';
+import surveyMultiChoice from '@jspsych/plugin-survey-multi-choice';
+import survey from '@jspsych/plugin-survey';
+import '@jspsych/plugin-survey/css/survey.css'
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 // TODO: Slider ticks oder Wert anzeigen
@@ -222,16 +226,77 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
-  function make_id_input() {
-    return {
-      type: SurveyTextPlugin,
-      questions: selected_language['id-questions'],
-      preabmle: selected_language['id-prompt'],
-      button_label: selected_language['next-button'],
-      on_finish(data) {
+  const make_id_input= {
+     timeline: [{
+      type: survey,
+      survey_json: {
+      showQuestionNumbers: false,
+      elements:
+        [
+          {
+            type: 'dropdown',
+            title: "Select the first letter of the city you were born in", 
+            name: 'cityFirst', 
+            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            isRequired: true
+          },
+          {
+            type: 'dropdown',
+            title: "Select the second letter of the city you were born in", 
+            name: 'citySecond', 
+            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            isRequired: true
+          }, 
+          {
+            type: 'dropdown',
+            title: "Enter your birth month", 
+            name: 'birthMonth', 
+            choices: [
+              "January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December"
+          ],
+          isRequired: true
+          },
+          {
+            type: 'dropdown',
+            title: "Select the first letter of your mothers name", 
+            name: 'motherFirst', 
+            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            isRequired: true
+          },
+          {
+            type: 'dropdown',
+            title: "Select the second letter of your mothers name", 
+            name: 'motherSecond', 
+            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            isRequired: true
+          },
+          
+          {
+            type: 'dropdown',
+            title: "Select the second last letter of your birth surname (lastname)", 
+            name: 'birthSecondLast', 
+            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            isRequired: true
+          },
 
-      }
-    }
+          {
+            type: 'dropdown',
+            title: "Select the last letter of your birth surname (lastname)", 
+            name: 'birthLast', 
+            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            isRequired: true
+          }
+    ]
+  },
+  //subject_id:data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast,
+  on_finish(data) {
+    sub_id=data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast
+    jsPsych.data.addProperties({
+    subject_id: sub_id
+   })
+  }
+    }]
   }
 
   function make_clarity_question(record_data) {
@@ -243,6 +308,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       labels: selected_language['clarity-labels'],
       require_movement: true,
       slider_width: 600,
+      subject_id:sub_id,
       on_finish(data) {
         data.fileName = filename_for_upload
         data.type = "clarity"
@@ -323,8 +389,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         'assets/audio/training/t_313p.wav',
         'assets/audio/training/t_313tw_6.wav'
       ],
-      record_data: false
+      record_data: false,
+      show_progress_bar:false,
     },
+    
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['explanation-pre-playback'],
@@ -381,10 +449,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   ];
 
   const selected_randomisation = jsPsych.randomization.sampleWithoutReplacement(Object.keys(randomisation_lists), 1)[0]
-
+  var sub_id
   jsPsych.data.addProperties({
-    selected_randomisation,
-    subject_id: "invalid",
+    selected_randomisation
     //fileName: filename_for_upload
   });
 
@@ -399,7 +466,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     randomisation.slice(3 * block_size, 4 * block_size)
   ]
 
-  const testing = 2;
+  const testing = 1;
   const test_blocks = [
     randomisation.slice(0, testing)
   ]
@@ -444,6 +511,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
  
   // TESTING
   await jsPsych.run([
+    make_id_input,
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['consent-form'],
@@ -456,6 +524,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
        
       }
     },
+    
     configure_microphone,
     configure_speakers,
     {
