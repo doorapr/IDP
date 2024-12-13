@@ -40,7 +40,7 @@ const langs = {
     "mic-select-text": "<p>Please select the microphone you want to use for the study. You will test it shortly and can return here if it doesn't work.</p>",
     "mic-select-button": "Use this microphone",
     "word-response-stimulus": "<p>Which word did you hear at the end of the sentence?</p>",
-    "done-button": "Done",
+    "done-button": "Next",
     "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then clearly and loudly say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please say \"NOTHING\".</p>",
     "clarity-question": "<p>How clearly did you hear the last word?</p>",
     "clarity-labels": ["Very unclear", "Very clear"],
@@ -60,6 +60,20 @@ const langs = {
     "mic-test": "<p>Please say a word to test your microphone. Speak loudly and clearly.</p>",
     "speaker-check": "<p>You will now hear a sentence. Please adjust your volume so you can understand the sentence clearly.</p>",
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
+    "id":{
+      "cityFirst":"Select the first letter of the city you were born in:",
+      "citySecond":"Select the second letter of the city you were born in:",
+      "birthMonth":"Enter your birth month:",
+      "motherFirst":"Select the first letter of your Mother's first name:",
+      "motherSecond":"Select the second letter of your Mother's first name:",
+      "birthSecondLast":"Select the second last letter of your birth surname (last name):",
+      "birthLast":"Select the last letter of your birth surname (last name):",
+      "alphabeth":['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "months":[
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+    }
   },
   "de": {
     "title": "Sprachbasierter Task",
@@ -86,6 +100,20 @@ const langs = {
     "mic-test": "<p>Bitte sagen Sie ein Wort, um Ihr Mikrofon zu testen. Sprechen Sie dafür laut und deutlich.</p>",
     "speaker-check": "<p>Sie hören jetzt einen Satz. Bitte stellen Sie Ihre Lautstärke so ein, dass der Satz klar verständlich ist.</p>",
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
+    "id":{
+      "cityFirst":"Wählen Sie den ersten Buchstaben ihrere Geburtsstadt:",
+      "citySecond":"Wählen Sie den zweiten Buchstaben ihrere Geburtsstadt:",
+      "birthMonth":"Wählen Sie ihr Geburtsmonat:",
+      "motherFirst":"Wählen Sie den ersten Buchstaben des Vornamens Ihrere Mutter:",
+      "motherSecond":"Wählen Sie den zweiten Buchstaben des Vornamens Ihrere Mutter:",
+      "birthSecondLast":"Wählen Sie den vorletzen Buchstaben Ihres Geburtsnachnamen:",
+      "birthLast":"Wählen Sie den letzen Buchstaben Ihres Geburtsnachnamen:",
+      "alphabeth":['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "months":[
+        "Januar", "Februar", "März", "April", "Mai", "Juni",
+        "Juli", "August", "September", "Oktober", "November", "Dezember"
+    ]
+    }
   }
 };
 
@@ -219,56 +247,52 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         [
           {
             type: 'dropdown',
-            title: "Select the first letter of the city you were born in", 
+            title: selected_language['id']['cityFirst'], 
             name: 'cityFirst', 
-            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-            isRequired: true
+            choices: selected_language['id']['alphabeth'],
           },
           {
             type: 'dropdown',
-            title: "Select the second letter of the city you were born in", 
+            title: selected_language['id']['citySecond'], 
             name: 'citySecond', 
-            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            choices: selected_language['id']['alphabeth'],
             isRequired: true
           }, 
           {
             type: 'dropdown',
-            title: "Enter your birth month", 
+            title: selected_language['id']['birthMonth'], 
             name: 'birthMonth', 
-            choices: [
-              "January", "February", "March", "April", "May", "June",
-              "July", "August", "September", "October", "November", "December"
-          ],
+            choices: selected_language['id']['months'],
           isRequired: true
           },
           {
             type: 'dropdown',
-            title: "Select the first letter of your mothers name", 
+            title: selected_language['id']['motherFirst'], 
             name: 'motherFirst', 
-            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            choices: selected_language['id']['alphabeth'],
             isRequired: true
           },
           {
             type: 'dropdown',
-            title: "Select the second letter of your mothers name", 
+            title: selected_language['id']['motherSecond'], 
             name: 'motherSecond', 
-            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            choices: selected_language['id']['alphabeth'],
             isRequired: true
           },
           
           {
             type: 'dropdown',
-            title: "Select the second last letter of your birth surname (lastname)", 
+            title: selected_language['id']['birthSecondLast'], 
             name: 'birthSecondLast', 
-            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            choices: selected_language['id']['alphabeth'],
             isRequired: true
           },
 
           {
             type: 'dropdown',
-            title: "Select the last letter of your birth surname (lastname)", 
+            title: selected_language['id']['birthLast'], 
             name: 'birthLast', 
-            choices: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+            choices: selected_language['id']['alphabeth'],
             isRequired: true
           }
     ]
