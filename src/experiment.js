@@ -250,6 +250,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
             title: selected_language['id']['cityFirst'], 
             name: 'cityFirst', 
             choices: selected_language['id']['alphabeth'],
+            isRequired: true
           },
           {
             type: 'dropdown',
@@ -263,7 +264,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
             title: selected_language['id']['birthMonth'], 
             name: 'birthMonth', 
             choices: selected_language['id']['months'],
-          isRequired: true
+            isRequired: true
           },
           {
             type: 'dropdown',
