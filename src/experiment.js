@@ -43,8 +43,8 @@ const langs = {
     "done-button": "Next",
     "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then clearly and loudly say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please say \"NOTHING\".</p>",
     "clarity-question": "<p>How clearly did you hear the last word?</p>",
-    "clarity-labels": ["Very unclear", "Very clear"],
-    "confidence-labels": ["Very unconfident", "Very confident"],
+    "clarity-labels": ["Very unclear<br>0%", "<span id='slider-value'>50%</span>", "Very clear<br>100%"],
+    "confidence-labels": ["Very unconfident<br>0%", "<span id='slider-value'>50%</span>", "Very confident<br>100%"],
     "confidence-question": "<p>How confident are you in your answer?</p>",
     "explanation-pre-playback": "<p>You will hear a woman reading a sentence in which the last word will be somewhat unclear. Please press \"Next\" to hear the sentence.</p>",
     "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then indicate how clearly you heard the last word.</p>",
@@ -60,19 +60,19 @@ const langs = {
     "mic-test": "<p>Please say a word to test your microphone. Speak loudly and clearly.</p>",
     "speaker-check": "<p>You will now hear a sentence. Please adjust your volume so you can understand the sentence clearly.</p>",
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
-    "id":{
-      "cityFirst":"Select the first letter of the city you were born in:",
-      "citySecond":"Select the second letter of the city you were born in:",
-      "birthMonth":"Enter your birth month:",
-      "motherFirst":"Select the first letter of your Mother's first name:",
-      "motherSecond":"Select the second letter of your Mother's first name:",
-      "birthSecondLast":"Select the second last letter of your birth surname (last name):",
-      "birthLast":"Select the last letter of your birth surname (last name):",
-      "alphabeth":['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      "months":[
+    "id": {
+      "cityFirst": "Select the first letter of the city you were born in:",
+      "citySecond": "Select the second letter of the city you were born in:",
+      "birthMonth": "Enter your birth month:",
+      "motherFirst": "Select the first letter of your Mother's first name:",
+      "motherSecond": "Select the second letter of your Mother's first name:",
+      "birthSecondLast": "Select the second last letter of your birth surname (last name):",
+      "birthLast": "Select the last letter of your birth surname (last name):",
+      "alphabeth": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "months": [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
-    ]
+      ]
     }
   },
   "de": {
@@ -84,8 +84,8 @@ const langs = {
     "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich laut und deutlich das Wort, welches Sie gehört haben. Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn sie nichts verstanden haben, sagen sie bitte \"NICHTS\".</p>",
     "clarity-question": "<p>Wie deutlich haben sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
-    "clarity-labels": ["Sehr deutlich", "Sehr undeutlich"],
-    "confidence-labels": ["Sehr unsicher", "Sehr sicher"],
+    "clarity-labels": ["Sehr undeutlich<br>0%", "<span id='slider-value'>50%</span>", "Sehr deutlich<br>100%"],
+    "confidence-labels": ["Sehr unsicher<br>0%", "<span id='slider-value'>50%</span>", "Sehr sicher<br>100%"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
     "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</p>",
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
@@ -100,19 +100,19 @@ const langs = {
     "mic-test": "<p>Bitte sagen Sie ein Wort, um Ihr Mikrofon zu testen. Sprechen Sie dafür laut und deutlich.</p>",
     "speaker-check": "<p>Sie hören jetzt einen Satz. Bitte stellen Sie Ihre Lautstärke so ein, dass der Satz klar verständlich ist.</p>",
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
-    "id":{
-      "cityFirst":"Wählen Sie den ersten Buchstaben ihrere Geburtsstadt:",
-      "citySecond":"Wählen Sie den zweiten Buchstaben ihrere Geburtsstadt:",
-      "birthMonth":"Wählen Sie ihr Geburtsmonat:",
-      "motherFirst":"Wählen Sie den ersten Buchstaben des Vornamens Ihrere Mutter:",
-      "motherSecond":"Wählen Sie den zweiten Buchstaben des Vornamens Ihrere Mutter:",
-      "birthSecondLast":"Wählen Sie den vorletzen Buchstaben Ihres Geburtsnachnamen:",
-      "birthLast":"Wählen Sie den letzen Buchstaben Ihres Geburtsnachnamen:",
-      "alphabeth":['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-      "months":[
+    "id": {
+      "cityFirst": "Wählen Sie den ersten Buchstaben ihrere Geburtsstadt:",
+      "citySecond": "Wählen Sie den zweiten Buchstaben ihrere Geburtsstadt:",
+      "birthMonth": "Wählen Sie ihr Geburtsmonat:",
+      "motherFirst": "Wählen Sie den ersten Buchstaben des Vornamens Ihrere Mutter:",
+      "motherSecond": "Wählen Sie den zweiten Buchstaben des Vornamens Ihrere Mutter:",
+      "birthSecondLast": "Wählen Sie den vorletzen Buchstaben Ihres Geburtsnachnamen:",
+      "birthLast": "Wählen Sie den letzen Buchstaben Ihres Geburtsnachnamen:",
+      "alphabeth": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "months": [
         "Januar", "Februar", "März", "April", "Mai", "Juni",
         "Juli", "August", "September", "Oktober", "November", "Dezember"
-    ]
+      ]
     }
   }
 };
@@ -198,7 +198,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       }
     ],
     loop_function(data) {
-      return data.values()[0].response == 0;
+      return data.values()[0].response == 1;
     }
   }
 
@@ -238,73 +238,70 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
-  const make_id_input= {
-     timeline: [{
+  const make_id_input = {
+    timeline: [{
       type: survey,
       survey_json: {
-      showQuestionNumbers: false,
-      elements:
-        [
-          {
-            type: 'dropdown',
-            title: selected_language['id']['cityFirst'], 
-            name: 'cityFirst', 
-            choices: selected_language['id']['alphabeth'],
-            isRequired: true
-          },
-          {
-            type: 'dropdown',
-            title: selected_language['id']['citySecond'], 
-            name: 'citySecond', 
-            choices: selected_language['id']['alphabeth'],
-            isRequired: true
-          }, 
-          {
-            type: 'dropdown',
-            title: selected_language['id']['birthMonth'], 
-            name: 'birthMonth', 
-            choices: selected_language['id']['months'],
-            isRequired: true
-          },
-          {
-            type: 'dropdown',
-            title: selected_language['id']['motherFirst'], 
-            name: 'motherFirst', 
-            choices: selected_language['id']['alphabeth'],
-            isRequired: true
-          },
-          {
-            type: 'dropdown',
-            title: selected_language['id']['motherSecond'], 
-            name: 'motherSecond', 
-            choices: selected_language['id']['alphabeth'],
-            isRequired: true
-          },
-          
-          {
-            type: 'dropdown',
-            title: selected_language['id']['birthSecondLast'], 
-            name: 'birthSecondLast', 
-            choices: selected_language['id']['alphabeth'],
-            isRequired: true
-          },
-
-          {
-            type: 'dropdown',
-            title: selected_language['id']['birthLast'], 
-            name: 'birthLast', 
-            choices: selected_language['id']['alphabeth'],
-            isRequired: true
-          }
-    ]
-  },
-  //subject_id:data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast,
-  on_finish(data) {
-    sub_id=data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast
-  jsPsych.data.addProperties({
-    subject_id: sub_id
-   })
-  }
+        showQuestionNumbers: false,
+        elements:
+          [
+            {
+              type: 'dropdown',
+              title: selected_language['id']['cityFirst'],
+              name: 'cityFirst',
+              choices: selected_language['id']['alphabeth'],
+              isRequired: true
+            },
+            {
+              type: 'dropdown',
+              title: selected_language['id']['citySecond'],
+              name: 'citySecond',
+              choices: selected_language['id']['alphabeth'],
+              isRequired: true
+            },
+            {
+              type: 'dropdown',
+              title: selected_language['id']['birthMonth'],
+              name: 'birthMonth',
+              choices: selected_language['id']['months'],
+              isRequired: true
+            },
+            {
+              type: 'dropdown',
+              title: selected_language['id']['motherFirst'],
+              name: 'motherFirst',
+              choices: selected_language['id']['alphabeth'],
+              isRequired: true
+            },
+            {
+              type: 'dropdown',
+              title: selected_language['id']['motherSecond'],
+              name: 'motherSecond',
+              choices: selected_language['id']['alphabeth'],
+              isRequired: true
+            },
+            {
+              type: 'dropdown',
+              title: selected_language['id']['birthSecondLast'],
+              name: 'birthSecondLast',
+              choices: selected_language['id']['alphabeth'],
+              isRequired: true
+            },
+            {
+              type: 'dropdown',
+              title: selected_language['id']['birthLast'],
+              name: 'birthLast',
+              choices: selected_language['id']['alphabeth'],
+              isRequired: true
+            }
+          ]
+      },
+      on_finish(data) {
+        sub_id = data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast
+        jsPsych.data.addProperties({
+          subject_id: sub_id
+        })
+      }
     }]
   }
 
@@ -317,7 +314,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       labels: selected_language['clarity-labels'],
       require_movement: true,
       slider_width: 600,
-      subject_id:sub_id,
+      subject_id: sub_id,
+      on_load() {
+        const slider = document.getElementById('jspsych-html-slider-response-response');
+        slider.oninput = () => {
+          const span = document.getElementById('slider-value');
+          span.textContent = `${slider.value}%`
+        };
+      },
       on_finish(data) {
         data.fileName = filename_for_upload
         data.type = "clarity"
@@ -334,6 +338,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       labels: selected_language['confidence-labels'],
       require_movement: true,
       slider_width: 600,
+      on_load() {
+        const slider = document.getElementById('jspsych-html-slider-response-response');
+        slider.oninput = () => {
+          const span = document.getElementById('slider-value');
+          span.textContent = `${slider.value}%`
+        };
+      },
       on_finish(data) {
         data.fileName = filename_for_upload
         data.type = "confidence"
@@ -399,9 +410,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         'assets/audio/training/t_313tw_6.wav'
       ],
       record_data: false,
-      show_progress_bar:false,
+      show_progress_bar: false,
     },
-    
+
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['explanation-pre-playback'],
@@ -496,7 +507,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     images: assetPaths.images,
     audio: () => [jsPsych.evaluateTimelineVariable('sentence'), jsPsych.evaluateTimelineVariable('word')],
     record_data: false,
-    show_progress_bar:false
+    show_progress_bar: false
   });
   timeline.push(ready_next_sentence(true));
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
@@ -505,7 +516,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       make_clarity_question(true),
       ...make_word_question(true),
       make_confidence_question(true)
-      
+
     ],
     on_timeline_finish() {
       console.log(jsPsych.data.get());
@@ -517,7 +528,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     stimulus: selected_language['pause-stimulus'],
     choices: [selected_language['done-button']]
   }
- 
+
   // TESTING
   await jsPsych.run([
     make_id_input,
@@ -530,10 +541,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           window.alert(selected_language['did-not-accept-message']);
           window.close();
         }
-       
+
       }
     },
-    
+
     configure_microphone,
     configure_speakers,
     {
@@ -541,42 +552,42 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       timeline_variables: test_blocks[0],
       randomize_order: true
     },])
-/* 
-  await jsPsych.run([
-    {
-      type: HtmlButtonResponsePlugin,
-      stimulus: selected_language['consent-form'],
-      choices: [selected_language['yes-button'], selected_language['no-button']],
-      on_finish(data) {
-        if (data.response == 1) { // Rejected
-          window.alert(selected_language['did-not-accept-message']);
-          window.close();
+  /* 
+    await jsPsych.run([
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: selected_language['consent-form'],
+        choices: [selected_language['yes-button'], selected_language['no-button']],
+        on_finish(data) {
+          if (data.response == 1) { // Rejected
+            window.alert(selected_language['did-not-accept-message']);
+            window.close();
+          }
+          saveData(jsPsych.data.get().csv());
         }
-        saveData(jsPsych.data.get().csv());
-      }
-    },
-    configure_microphone,
-    configure_speakers,
-    explanation,
-    {
-      timeline,
-      timeline_variables: blocks[0],
-      randomize_order: true
-    },
-    pause, {
-      timeline,
-      timeline_variables: blocks[1],
-      randomize_order: true
-    }, pause, {
-      timeline,
-      timeline_variables: blocks[2],
-      randomize_order: true
-    }, pause, {
-      timeline,
-      timeline_variables: blocks[3],
-      randomize_order: true
-    }]);
-*/
+      },
+      configure_microphone,
+      configure_speakers,
+      explanation,
+      {
+        timeline,
+        timeline_variables: blocks[0],
+        randomize_order: true
+      },
+      pause, {
+        timeline,
+        timeline_variables: blocks[1],
+        randomize_order: true
+      }, pause, {
+        timeline,
+        timeline_variables: blocks[2],
+        randomize_order: true
+      }, pause, {
+        timeline,
+        timeline_variables: blocks[3],
+        randomize_order: true
+      }]);
+  */
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
   return jsPsych;
