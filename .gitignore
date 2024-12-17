@@ -2,4 +2,3 @@ node_modules
 .jspsych-builder
 packaged
 src/de-big
-src/de-small

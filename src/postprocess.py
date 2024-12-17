@@ -67,7 +67,7 @@ if not os.path.exists(data_file):
 print(f'Found data file at {data_file}.')
 print(f'Found {len(files)} files to do speech recognition on.')
 
-model_dir = os.path.join(current_dir, 'de-big')
+model_dir = os.path.join(current_dir, 'de-small')
 if not os.path.exists(model_dir):
     print(f'Vosk speech model not found, it was expected at this path: {model_dir}. You can download it from here: https://alphacephei.com/vosk/models currently we use the vosk-model-de-0.21 for german language recognition.')
     exit(1)
