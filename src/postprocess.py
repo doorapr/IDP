@@ -57,8 +57,8 @@ if not os.path.isdir(base_dir):
     print(f'The given location ({base_dir}) is not a directory.')
     exit(1)
 
-files = glob('*/files/*.txt', root_dir=base_dir)
-data_file = os.path.join(base_dir, glob('*/data.txt', root_dir=base_dir)[0])
+files = glob(os.path.join(base_dir, '*/files/*.txt'))
+data_file = glob(os.path.join(base_dir, '*/data.txt'))[0]
 
 if not os.path.exists(data_file):
     print(f'Could not find results file data.txt for participant, expected it at {data_file}.')
