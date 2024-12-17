@@ -80,6 +80,8 @@ recognizer.vosk_model = Model(
 
 overall_start = time.time()
 
+json_decoder = json.decoder.JSONDecoder()
+
 transcription_map = {}
 for fileName in files:
     start = time.time()
@@ -93,11 +95,12 @@ for fileName in files:
     file.close()
     with sr.AudioFile(wavPath) as source:
         audio_data = recognizer.record(source)
-        result = recognizer.recognize_vosk(audio_data, 'de')
-        if wavPath not in transcription_map:
-            transcription_map[wavPath] = {"transcription": result}
+        result = json_decoder.decode(recognizer.recognize_vosk(audio_data, 'de'))['text']
+        filename = os.path.basename(wavPath)
+        if filename not in transcription_map:
+            transcription_map[filename] = {"transcription": result}
         else:
-            transcription_map[wavPath]["transcription"] = result
+            transcription_map[filename]["transcription"] = result
         end = time.time()
         print("Recognized word " + result + " for file " + wavPath + " in " + str(end - start) + " seconds.")
     
@@ -120,7 +123,7 @@ for x in range(0, len(json_object)):
     # print(json_object[x])
 
 print(transcription_map)
-with open(f"{subject_id}.csv", 'w', newline='') as file:
+with open(os.path.join(os.path.dirname(data_file), f"{subject_id}.csv"), 'w', newline='') as file:
     writer = csv.writer(file)
     field = ["audio", "transcription", "confidence", "clarity"]
     writer.writerow(field)
