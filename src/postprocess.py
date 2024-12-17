@@ -1,11 +1,20 @@
 # requires installing SpeechRecognition, Vosk
-
-import speech_recognition as sr
+try:
+    import speech_recognition as sr
+except ImportError:
+    print('This script requires the SpeechRecognition package to be installed. Install it with "python -m pip install SpeechRecognition", see also: https://pypi.org/project/SpeechRecognition/')
+    exit(1)
+    
+try:
+    from vosk import Model
+except ImportError:
+    print('This script requires the vosk package to be installed. Install it with "python -m pip install vosk", see also: https://pypi.org/project/vosk/')
+    exit(1)
+    
 import base64
 import os
 import subprocess
 from glob import glob
-from vosk import Model
 import csv
 import json
 import sys
@@ -52,10 +61,15 @@ files = glob('**/*.txt', root_dir=base_dir, recursive=True)
 
 print(f'Found {len(files)} files to do speech recognition on.')
 
+model_dir = os.path.join(current_dir, 'de-big')
+if not os.path.exists(model_dir):
+    print(f'Vosk speech model not found, it was expected at this path: {model_dir}. You can download it from here: https://alphacephei.com/vosk/models currently we use the vosk-model-de-0.21 for german language recognition.')
+    exit(1)
+
 recognizer = sr.Recognizer()
 recognizer.vosk_model = Model(
     # TODO: Internationalisation, english model
-    model_path=os.path.join(current_dir, 'de-big')
+    model_path=model_dir
 )
 
 overall_start = time.time()
