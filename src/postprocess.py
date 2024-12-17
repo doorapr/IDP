@@ -57,7 +57,7 @@ if not os.path.isdir(base_dir):
     print(f'The given location ({base_dir}) is not a directory.')
     exit(1)
 
-files = glob('**/*.txt', root_dir=base_dir, recursive=True)
+files = glob('**/files/*.txt', root_dir=base_dir, recursive=True)
 
 print(f'Found {len(files)} files to do speech recognition on.')
 
