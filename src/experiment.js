@@ -28,9 +28,6 @@ import survey from '@jspsych/plugin-survey';
 import '@jspsych/plugin-survey/css/survey.css'
 
 // TODO: Testen mit verschiedenen Browsern und OSs
-// TODO: Slider ticks oder Wert anzeigen
-
-
 
 // TODO: Transcription, dor
 

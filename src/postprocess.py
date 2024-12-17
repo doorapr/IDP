@@ -16,12 +16,10 @@ from os.path import abspath
 print(sys.argv)
 
 current_dir = os.path.dirname(abspath(getsourcefile(lambda: 0)))
-ffmpeg = os.path.join(current_dir, 'ffmpeg', sys.platform,
-                      'ffmpeg' + ('.exe' if sys.platform == 'win32' else ''))
+ffmpeg = os.path.join(current_dir, 'ffmpeg', sys.platform, 'ffmpeg' + ('.exe' if sys.platform == 'win32' else ''))
 
 if not os.path.exists(ffmpeg) or not os.path.isfile(ffmpeg):
-    print(f'Your system is not supported (platform is {
-          sys.platform}, looking for {ffmpeg}).')
+    print(f'Your system is not supported (platform is {sys.platform}, looking for {ffmpeg}).')
     if not os.path.exists(ffmpeg):
         print("Does not exist")
     if not os.path.isfile(ffmpeg):
