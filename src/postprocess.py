@@ -42,7 +42,7 @@ if len(sys.argv) == 1:
           
           To use this script you need python >= 3.9 <= 3.12, and to install the SpeechRecognition and vosk packages.
           
-          The script should be called like this: python3 postprocess.py [base directory of the results].
+          The script should be called like this: python3 postprocess.py [directory of the results of one participant e.g. study_results_39 (always contains one comp_results_...)].
           ''')
     exit(0)
 
@@ -57,8 +57,14 @@ if not os.path.isdir(base_dir):
     print(f'The given location ({base_dir}) is not a directory.')
     exit(1)
 
-files = glob('**/files/*.txt', root_dir=base_dir, recursive=True)
+files = glob('*/files/*.txt', root_dir=base_dir)
+data_file = os.path.join(base_dir, glob('*/data.txt', root_dir=base_dir)[0])
 
+if not os.path.exists(data_file):
+    print(f'Could not find results file data.txt for participant, expected it at {data_file}.')
+    exit(1)
+
+print(f'Found data file at {data_file}.')
 print(f'Found {len(files)} files to do speech recognition on.')
 
 model_dir = os.path.join(current_dir, 'de-big')
@@ -98,11 +104,7 @@ for fileName in files:
 overall_end = time.time()
 print("Recognized " + str(len(files)) + " words in " + str(overall_end - overall_start) + " seconds, "  + str(len(files) / (overall_end - overall_start)) + " per second.")
 
-
-fileName = "data_test.txt"
-data_path = '/Users/dorapruteanu/Downloads'
-dataPath = os.path.join(data_path, fileName)
-study_data = open(dataPath, "r").read()
+study_data = open(data_file, "r").read()
 
 json_object = json.loads(study_data)
 subject_id = json_object[0].get("subject_id", "unknown_subject")
