@@ -320,6 +320,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         };
       },
       on_finish(data) {
+        if(!record_data){return}
         data.fileName = filename_for_upload
         data.type = "clarity"
       }
@@ -343,6 +344,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         };
       },
       on_finish(data) {
+        if(!record_data){return}
         data.fileName = filename_for_upload
         data.type = "confidence"
       }
@@ -483,22 +485,23 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     randomisation.slice(3 * block_size, 4 * block_size)
   ]
 
-  const testing = 1;
+  /*const testing = 1;
   const test_blocks = [
     randomisation.slice(0, testing)
-  ]
+  ]*/
+  const timeline = [];
 
-  // timeline.push({ // 
-  //   type: initializeMicrophone,
-  //   button_label: selected_language['mic-select-button'],
-  //   device_select_message: selected_language['mic-select-text'],
-  //   record_data: false
-  // });
+   timeline.push({ // 
+     type: initializeMicrophone,
+     button_label: selected_language['mic-select-button'],
+     device_select_message: selected_language['mic-select-text'],
+     record_data: false
+   });
 
   // 4 Blöcke â 50 Sätze
   // Preload assets
 
-  const timeline = [];
+  
   timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
@@ -527,7 +530,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   }
 
   // TESTING
-  await jsPsych.run([
+  /*await jsPsych.run([
     make_id_input,
     {
       type: HtmlButtonResponsePlugin,
@@ -548,9 +551,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       timeline,
       timeline_variables: test_blocks[0],
       randomize_order: true
-    },])
-  /* 
+    },])*/
+  
     await jsPsych.run([
+    make_id_input,
       {
         type: HtmlButtonResponsePlugin,
         stimulus: selected_language['consent-form'],
@@ -560,7 +564,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
             window.alert(selected_language['did-not-accept-message']);
             window.close();
           }
-          saveData(jsPsych.data.get().csv());
+          //saveData(jsPsych.data.get().csv());
         }
       },
       configure_microphone,
@@ -584,7 +588,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         timeline_variables: blocks[3],
         randomize_order: true
       }]);
-  */
+  
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
   return jsPsych;
