@@ -4,8 +4,13 @@
   background-color: #ffffff;
 }
 
+.jspsych-content-wrapper {
+  justify-content: center;
+  align-items: center;
+}
+
 #jspsych-content {
-  width: 800px;
+  width: 1000px;
   max-width: calc(100% - 20px);
   margin: 0 auto;
   padding: 0 10px;

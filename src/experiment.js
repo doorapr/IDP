@@ -26,10 +26,9 @@ import surveyMultiSelect from '@jspsych/plugin-survey-multi-select';
 import surveyMultiChoice from '@jspsych/plugin-survey-multi-choice';
 import survey from '@jspsych/plugin-survey';
 import '@jspsych/plugin-survey/css/survey.css'
+import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
-
-// TODO: Transcription, dor
 
 const langs = {
   "en": {
@@ -49,14 +48,17 @@ const langs = {
     "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. The experiment will now begin.</p>",
     "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
     "pause-stimulus": "<p>Time for a short break. Click \"Next\" when you're ready for the next 50 sentences.</p>",
-    "recording-check": "<p>Did the recording work?</p>",
     "did-not-accept-message": "You did not accept the consent form. This tab will now close.",
     "consent-form": "Welcome & Consent Form",
     "yes-button": "Yes",
     "no-button": "No",
     "mic-test": "<p>Please say a word to test your microphone. Speak <b>loudly</b> and <b>clearly</b>.</p>",
+    "recording-check": "<p>Did you hear the word you recorded? If you want to try recording again press \"Change microphone\". If you want to hear the recording again press \"Listen again\". If you're finished setting up press \"Next\".</p>",
+    "listen-again-button": "Listen again",
+    "change-microphone-button": "Change microphone",
     "speaker-check": "<p>You will now hear a sentence. Please adjust your volume so you can understand the sentence clearly.</p>",
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
+    "begin-training-session": "<p>You will now start the training session.</p>",
     "id": {
       "cityFirst": "Select the first letter of the city you were born in:",
       "citySecond": "Select the second letter of the city you were born in:",
@@ -65,7 +67,7 @@ const langs = {
       "motherSecond": "Select the second letter of your Mother's first name:",
       "birthSecondLast": "Select the second last letter of your birth surname (last name):",
       "birthLast": "Select the last letter of your birth surname (last name):",
-      "alphabeth": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "alphabet": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
         "01", "02", "03", "04", "05", "06",
         "07", "08", "09", "10", "11", "12"
@@ -78,7 +80,7 @@ const langs = {
     "mic-select-button": "Dieses Mikrofon verwenden",
     "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "done-button": "Weiter",
-    "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben. Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn Sie nichts verstanden haben, sagen Sie bitte \"NICHTS\".</p>",
+    "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p> Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn Sie nichts verstanden haben, sagen Sie bitte \"NICHTS\".</p>",
     "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
     "clarity-labels": ["Sehr undeutlich<br>0%", "<span id='slider-value'>50%</span>", "Sehr deutlich<br>100%"],
@@ -89,23 +91,26 @@ const langs = {
     "end-of-tutorial": "<p>Vielen Dank! Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
     "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>",
     "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind, klicken Sie auf \"Weiter\".</p>",
-    "recording-check": "<p>Hat die Aufnahme funktioniert?</p>",
     "did-not-accept-message": "Sie haben die Einverständniserklärung nicht akzeptiert. Dieser Tab wird sich jetzt schließen.",
     "consent-form": "Willkommen & Einverständniserklärung",
     "yes-button": "Ja",
     "no-button": "Nein",
     "mic-test": "<p>Bitte sagen Sie ein Wort, um Ihr Mikrofon zu testen. Sprechen Sie dafür <b>laut</b> und <b>deutlich</b>.</p>",
+    "recording-check": "<p'>Haben Sie das Wort gehört, das Sie aufgenommen haben?</p><p>Wenn Sie die Aufnahme nochmal probieren wollen drücken Sie \"Mikrofon ändern\".</p><p>Wenn Sie die Aufnahme nochmal anhören wollen drücken Sie \"Aufnahme abspielen\".</p><p>Wenn Sie mit der Aufnahme zufrieden sind drücken Sie \"Weiter\".</p>",
+    "change-microphone-button": "Mikrofon ändern",
+    "listen-again-button": "Aufnahme abspielen",
     "speaker-check": "<p>Sie hören jetzt einen Satz. Bitte stellen Sie Ihre Lautstärke so ein, dass der Satz klar verständlich ist.</p>",
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
+    "begin-training-session": "<p>Sie beginnen jetzt die Trainingssession.</p>",
     "id": {
-      "cityFirst": "Wählen Sie den ersten Buchstaben ihrere Geburtsstadt:",
+      "cityFirst": "Wählen Sie den ersten Buchstaben ihrere Geburtsstadt (Umlaute werden durch den entsprechenden Vokal ersetzt ä->a, ü->u, etc.):",
       "citySecond": "Wählen Sie den zweiten Buchstaben ihrere Geburtsstadt:",
       "birthMonth": "Wählen Sie ihr Geburtsmonat:",
       "motherFirst": "Wählen Sie den ersten Buchstaben des Vornamens Ihrere Mutter:",
       "motherSecond": "Wählen Sie den zweiten Buchstaben des Vornamens Ihrere Mutter:",
       "birthSecondLast": "Wählen Sie den vorletzen Buchstaben Ihres Geburtsnachnamen:",
       "birthLast": "Wählen Sie den letzen Buchstaben Ihres Geburtsnachnamen:",
-      "alphabeth": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+      "alphabet": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
         "01", "02", "03", "04", "05", "06",
         "07", "08", "09", "10", "11", "12"
@@ -130,18 +135,10 @@ const randomisation_lists = {
  */
 export async function run({ assetPaths, input = {}, environment, title, version, stimulus, record_data }) {
 
-  const jsPsych = initJsPsych(
-  );
+  const jsPsych = initJsPsych();
 
-  await jsPsych.run([{ // Instead of choosing the language this will probably come from the input / environment from JATOS
-    type: HtmlButtonResponsePlugin,
-    stimulus: '<p>Please choose the language you would like to take the experiment in. / Bitte wählen Sie die Sprache in der Sie das Experiment absolvieren möchten.</p>',
-    choices: Object.keys(langs),
-    button_html: (choice) => `<button class="jspsych-btn"><img src="assets/images/flag-${choice}.svg" style="width: 100%"></img></button>`
-  }])
-
-
-  const selected_language = langs[Object.keys(langs)[jsPsych.data.results.trials[0].response]];
+  jsPsych.data.addProperties({selected_language: 'de'})
+  const selected_language = langs['de']; // selecting the language introduced problems and will be fed in from JATOS anyway.
 
   const configure_microphone = {
     timeline: [
@@ -154,21 +151,37 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       {
         type: htmlAudioResponse,
         stimulus: selected_language['mic-test'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'>",
-        record_again_button_label: selected_language['record-again-button'],
-        accept_button_label: selected_language['done-button'],
         done_button_label: selected_language['done-button'],
         recording_duration: 7500,
-        record_data: false,
-        allow_playback: true
+        record_data: true,
+        save_audio_url: true
       },
       {
-        type: HtmlButtonResponsePlugin,
-        stimulus: selected_language['recording-check'],
-        choices: [selected_language['yes-button'], selected_language['no-button']]
+        timeline: [{
+          type: AudioButtonResponsePlugin,
+          stimulus: () => {
+            const last_trial_data = jsPsych.data.get().last(1).values()[0];
+            return last_trial_data.audio_url || last_trial_data.stimulus;
+          },
+          on_load() {
+            const content = document.getElementById('jspsych-content');
+            content.replaceChildren(content.children[1], content.children[0]); // make the text appear on top of the buttons, this only works in this specific case. YAGNI.
+          },
+          prompt: selected_language['recording-check'],
+          choices: [selected_language['change-microphone-button'], selected_language['listen-again-button'], selected_language['done-button']]
+        }],
+        loop_function(data) { 
+          if (data.values()[0].response == 1) { // if listen again is pressed, listen again
+            return true; 
+          } else { // if listen again is not pressed, revoke the URL object to save RAM
+            URL.revokeObjectURL(data.values()[0].stimulus);
+            return false;
+          }
+        }
       }
     ],
-    loop_function(data) {
-      return data.values()[0].response == 1;
+    loop_function(data) { // if change microphone is pressed, loop the whole thing
+      return data.last(1).values()[0].response == 0;
     }
   }
 
@@ -246,14 +259,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               type: 'dropdown',
               title: selected_language['id']['cityFirst'],
               name: 'cityFirst',
-              choices: selected_language['id']['alphabeth'],
+              choices: selected_language['id']['alphabet'],
               isRequired: true
             },
             {
               type: 'dropdown',
               title: selected_language['id']['citySecond'],
               name: 'citySecond',
-              choices: selected_language['id']['alphabeth'],
+              choices: selected_language['id']['alphabet'],
               isRequired: true
             },
             {
@@ -267,28 +280,28 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               type: 'dropdown',
               title: selected_language['id']['motherFirst'],
               name: 'motherFirst',
-              choices: selected_language['id']['alphabeth'],
+              choices: selected_language['id']['alphabet'],
               isRequired: true
             },
             {
               type: 'dropdown',
               title: selected_language['id']['motherSecond'],
               name: 'motherSecond',
-              choices: selected_language['id']['alphabeth'],
+              choices: selected_language['id']['alphabet'],
               isRequired: true
             },
             {
               type: 'dropdown',
               title: selected_language['id']['birthSecondLast'],
               name: 'birthSecondLast',
-              choices: selected_language['id']['alphabeth'],
+              choices: selected_language['id']['alphabet'],
               isRequired: true
             },
             {
               type: 'dropdown',
               title: selected_language['id']['birthLast'],
               name: 'birthLast',
-              choices: selected_language['id']['alphabeth'],
+              choices: selected_language['id']['alphabet'],
               isRequired: true
             }
           ]
@@ -320,7 +333,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         };
       },
       on_finish(data) {
-        if(!record_data){return}
+        if (!record_data) { return }
         data.fileName = filename_for_upload
         data.type = "clarity"
       }
@@ -344,7 +357,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         };
       },
       on_finish(data) {
-        if(!record_data){return}
+        if (!record_data) { return }
         data.fileName = filename_for_upload
         data.type = "confidence"
       }
@@ -382,8 +395,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
-
-
   function ready_next_sentence(record_data) {
     return [{
       type: HtmlButtonResponsePlugin,
@@ -412,7 +423,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false,
       show_progress_bar: false,
     },
-
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: selected_language['begin-training-session'],
+      choices: [selected_language['done-button']],
+      record_data: false
+    },
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['explanation-pre-playback'],
@@ -472,7 +488,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   var sub_id
   jsPsych.data.addProperties({
     selected_randomisation
-    //fileName: filename_for_upload
   });
 
   const randomisation = randomisation_lists[selected_randomisation].ALL;
@@ -486,23 +501,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     randomisation.slice(3 * block_size, 4 * block_size)
   ]
 
-  /*const testing = 1;
-  const test_blocks = [
-    randomisation.slice(0, testing)
-  ]*/
   const timeline = [];
-
-   timeline.push({ // 
-     type: initializeMicrophone,
-     button_label: selected_language['mic-select-button'],
-     device_select_message: selected_language['mic-select-text'],
-     record_data: false
-   });
 
   // 4 Blöcke â 50 Sätze
   // Preload assets
 
-  
   timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
@@ -520,7 +523,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
     ],
     on_timeline_finish() {
-      console.log(jsPsych.data.get());
+      if (typeof jatos !== 'undefined') {
+        jatos.submitResultData(jsPsych.data.get().json()) // send the whole data every time, it's not that big
+      }
     }
   });
 
@@ -530,8 +535,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     choices: [selected_language['done-button']]
   }
 
-  // TESTING
-  /*await jsPsych.run([
+  await jsPsych.run([
     make_id_input,
     {
       type: HtmlButtonResponsePlugin,
@@ -542,54 +546,36 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           window.alert(selected_language['did-not-accept-message']);
           window.close();
         }
-
       }
     },
-
     configure_microphone,
     configure_speakers,
+    explanation,
     {
       timeline,
-      timeline_variables: test_blocks[0],
+      timeline_variables: blocks[0],
       randomize_order: true
-    },])*/
-  
-    await jsPsych.run([
-    make_id_input,
-      {
-        type: HtmlButtonResponsePlugin,
-        stimulus: selected_language['consent-form'],
-        choices: [selected_language['yes-button'], selected_language['no-button']],
-        on_finish(data) {
-          if (data.response == 1) { // Rejected
-            window.alert(selected_language['did-not-accept-message']);
-            window.close();
-          }
-          //saveData(jsPsych.data.get().csv());
-        }
-      },
-      configure_microphone,
-      configure_speakers,
-      explanation,
-      {
-        timeline,
-        timeline_variables: blocks[0],
-        randomize_order: true
-      },
-      pause, {
-        timeline,
-        timeline_variables: blocks[1],
-        randomize_order: true
-      }, pause, {
-        timeline,
-        timeline_variables: blocks[2],
-        randomize_order: true
-      }, pause, {
-        timeline,
-        timeline_variables: blocks[3],
-        randomize_order: true
-      }]);
-  
+    },
+    pause, 
+    {
+      timeline,
+      timeline_variables: blocks[1],
+      randomize_order: true
+    }, 
+    pause, 
+    {
+      timeline,
+      timeline_variables: blocks[2],
+      randomize_order: true
+    }, 
+    pause, 
+    {
+      timeline,
+      timeline_variables: blocks[3],
+      randomize_order: true
+    }
+  ]);
+
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)
   return jsPsych;
