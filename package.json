@@ -26,7 +26,10 @@
     "fs": "^0.0.1-security",
     "jspsych": "^8.0.2",
     "openai": "^4.71.0",
+    "panda": "^0.6.5",
+    "pandas": "^0.0.3",
     "papaparse": "^5.4.1",
+    "pd": "^0.8.1",
     "read-excel-file": "^5.8.6"
   },
   "devDependencies": {
