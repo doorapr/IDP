@@ -67,8 +67,8 @@ const langs = {
       "birthLast": "Select the last letter of your birth surname (last name):",
       "alphabeth": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+        "01", "02", "03", "04", "05", "06",
+        "07", "08", "09", "10", "11", "12"
       ]
     }
   },
@@ -107,8 +107,8 @@ const langs = {
       "birthLast": "Wählen Sie den letzen Buchstaben Ihres Geburtsnachnamen:",
       "alphabeth": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
-        "Januar", "Februar", "März", "April", "Mai", "Juni",
-        "Juli", "August", "September", "Oktober", "November", "Dezember"
+        "01", "02", "03", "04", "05", "06",
+        "07", "08", "09", "10", "11", "12"
       ]
     }
   }
@@ -371,7 +371,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               .then(() => {
                 console.log("File was successfully uploaded");
                 data.response = filename_for_upload;
-                data.type="mic_input" // Remove response data from RAM, we already saved it to the server.
+                data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
