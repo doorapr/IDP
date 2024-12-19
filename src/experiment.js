@@ -71,7 +71,8 @@ const langs = {
       "months": [
         "01", "02", "03", "04", "05", "06",
         "07", "08", "09", "10", "11", "12"
-      ]
+      ],
+      "placeholder": 'Select...'
     }
   },
   "de": {
@@ -114,7 +115,8 @@ const langs = {
       "months": [
         "01", "02", "03", "04", "05", "06",
         "07", "08", "09", "10", "11", "12"
-      ]
+      ],
+      "placeholder": 'Auswählen...'
     }
   }
 };
@@ -252,6 +254,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     timeline: [{
       type: survey,
       survey_json: {
+        completeText: selected_language['done-button'],
         showQuestionNumbers: false,
         elements:
           [
@@ -260,49 +263,56 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               title: selected_language['id']['cityFirst'],
               name: 'cityFirst',
               choices: selected_language['id']['alphabet'],
-              isRequired: true
+              isRequired: true,
+              placeholder: selected_language['id']['placeholder']
             },
             {
               type: 'dropdown',
               title: selected_language['id']['citySecond'],
               name: 'citySecond',
               choices: selected_language['id']['alphabet'],
-              isRequired: true
+              isRequired: true,
+              placeholder: selected_language['id']['placeholder']
             },
             {
               type: 'dropdown',
               title: selected_language['id']['birthMonth'],
               name: 'birthMonth',
               choices: selected_language['id']['months'],
-              isRequired: true
+              isRequired: true,
+              placeholder: selected_language['id']['placeholder']
             },
             {
               type: 'dropdown',
               title: selected_language['id']['motherFirst'],
               name: 'motherFirst',
               choices: selected_language['id']['alphabet'],
-              isRequired: true
+              isRequired: true,
+              placeholder: selected_language['id']['placeholder']
             },
             {
               type: 'dropdown',
               title: selected_language['id']['motherSecond'],
               name: 'motherSecond',
               choices: selected_language['id']['alphabet'],
-              isRequired: true
+              isRequired: true,
+              placeholder: selected_language['id']['placeholder']
             },
             {
               type: 'dropdown',
               title: selected_language['id']['birthSecondLast'],
               name: 'birthSecondLast',
               choices: selected_language['id']['alphabet'],
-              isRequired: true
+              isRequired: true,
+              placeholder: selected_language['id']['placeholder']
             },
             {
               type: 'dropdown',
               title: selected_language['id']['birthLast'],
               name: 'birthLast',
               choices: selected_language['id']['alphabet'],
-              isRequired: true
+              isRequired: true,
+              placeholder: selected_language['id']['placeholder']
             }
           ]
       },
