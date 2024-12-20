@@ -21,6 +21,7 @@ import sys
 import time
 from inspect import getsourcefile
 from os.path import abspath
+from charset_normalizer import detect
 #import pandas as pd
 
 print(sys.argv)
@@ -131,14 +132,34 @@ for x in range(0, len(json_object)):
     # print(json_object[x])
 
 #print(transcription_map)
-path_original_csv="src/original_csv.csv"
+path_original_csv="assets/text"
+
+
 
 with open(os.path.join(os.path.dirname(data_file), "results.csv"), 'w', newline='') as file:
-    writer = csv.writer(file)
-    field = ["subject_id","audio" "transcription", "confidence", "clarity", "response_audio","randomisation"]
-    writer.writerow(field)
+    writer = None
+   
     for key, values in transcription_map.items():
-        writer.writerow([
+        with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'rb') as f:
+            raw_data = f.read()
+            detected_encoding = detect(raw_data)['encoding']
+        with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'r',encoding=detected_encoding) as original_file:
+            reader = csv.reader(original_file, delimiter=';')
+            source_header = next(reader)
+            source_index_map = {col: idx for idx, col in enumerate(source_header)}
+            matching_row = None
+            for row in reader:
+                
+                if row[source_index_map.get("Single_Word", -1)] == key:
+                    matching_row = row
+                    break
+                    
+        if not writer:        
+            field = ["subject_id","audio" ,"transcription", "confidence", "clarity", "response_audio","randomisation",]+ source_header
+            writer = csv.writer(file)
+            writer.writerow(field)
+        
+        output_row=[
             subject_id,
             key,
             values.get("transcription", ""),
@@ -146,12 +167,11 @@ with open(os.path.join(os.path.dirname(data_file), "results.csv"), 'w', newline=
             values.get("clarity", ""),
             values.get("response_audio", ""),
             values.get("randomisation", "")
-        ])
+        ]
+        output_row.extend(matching_row)
+        writer.writerow(output_row)
 
 
 
-#original = pd.read_csv(path_original_csv)
-#dict_df = pd.DataFrame.from_dict(transcription_map, orient='index').reset_index()
-#print(dict_df)
 #  csv file pro person
 # index, proband, target_word,
