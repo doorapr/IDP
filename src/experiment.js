@@ -38,12 +38,13 @@ const langs = {
     "word-response-stimulus": "<p>Which word did you hear at the end of the sentence?</p>",
     "done-button": "Next",
     "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please say \"NOTHING\".</p>",
+    "word-question-prior": "<p>Which word did you expect to hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you expected to hear.</p>",
     "clarity-question": "<p>How clearly did you hear the last word?</p>",
     "clarity-labels": ["Very unclear<br>0%", "<span id='slider-value'>50%</span>", "Very clear<br>100%"],
     "confidence-labels": ["Very unconfident<br>0%", "<span id='slider-value'>50%</span>", "Very confident<br>100%"],
     "confidence-question": "<p>How confident are you in your answer?</p>",
     "explanation-pre-playback": "<p>You will hear a woman reading a sentence in which the last word will be somewhat unclear. Please press \"Next\" to hear the sentence.</p>",
-    "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then indicate how clearly you heard the last word.</p>",
+    "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then tell say the word you expected to hear. Afterwards indicate how clear you heard the sentence.</p>",
     "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Click \"Next\" to continue with the next sentence.</p>",
     "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. The experiment will now begin.</p>",
     "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
@@ -82,12 +83,13 @@ const langs = {
     "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "done-button": "Weiter",
     "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p> Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn Sie nichts verstanden haben, sagen Sie bitte \"NICHTS\".</p>",
+    "word-question-prior": "<p>Welches Wort haben Sie erwartet zu hören?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie erwartet haben.</p>",
     "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
     "clarity-labels": ["Sehr undeutlich<br>0%", "<span id='slider-value'>50%</span>", "Sehr deutlich<br>100%"],
     "confidence-labels": ["Sehr unsicher<br>0%", "<span id='slider-value'>50%</span>", "Sehr sicher<br>100%"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
-    "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</p>",
+    "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie zuerst an, welches Wort Sie erwartet hätten und dann, wie deutlich Sie das Wort gehört haben.</p>",
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
     "end-of-tutorial": "<p>Vielen Dank! Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
     "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>",
@@ -107,8 +109,8 @@ const langs = {
       "cityFirst": "Wählen Sie den ersten Buchstaben ihrere Geburtsstadt (Umlaute werden durch den entsprechenden Vokal ersetzt ä->a, ü->u, etc.):",
       "citySecond": "Wählen Sie den zweiten Buchstaben ihrere Geburtsstadt:",
       "birthMonth": "Wählen Sie ihr Geburtsmonat:",
-      "motherFirst": "Wählen Sie den ersten Buchstaben des Vornamens Ihrere Mutter:",
-      "motherSecond": "Wählen Sie den zweiten Buchstaben des Vornamens Ihrere Mutter:",
+      "motherFirst": "Wählen Sie den ersten Buchstaben des Vornamens Ihrer Mutter:",
+      "motherSecond": "Wählen Sie den zweiten Buchstaben des Vornamens Ihrer Mutter:",
       "birthSecondLast": "Wählen Sie den vorletzen Buchstaben Ihres Geburtsnachnamen:",
       "birthLast": "Wählen Sie den letzen Buchstaben Ihres Geburtsnachnamen:",
       "alphabet": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
@@ -394,11 +396,46 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               .then(() => {
                 console.log("File was successfully uploaded");
                 data.response = filename_for_upload;
+                data.fileName = filename_for_upload;
                 data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
             data.response = filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+          }
+        }
+      }
+    }];
+  }
+
+
+  function make_word_question_prior(record_data) {
+    return [{
+      type: HtmlButtonResponsePlugin,
+      stimulus: selected_language['word-question-prior'],
+      choices: [selected_language['done-button']],
+      record_data: false
+    }, { // Which word was understood?
+      type: htmlAudioResponse,
+      stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+      recording_duration: 7500,
+      show_done_button: true,
+      done_button_label: selected_language['done-button'],
+      record_data,
+      on_finish(data) {
+        if (record_data) {
+          if (typeof jatos !== 'undefined') {
+            var prior_filename_for_upload= "prior_"+filename_for_upload
+            jatos.uploadResultFile(data.response, prior_filename_for_upload)
+              .then(() => {
+                console.log("File was successfully uploaded");
+                data.response = prior_filename_for_upload;
+                data.fileName = filename_for_upload;
+                data.type="prior_input"; // Remove response data from RAM, we already saved it to the server.
+              })
+              .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
+          } else {
+            data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
           }
         }
       }
@@ -453,6 +490,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false
     },
     ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
+    make_word_question_prior(false),
     make_clarity_question(false),
     ...make_word_question(false),
     make_confidence_question(false),
@@ -466,6 +504,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     {
       timeline: [
         ...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')),
+        make_word_question_prior(false),
         make_clarity_question(false),
         ...make_word_question(false),
         make_confidence_question(false),
@@ -527,6 +566,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
   timeline.push({
     timeline: [
+      make_word_question_prior(true),
       make_clarity_question(true),
       ...make_word_question(true),
       make_confidence_question(true)
@@ -560,7 +600,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     },
     configure_microphone,
     configure_speakers,
-    explanation,
+    //explanation,
     {
       timeline,
       timeline_variables: blocks[0],

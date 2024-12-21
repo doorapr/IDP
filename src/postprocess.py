@@ -99,10 +99,17 @@ for fileName in files:
         audio_data = recognizer.record(source)
         result = json_decoder.decode(recognizer.recognize_vosk(audio_data, 'de'))['text']
         filename = os.path.basename(wavPath)
-        if filename not in transcription_map:
-            transcription_map[filename] = {"transcription": result}
-        else:
-            transcription_map[filename]["transcription"] = result
+        if filename.startswith("prior_"): 
+            og_filename = filename[len("prior_"):]
+            if og_filename not in transcription_map:
+                transcription_map[og_filename] = {"transcription_prior": result}
+            else:
+                transcription_map[og_filename]["transcription_prior"] = result
+        else:        
+            if filename not in transcription_map:
+                transcription_map[filename] = {"transcription": result}
+            else:
+                transcription_map[filename]["transcription"] = result
         end = time.time()
         print("Recognized word " + result + " for file " + wavPath + " in " + str(end - start) + " seconds.")
     
@@ -114,6 +121,7 @@ study_data = open(data_file, "r").read()
 json_object = json.loads(study_data)
 subject_id = json_object[0].get("subject_id", "unknown_subject")
 randomisation = json_object[0].get("selected_randomisation", "unknown_randomisation")
+#print(randomisation)
 for x in range(0, len(json_object)):
     if "fileName" in json_object[x]:
         key = json_object[x]["fileName"].replace('.txt', '.wav')
@@ -128,18 +136,23 @@ for x in range(0, len(json_object)):
         if json_object[x]["type"] == "mic_input":
             response_audio = json_object[x]["response"]
             transcription_map[key]["response_audio"] = response_audio
+        if json_object[x]["type"] == "prior_input":
+            prior_audio = json_object[x]["response"]
+            print(prior_audio)
+            transcription_map[key]["prior_audio"] = prior_audio
 
     # print(json_object[x])
 
 #print(transcription_map)
 path_original_csv="assets/text"
 
-
+#print(transcription_map)
 
 with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"), 'w', newline='') as file:
     writer = None
     
     for key, values in transcription_map.items():
+        #print(values.get("randomisation"))
         with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'rb') as f:
             raw_data = f.read()
             detected_encoding = detect(raw_data)['encoding']
@@ -154,7 +167,7 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
                     break
                     
         if not writer:        
-            field = ["subject_id","audio" ,"transcription", "confidence", "clarity", "response_audio","randomisation",]+ source_header
+            field = ["subject_id","audio" ,"transcription", "confidence", "clarity", "response_audio","randomisation","prior_audio","transcription_prior",]+ source_header
             writer = csv.writer(file)
             writer.writerow(field)
         
@@ -165,7 +178,9 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
             values.get("confidence", ""),
             values.get("clarity", ""),
             values.get("response_audio", ""),
-            values.get("randomisation", "")
+            values.get("randomisation", ""),
+            values.get("prior_audio",""),
+            values.get("transcription_prior","")
         ]
         output_row.extend(matching_row)
         writer.writerow(output_row)
