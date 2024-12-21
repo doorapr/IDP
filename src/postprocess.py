@@ -136,9 +136,9 @@ path_original_csv="assets/text"
 
 
 
-with open(os.path.join(os.path.dirname(data_file), "results.csv"), 'w', newline='') as file:
+with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"), 'w', newline='') as file:
     writer = None
-   
+    
     for key, values in transcription_map.items():
         with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'rb') as f:
             raw_data = f.read()
@@ -149,7 +149,6 @@ with open(os.path.join(os.path.dirname(data_file), "results.csv"), 'w', newline=
             source_index_map = {col: idx for idx, col in enumerate(source_header)}
             matching_row = None
             for row in reader:
-                
                 if row[source_index_map.get("Single_Word", -1)] == key:
                     matching_row = row
                     break
