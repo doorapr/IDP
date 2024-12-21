@@ -600,7 +600,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     },
     configure_microphone,
     configure_speakers,
-    //explanation,
+    explanation,
     {
       timeline,
       timeline_variables: blocks[0],
