@@ -38,6 +38,7 @@ const langs = {
     "word-response-stimulus": "<p>Which word did you hear at the end of the sentence?</p>",
     "done-button": "Next",
     "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please say \"NOTHING\".</p>",
+    "word-question-prior-question":"<p>Is this the word you expected to hear?</p>",
     "word-question-prior": "<p>Which word did you expect to hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you expected to hear.</p>",
     "clarity-question": "<p>How clearly did you hear the last word?</p>",
     "clarity-labels": ["Very unclear<br>0%", "<span id='slider-value'>50%</span>", "Very clear<br>100%"],
@@ -83,6 +84,7 @@ const langs = {
     "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "done-button": "Weiter",
     "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p> Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn Sie nichts verstanden haben, sagen Sie bitte \"NICHTS\".</p>",
+    "word-question-prior-question":"<p>Ist dass das Wort, das Sie erwartet haben?</p>",
     "word-question-prior": "<p>Welches Wort haben Sie erwartet zu hören?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie erwartet haben.</p>",
     "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
@@ -408,13 +410,90 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
-
-  function make_word_question_prior(record_data) {
-    return [{
+  function ask_prior(record_data){
+    return {
+        type: HtmlButtonResponsePlugin,
+        stimulus: selected_language['word-question-prior-question'],
+        choices: [selected_language['yes-button'],selected_language['no-button']],
+        record_data,
+      }
+        
+    }
+  
+    const make_word_question_prior_test= [
+      {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['word-question-prior'],
       choices: [selected_language['done-button']],
-      record_data: false
+      record_data: false,   
+    }, { // Which word was understood?
+      type: htmlAudioResponse,
+      stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+      recording_duration: 7500,
+      show_done_button: true,
+      done_button_label: selected_language['done-button'],
+      record_data,
+      on_finish(data) {
+        if (record_data) {
+          if (typeof jatos !== 'undefined') {
+            var prior_filename_for_upload= "prior_"+filename_for_upload
+            jatos.uploadResultFile(data.response, prior_filename_for_upload)
+              .then(() => {
+                console.log("File was successfully uploaded");
+                data.response = prior_filename_for_upload;
+                data.fileName = filename_for_upload;
+                data.type="prior_input"; // Remove response data from RAM, we already saved it to the server.
+              })
+              .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
+          } else {
+            data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+          }
+        }
+      }
+    }
+  ]
+
+  function conditional_prior(record_data){
+    return {
+      timeline: make_word_question_prior(record_data),
+      record_data:true, // The trial(s) to execute conditionally
+      conditional_function: function() {
+        const data = jsPsych.data.get().last(1).values()[0];
+        if(data.response == 0){
+          return false;
+        } else {
+          return true;
+      }
+    }
+    }
+  }
+
+  
+
+  function make_word_question_prior(record_data) {
+    
+    return [
+      {
+      //timeline:[ask_prior],
+      type: HtmlButtonResponsePlugin,
+      stimulus: selected_language['word-question-prior'],
+      choices: [selected_language['done-button']],
+      record_data: false,
+      /*
+      conditional_function: function(){
+        // get the data from the previous trial,
+        // and check which key was pressed
+        const data = jsPsych.data.get().last(1).values()[0];
+        console.log(data)
+        console.log("IN HERE")
+        console.log(data.response)
+        if(jsPsych.pluginAPI.compareKeys(data.response, selected_language['yes-button'])){
+            return false;
+        } else {
+            return true;
+        }
+    }*/
+      
     }, { // Which word was understood?
       type: htmlAudioResponse,
       stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
@@ -490,7 +569,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false
     },
     ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
-    make_word_question_prior(false),
+    conditional_prior(false),
     make_clarity_question(false),
     ...make_word_question(false),
     make_confidence_question(false),
@@ -504,7 +583,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     {
       timeline: [
         ...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')),
-        make_word_question_prior(false),
+        conditional_prior(false),
         make_clarity_question(false),
         ...make_word_question(false),
         make_confidence_question(false),
@@ -564,9 +643,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push(ready_next_sentence(true));
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
+  timeline.push(ask_prior(true))
+  timeline.push(conditional_prior(true))
   timeline.push({
     timeline: [
-      make_word_question_prior(true),
+      //ask_prior(true),
+      //make_word_question_prior(true),
       make_clarity_question(true),
       ...make_word_question(true),
       make_confidence_question(true)
@@ -600,7 +682,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     },
     configure_microphone,
     configure_speakers,
-    explanation,
+    //explanation,
     {
       timeline,
       timeline_variables: blocks[0],
