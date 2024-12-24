@@ -413,6 +413,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   function ask_prior(record_data){
     return {
         type: HtmlButtonResponsePlugin,
+        // TODO: den namen schöner
         stimulus: selected_language['word-question-prior-question'],
         choices: [selected_language['yes-button'],selected_language['no-button']],
         record_data,
@@ -420,43 +421,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         
     }
   
-    const make_word_question_prior_test= [
-      {
-      type: HtmlButtonResponsePlugin,
-      stimulus: selected_language['word-question-prior'],
-      choices: [selected_language['done-button']],
-      record_data: false,   
-    }, { // Which word was understood?
-      type: htmlAudioResponse,
-      stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
-      recording_duration: 7500,
-      show_done_button: true,
-      done_button_label: selected_language['done-button'],
-      record_data,
-      on_finish(data) {
-        if (record_data) {
-          if (typeof jatos !== 'undefined') {
-            var prior_filename_for_upload= "prior_"+filename_for_upload
-            jatos.uploadResultFile(data.response, prior_filename_for_upload)
-              .then(() => {
-                console.log("File was successfully uploaded");
-                data.response = prior_filename_for_upload;
-                data.fileName = filename_for_upload;
-                data.type="prior_input"; // Remove response data from RAM, we already saved it to the server.
-              })
-              .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
-          } else {
-            data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
-          }
-        }
-      }
-    }
-  ]
+ 
 
   function conditional_prior(record_data){
     return {
-      timeline: make_word_question_prior(record_data),
-      record_data:true, // The trial(s) to execute conditionally
+      timeline: make_word_question_prior(record_data),// The trial to execute conditionally
+      record_data:true, 
       conditional_function: function() {
         const data = jsPsych.data.get().last(1).values()[0];
         if(data.response == 0){
@@ -474,26 +444,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     
     return [
       {
-      //timeline:[ask_prior],
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['word-question-prior'],
       choices: [selected_language['done-button']],
-      record_data: false,
-      /*
-      conditional_function: function(){
-        // get the data from the previous trial,
-        // and check which key was pressed
-        const data = jsPsych.data.get().last(1).values()[0];
-        console.log(data)
-        console.log("IN HERE")
-        console.log(data.response)
-        if(jsPsych.pluginAPI.compareKeys(data.response, selected_language['yes-button'])){
-            return false;
-        } else {
-            return true;
-        }
-    }*/
-      
+      record_data: false,   
     }, { // Which word was understood?
       type: htmlAudioResponse,
       stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
@@ -529,7 +483,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false
     }]
   }
-
+// TODO: Explanation an prior anpassen
   const explanation = [
     {
       type: PreloadPlugin,
@@ -647,8 +601,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   timeline.push(conditional_prior(true))
   timeline.push({
     timeline: [
-      //ask_prior(true),
-      //make_word_question_prior(true),
       make_clarity_question(true),
       ...make_word_question(true),
       make_confidence_question(true)

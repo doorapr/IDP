@@ -138,21 +138,23 @@ for x in range(0, len(json_object)):
             transcription_map[key]["response_audio"] = response_audio
         if json_object[x]["type"] == "prior_input":
             prior_audio = json_object[x]["response"]
-            print(prior_audio)
             transcription_map[key]["prior_audio"] = prior_audio
+        if json_object[x]["type"] == "prior_expectation":
+            prior_expectation = json_object[x]["response"]
+            transcription_map[key]["prior_expectation"] = prior_expectation
 
     # print(json_object[x])
 
-#print(transcription_map)
+#path to the S1,S2,S3,S4 csv
 path_original_csv="assets/text"
 
-#print(transcription_map)
+
 
 with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"), 'w', newline='') as file:
     writer = None
     
     for key, values in transcription_map.items():
-        #print(values.get("randomisation"))
+        
         with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'rb') as f:
             raw_data = f.read()
             detected_encoding = detect(raw_data)['encoding']
@@ -167,7 +169,7 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
                     break
                     
         if not writer:        
-            field = ["subject_id","audio" ,"transcription", "confidence", "clarity", "response_audio","randomisation","prior_audio","transcription_prior",]+ source_header
+            field = ["subject_id","audio" ,"transcription", "confidence", "clarity", "response_audio","randomisation","expected_prior_audio","expected_prior_transcription","was_prior_as_expected"]+ source_header
             writer = csv.writer(file)
             writer.writerow(field)
         
@@ -180,7 +182,8 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
             values.get("response_audio", ""),
             values.get("randomisation", ""),
             values.get("prior_audio",""),
-            values.get("transcription_prior","")
+            values.get("transcription_prior",""),
+            values.get("prior_expectation","")
         ]
         output_row.extend(matching_row)
         writer.writerow(output_row)
