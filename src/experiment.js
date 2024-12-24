@@ -417,6 +417,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         stimulus: selected_language['word-question-prior-question'],
         choices: [selected_language['yes-button'],selected_language['no-button']],
         record_data,
+        on_finish(data){
+          data.type="prior_expectation";
+          data.fileName = filename_for_upload;
+        }
+        
       }
         
     }
@@ -469,6 +474,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
             data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+            data.fileName = filename_for_upload;
           }
         }
       }

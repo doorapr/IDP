@@ -121,7 +121,7 @@ study_data = open(data_file, "r").read()
 json_object = json.loads(study_data)
 subject_id = json_object[0].get("subject_id", "unknown_subject")
 randomisation = json_object[0].get("selected_randomisation", "unknown_randomisation")
-#print(randomisation)
+print(randomisation)
 for x in range(0, len(json_object)):
     if "fileName" in json_object[x]:
         key = json_object[x]["fileName"].replace('.txt', '.wav')
@@ -141,6 +141,7 @@ for x in range(0, len(json_object)):
             transcription_map[key]["prior_audio"] = prior_audio
         if json_object[x]["type"] == "prior_expectation":
             prior_expectation = json_object[x]["response"]
+            print(prior_expectation)
             transcription_map[key]["prior_expectation"] = prior_expectation
 
     # print(json_object[x])
@@ -160,7 +161,7 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
             detected_encoding = detect(raw_data)['encoding']
         with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'r',encoding=detected_encoding) as original_file:
             reader = csv.reader(original_file, delimiter=';')
-            source_header = next(reader)
+            source_header = next(reader) #the column names
             source_index_map = {col: idx for idx, col in enumerate(source_header)}
             matching_row = None
             for row in reader:
