@@ -45,7 +45,7 @@ const langs = {
     "confidence-labels": ["Very unconfident<br>0%", "<span id='slider-value'>50%</span>", "Very confident<br>100%"],
     "confidence-question": "<p>How confident are you in your answer?</p>",
     "explanation-pre-playback": "<p>You will hear a woman reading a sentence in which the last word will be somewhat unclear. Please press \"Next\" to hear the sentence.</p>",
-    "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then tell say the word you expected to hear. Afterwards indicate how clear you heard the sentence.</p>",
+    "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. </p><br> <p>After that, you will be asked whether the word you heard matches the word you expected.</p><br> <p>If you expected a different word, please indicate this.</p><br> <p>Next, rate how clearly you heard the word, and finally, provide the word you heard.</p>",
     "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Click \"Next\" to continue with the next sentence.</p>",
     "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. The experiment will now begin.</p>",
     "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
@@ -91,7 +91,7 @@ const langs = {
     "clarity-labels": ["Sehr undeutlich<br>0%", "<span id='slider-value'>50%</span>", "Sehr deutlich<br>100%"],
     "confidence-labels": ["Sehr unsicher<br>0%", "<span id='slider-value'>50%</span>", "Sehr sicher<br>100%"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
-    "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie zuerst an, welches Wort Sie erwartet hätten und dann, wie deutlich Sie das Wort gehört haben.</p>",
+    "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an.</p><br><p>Im Anschluss werden Sie gefragt, ob das gehörte Wort mit dem erwarteten Wort übereinstimmt.</p><br> <p>Falls Sie ein anderes Wort erwartet haben, geben Sie dies bitte an.</p><br> <p>Danach bewerten Sie, wie klar Sie das Wort gehört haben, und geben abschließend das gehörte Wort an.</p>",
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
     "end-of-tutorial": "<p>Vielen Dank! Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
     "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>",
@@ -410,7 +410,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
-  function ask_prior(record_data){
+  function ask_prior(record_data){ //TODO: check how explain part influences csv
     return {
         type: HtmlButtonResponsePlugin,
         // TODO: den namen schöner
@@ -529,6 +529,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false
     },
     ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
+    ask_prior(true),
     conditional_prior(false),
     make_clarity_question(false),
     ...make_word_question(false),
@@ -543,6 +544,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     {
       timeline: [
         ...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')),
+        ask_prior(true),
         conditional_prior(false),
         make_clarity_question(false),
         ...make_word_question(false),
@@ -640,7 +642,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     },
     configure_microphone,
     configure_speakers,
-    //explanation,
+    explanation,
     {
       timeline,
       timeline_variables: blocks[0],
