@@ -62,8 +62,8 @@ const langs = {
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
     "begin-training-session": "<p>You will now start the training session.</p>",
    "id": {
-    "cityFirst": "Select the first letter of the city where you were born:",
-    "citySecond": "Select the second letter of the city where you were born:",
+    "cityFirst": "Select the first letter of the city you were born in:",
+    "citySecond": "Select the second letter of the city you were born in:",
     "birthMonth": "Enter your birth month:",
     "motherFirst": "Select the first letter of your mother's first name:",
     "motherSecond": "Select the second letter of your mother's first name:",
