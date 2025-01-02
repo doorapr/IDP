@@ -410,7 +410,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }];
   }
 
-  function ask_prior(record_data){ //TODO: check how explain part influences csv
+  function ask_prior(record_data,in_training){ //TODO: check how explain part influences csv
     return {
         type: HtmlButtonResponsePlugin,
         // TODO: den namen schöner
@@ -420,6 +420,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         on_finish(data){
           data.type="prior_expectation";
           data.fileName = filename_for_upload;
+          if (in_training){ 
+            data.training="true";
+          }
         }
         
       }
@@ -529,7 +532,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false
     },
     ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
-    ask_prior(true),
+    ask_prior(true,true),
     conditional_prior(false),
     make_clarity_question(false),
     ...make_word_question(false),
@@ -544,7 +547,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     {
       timeline: [
         ...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')),
-        ask_prior(true),
+        ask_prior(true,true),
         conditional_prior(false),
         make_clarity_question(false),
         ...make_word_question(false),
@@ -605,7 +608,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push(ready_next_sentence(true));
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
-  timeline.push(ask_prior(true))
+  timeline.push(ask_prior(true,false))
   timeline.push(conditional_prior(true))
   timeline.push({
     timeline: [
