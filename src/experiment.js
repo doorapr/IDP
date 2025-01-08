@@ -60,13 +60,10 @@ const langs = {
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
     "begin-training-session": "<p>You will now start the training session.</p>",
     "id": {
-      "cityFirst": "Select the first letter of the city you were born in:",
-      "citySecond": "Select the second letter of the city you were born in:",
+      "city": "Please provide the first two letters of the city you were born in:",
       "birthMonth": "Enter your birth month:",
-      "motherFirst": "Select the first letter of your Mother's first name:",
-      "motherSecond": "Select the second letter of your Mother's first name:",
-      "birthSecondLast": "Select the second last letter of your birth surname (last name):",
-      "birthLast": "Select the last letter of your birth surname (last name):",
+      "mother": "Please provide the first two letters of your Mother's first name:",  
+      "birthname": "Please provide the last two letters of your birth surname (last name):",
       "alphabet": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
         "01", "02", "03", "04", "05", "06",
@@ -104,13 +101,10 @@ const langs = {
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
     "begin-training-session": "<p>Sie beginnen jetzt die Trainingssession.</p>",
     "id": {
-      "cityFirst": "Wählen Sie den ersten Buchstaben Ihrer Geburtsstadt (Umlaute werden durch den entsprechenden Vokal ersetzt, z. B. ä → a, ü → u, etc.):",
-      "citySecond": "Wählen Sie den zweiten Buchstaben Ihrer Geburtsstadt:",
+      "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an (Umlaute werden durch den entsprechenden Vokal ersetzt, z. B. ä → a, ü → u, etc.):",
       "birthMonth": "Wählen Sie Ihren Geburtsmonat:",
-      "motherFirst": "Wählen Sie den ersten Buchstaben des Vornamens Ihrer Mutter:",
-      "motherSecond": "Wählen Sie den zweiten Buchstaben des Vornamens Ihrer Mutter:",
-      "birthSecondLast": "Wählen Sie den vorletzten Buchstaben Ihres Geburtsnachnamens:",
-      "birthLast": "Wählen Sie den letzten Buchstaben Ihres Geburtsnachnamens:",
+      "mother": "Geben Sie die ersten zwei Buchstaben des Vornamens Ihrer Mutter an:",
+      "birthname": "Geben Sie die letzten zwei Buchstaben Ihres Geburtsnachnamens an:",
       "alphabet": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
         "01", "02", "03", "04", "05", "06",
@@ -251,18 +245,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         elements:
           [
             {
-              type: 'dropdown',
-              title: selected_language['id']['cityFirst'],
-              name: 'cityFirst',
-              choices: selected_language['id']['alphabet'],
-              isRequired: true,
-              placeholder: selected_language['id']['placeholder']
-            },
-            {
-              type: 'dropdown',
-              title: selected_language['id']['citySecond'],
-              name: 'citySecond',
-              choices: selected_language['id']['alphabet'],
+              type: 'text',
+              title: selected_language['id']['city'],
+              name: 'city',
+              maskType: "pattern",
+              maskSettings: {
+                pattern: "aa"
+              },
+              
               isRequired: true,
               placeholder: selected_language['id']['placeholder']
             },
@@ -275,41 +265,31 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               placeholder: selected_language['id']['placeholder']
             },
             {
-              type: 'dropdown',
-              title: selected_language['id']['motherFirst'],
-              name: 'motherFirst',
-              choices: selected_language['id']['alphabet'],
+              type: 'text',
+              title: selected_language['id']['mother'],
+              name: 'mother',
+              maskType: "pattern",
+              maskSettings: {
+                pattern: "aa"
+              },
               isRequired: true,
               placeholder: selected_language['id']['placeholder']
             },
             {
-              type: 'dropdown',
-              title: selected_language['id']['motherSecond'],
-              name: 'motherSecond',
-              choices: selected_language['id']['alphabet'],
-              isRequired: true,
-              placeholder: selected_language['id']['placeholder']
-            },
-            {
-              type: 'dropdown',
-              title: selected_language['id']['birthSecondLast'],
-              name: 'birthSecondLast',
-              choices: selected_language['id']['alphabet'],
-              isRequired: true,
-              placeholder: selected_language['id']['placeholder']
-            },
-            {
-              type: 'dropdown',
-              title: selected_language['id']['birthLast'],
-              name: 'birthLast',
-              choices: selected_language['id']['alphabet'],
+              type: 'text',
+              title: selected_language['id']['birthname'],
+              name: 'birthname',
+              maskType: "pattern",
+              maskSettings: {
+                pattern: "aa"
+              },
               isRequired: true,
               placeholder: selected_language['id']['placeholder']
             }
           ]
       },
       on_finish(data) {
-        sub_id = data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast
+        sub_id = data.response.city + data.response.birthMonth + data.response.mother  + data.response.birthname
         jsPsych.data.addProperties({
           subject_id: sub_id
         })
@@ -519,7 +499,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
   timeline.push({
     timeline: [
-      make_clarity_question(true,roundIndex),
+      make_clarity_question(true),
       ...make_word_question(true),
       make_confidence_question(true)
     ],
