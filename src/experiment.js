@@ -58,13 +58,13 @@ const langs = {
     "change-microphone-button": "Change microphone",
     "speaker-check": "<p>You will now hear a sentence. Please adjust your volume so you can understand the sentence clearly.</p>",
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
-    "begin-training-session": "<p>You will now start the training session.</p>",
+    "begin-training-session": "<p>You will now start the <b>training</b> session.</p>",
+    "begin-technical":"<p>In the next step, you will be asked to make some <b>technical</b> configurations to optimize the experiment.</p>",
     "id": {
       "city": "Please provide the first two letters of the city you were born in:",
       "birthMonth": "Enter your birth month:",
       "mother": "Please provide the first two letters of your Mother's first name:",  
       "birthname": "Please provide the last two letters of your birth surname (last name):",
-      "alphabet": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
         "01", "02", "03", "04", "05", "06",
         "07", "08", "09", "10", "11", "12"
@@ -99,13 +99,13 @@ const langs = {
     "listen-again-button": "Aufnahme abspielen",
     "speaker-check": "<p>Sie hören jetzt einen Satz. Bitte stellen Sie Ihre Lautstärke so ein, dass der Satz klar verständlich ist.</p>",
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
-    "begin-training-session": "<p>Sie beginnen jetzt die Trainingssession.</p>",
+    "begin-training-session": "<p>Sie beginnen jetzt die <b>Trainingssession</b>.</p>",
+    "begin-technical":"<p>Im nächsten Schritt werden Sie gebeten einige <b>technische Konfigurationen</b> vorzunehmen, um das Experiment optimal anzupassen.</p>",
     "id": {
       "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an (Umlaute werden durch den entsprechenden Vokal ersetzt, z. B. ä → a, ü → u, etc.):",
       "birthMonth": "Wählen Sie Ihren Geburtsmonat:",
       "mother": "Geben Sie die ersten zwei Buchstaben des Vornamens Ihrer Mutter an:",
       "birthname": "Geben Sie die letzten zwei Buchstaben Ihres Geburtsnachnamens an:",
-      "alphabet": ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
       "months": [
         "01", "02", "03", "04", "05", "06",
         "07", "08", "09", "10", "11", "12"
@@ -529,6 +529,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           window.close();
         }
       }
+    },
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: selected_language['begin-technical'],
+      choices: [selected_language['done-button']],
+      record_data: false
     },
     configure_microphone,
     configure_speakers,
