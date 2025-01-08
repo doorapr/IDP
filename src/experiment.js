@@ -61,6 +61,7 @@ const langs = {
     "begin-training-session": "<p>You will now start the <b>training</b> session.</p>",
     "begin-technical":"<p>In the next step, you will be asked to make some <b>technical</b> configurations to optimize the experiment.</p>",
     "id": {
+      "umlaut":"<p><b>Umlauts are replaced by the corresponding vowel, e.g. ä → a, ü → u, etc.</b></p>",
       "city": "Please provide the first two letters of the city you were born in:",
       "birthMonth": "Enter your birth month:",
       "mother": "Please provide the first two letters of your Mother's first name:",  
@@ -102,7 +103,8 @@ const langs = {
     "begin-training-session": "<p>Sie beginnen jetzt die <b>Trainingssession</b>.</p>",
     "begin-technical":"<p>Im nächsten Schritt werden Sie gebeten einige <b>technische Konfigurationen</b> vorzunehmen, um das Experiment optimal anzupassen.</p>",
     "id": {
-      "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an (Umlaute werden durch den entsprechenden Vokal ersetzt, z. B. ä → a, ü → u, etc.):",
+      "umlaut":"<p><b>Umlaute werden durch den entsprechenden Vokal ersetzt, z. B. ä → a, ü → u, etc.</b></p>",
+      "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an:",
       "birthMonth": "Wählen Sie Ihren Geburtsmonat:",
       "mother": "Geben Sie die ersten zwei Buchstaben des Vornamens Ihrer Mutter an:",
       "birthname": "Geben Sie die letzten zwei Buchstaben Ihres Geburtsnachnamens an:",
@@ -243,7 +245,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         completeText: selected_language['done-button'],
         showQuestionNumbers: false,
         elements:
-          [
+          [{
+            readOnly:true,
+            html:selected_language['id']['umlaut'],
+            type:'html'
+          },
             {
               type: 'text',
               title: selected_language['id']['city'],
@@ -254,7 +260,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               },
               
               isRequired: true,
-              placeholder: selected_language['id']['placeholder']
+              description: "Munich -> mu"
             },
             {
               type: 'dropdown',
@@ -273,18 +279,21 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 pattern: "aa"
               },
               isRequired: true,
-              placeholder: selected_language['id']['placeholder']
+              description: "Emma -> em"
             },
             {
               type: 'text',
               title: selected_language['id']['birthname'],
               name: 'birthname',
+              description: "Mustermann -> nn",
+              showCommentArea: true,
               maskType: "pattern",
               maskSettings: {
-                pattern: "aa"
+                pattern: "aa",
+                
               },
               isRequired: true,
-              placeholder: selected_language['id']['placeholder']
+               
             }
           ]
       },
