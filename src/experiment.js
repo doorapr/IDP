@@ -393,7 +393,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       }
     }];
   }
-
+  
   function ready_next_sentence(record_data) {
     return [{
       type: HtmlButtonResponsePlugin,
@@ -402,6 +402,70 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false
     }]
   }
+
+  function ask_prior(record_data){ //TODO: check how explain part influences csv
+    return {
+        type: HtmlButtonResponsePlugin,
+        // TODO: den namen schöner
+        stimulus: selected_language['word-question-prior-question'],
+        choices: [selected_language['yes-button'],selected_language['no-button']],
+        record_data,
+        on_finish(data){
+          data.type="prior_expectation";
+          data.fileName = filename_for_upload;
+        }
+
+      }}
+
+  function conditional_prior(record_data){
+        return {
+          timeline: make_word_question_prior(record_data),// The trial to execute conditionally
+          record_data:true, 
+          conditional_function: function() {
+            const data = jsPsych.data.get().last(1).values()[0];
+            if(data.response == 0){
+              return false;
+            } else {
+              return true;
+          }
+        }
+        }
+      }
+  function make_word_question_prior(record_data) {
+
+        return [
+          {
+          type: HtmlButtonResponsePlugin,
+          stimulus: selected_language['word-question-prior'],
+          choices: [selected_language['done-button']],
+          record_data: false,   
+        }, { // Which word was understood?
+          type: htmlAudioResponse,
+          stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+          recording_duration: 7500,
+          show_done_button: true,
+          done_button_label: selected_language['done-button'],
+          record_data,
+          on_finish(data) {
+            if (record_data) {
+              if (typeof jatos !== 'undefined') {
+                var prior_filename_for_upload= "prior_"+filename_for_upload
+                jatos.uploadResultFile(data.response, prior_filename_for_upload)
+                  .then(() => {
+                    console.log("File was successfully uploaded");
+                    data.response = prior_filename_for_upload;
+                    data.fileName = filename_for_upload;
+                    data.type="prior_input"; // Remove response data from RAM, we already saved it to the server.
+                  })
+                  .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
+              } else {
+                data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+                data.fileName = filename_for_upload;
+              }
+            }
+          }
+        }];
+      }
 // TODO: Explanation an prior anpassen
   const explanation = [
     {
@@ -496,7 +560,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
   ])
-
+  var roundIndex=1;
   const timeline = [];
 
   // 4 Blöcke â 50 Sätze
@@ -516,7 +580,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     timeline: [
       make_clarity_question(true),
       ...make_word_question(true),
-      make_confidence_question(true)
+      ask_prior(true),
+      conditional_prior(false)
     ],
     
     on_timeline_finish() {
