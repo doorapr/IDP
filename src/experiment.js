@@ -10,20 +10,15 @@
 // You can import stylesheets (.scss or .css).
 import "../styles/main.scss";
 
-import FullscreenPlugin from "@jspsych/plugin-fullscreen";
 import audioKeyboardResponse from '@jspsych/plugin-audio-keyboard-response';
-import audioButtonResponse from '@jspsych/plugin-audio-button-response';
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import SurveyTextPlugin from "@jspsych/plugin-survey-text";
-import InstructionsPlugin from "@jspsych/plugin-instructions";
 import HtmlSliderResponsePlugin from "@jspsych/plugin-html-slider-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { initJsPsych } from "jspsych";
-import surveyMultiSelect from '@jspsych/plugin-survey-multi-select';
-import surveyMultiChoice from '@jspsych/plugin-survey-multi-choice';
 import survey from '@jspsych/plugin-survey';
 import '@jspsych/plugin-survey/css/survey.css'
 import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
@@ -200,6 +195,82 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     loop_function(data) {
       return data.values()[0].response == 1;
     }
+  }
+
+
+
+  function make_titration_cycle() {
+    // show word
+    // ask if language detected
+    // -> only if true: 
+    //    ask if word understood
+    //    -> only if true:
+    //       ask for word
+    //       ask if typo corrected is intended
+    //       check for correctness
+
+    
+    // show word
+    [
+      { // delay
+        type: HtmlKeyboardResponsePlugin,
+        stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+        choices: "NO_KEYS",
+        trial_duration: 150,
+        record_data: false
+      }, { // actual playback
+        type: audioKeyboardResponse,
+        stimulus: 'assets/audio/training/t_382tw.wav',
+        choices: "NO_KEYS",
+        prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+        trial_ends_after_audio: true,
+        record_data: false
+      }, { // ask if language detected
+        type: HtmlButtonResponsePlugin,
+        stimulus: selected_language['language-detected-question'],
+        choices: [selected_language['yes-button'], selected_language['no-button']],
+        record_data: false
+      }
+    ]
+
+    [
+      { //    ask if word understood
+        type: HtmlButtonResponsePlugin,
+        stimulus: selected_language['word-detected-question'],
+        choices: [selected_language['yes-button'], selected_language['no-button']],
+        record_data: false
+      }
+    ]
+
+    [
+      { //       ask for word
+        type: SurveyTextPlugin,
+        questions: [selected_language['titration-which-word-question']],
+        button_label: selected_language['done-button'],
+        record_data: false,
+        on_finish(result) {
+          // do typo-correction on the result
+        }
+      }, { //       ask if typo corrected is intended
+        type: HtmlButtonResponsePlugin,
+        stimulus: selected_language['titration-typo-question'] + "<corrected-word>",
+        choices: [selected_language['yes-button'], selected_language['no-button']],
+        on_finish(result) {
+          // check if the correct word was understood and increase/update the score
+        }
+      }
+    ]
+  }
+
+  const sensory_titration = {
+    timeline: [
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: selected_language['begin-titration'],
+        choices: [selected_language['done-button']],
+        record_data: false
+      }
+    ]
   }
 
   var filename_for_upload;
