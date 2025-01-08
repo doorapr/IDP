@@ -136,6 +136,8 @@ for x in range(0, len(json_object)):
         if json_object[x]["type"] == "mic_input":
             response_audio = json_object[x]["response"]
             transcription_map[key]["response_audio"] = response_audio
+            roundIndex = json_object[x]["roundIndex"]
+            transcription_map[key]["roundIndex"]=roundIndex
         if json_object[x]["type"] == "prior_input":
             prior_audio = json_object[x]["response"]
             transcription_map[key]["prior_audio"] = prior_audio
@@ -169,13 +171,14 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
                     break
                     
         if not writer:        
-            field = ["subject_id","audio" ,"transcription", "confidence", "clarity", "response_audio","randomisation","expected_prior_audio","expected_prior_transcription","was_prior_as_expected"]+ source_header
+            field = ["subject_id","audio" ,"trial","transcription", "confidence", "clarity", "response_audio","randomisation","expected_prior_audio","expected_prior_transcription","was_prior_as_expected"]+ source_header
             writer = csv.writer(file)
             writer.writerow(field)
         
         output_row=[
             subject_id,
             key,
+            values.get("roundIndex",""),
             values.get("transcription", ""),
             values.get("confidence", ""),
             values.get("clarity", ""),

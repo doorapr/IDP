@@ -3,7 +3,7 @@
  * @description 
  * @version 0.1.0
  *
- * @assets Stimuli/,assets/images,assets/audio/training
+ * @assets Stimuli/,assets/images,assets/audio/training,assets/text
  * 
  */
 
@@ -124,14 +124,6 @@ const langs = {
     }
   }
 };
-
-
-const randomisation_lists = {
-  S1: require('/assets/text/S1.js'),
-  S2: require('/assets/text/S2_ALL.js'),
-  S3: require('/assets/text/S3_ALL.js'),
-  S4: require('/assets/text/S4_ALL.js'),
-}
 
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
@@ -350,6 +342,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         if (!record_data) { return }
         data.fileName = filename_for_upload
         data.type = "clarity"
+        
       }
     };
   }
@@ -399,82 +392,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 console.log("File was successfully uploaded");
                 data.response = filename_for_upload;
                 data.fileName = filename_for_upload;
+                data.roundIndex=roundIndex;
                 data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
             data.response = filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
-          }
-        }
-      }
-    }];
-  }
-
-  function ask_prior(record_data){ //TODO: check how explain part influences csv
-    return {
-        type: HtmlButtonResponsePlugin,
-        // TODO: den namen schöner
-        stimulus: selected_language['word-question-prior-question'],
-        choices: [selected_language['yes-button'],selected_language['no-button']],
-        record_data,
-        on_finish(data){
-          data.type="prior_expectation";
-          data.fileName = filename_for_upload;
-        }
-        
-      }
-        
-    }
-  
- 
-
-  function conditional_prior(record_data){
-    return {
-      timeline: make_word_question_prior(record_data),// The trial to execute conditionally
-      record_data:true, 
-      conditional_function: function() {
-        const data = jsPsych.data.get().last(1).values()[0];
-        if(data.response == 0){
-          return false;
-        } else {
-          return true;
-      }
-    }
-    }
-  }
-
-  
-
-  function make_word_question_prior(record_data) {
-    
-    return [
-      {
-      type: HtmlButtonResponsePlugin,
-      stimulus: selected_language['word-question-prior'],
-      choices: [selected_language['done-button']],
-      record_data: false,   
-    }, { // Which word was understood?
-      type: htmlAudioResponse,
-      stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
-      recording_duration: 7500,
-      show_done_button: true,
-      done_button_label: selected_language['done-button'],
-      record_data,
-      on_finish(data) {
-        if (record_data) {
-          if (typeof jatos !== 'undefined') {
-            var prior_filename_for_upload= "prior_"+filename_for_upload
-            jatos.uploadResultFile(data.response, prior_filename_for_upload)
-              .then(() => {
-                console.log("File was successfully uploaded");
-                data.response = prior_filename_for_upload;
-                data.fileName = filename_for_upload;
-                data.type="prior_input"; // Remove response data from RAM, we already saved it to the server.
-              })
-              .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
-          } else {
-            data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
-            data.fileName = filename_for_upload;
+            console.log(roundIndex)
           }
         }
       }
@@ -571,22 +495,18 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }
   ];
 
-  const selected_randomisation = jsPsych.randomization.sampleWithoutReplacement(Object.keys(randomisation_lists), 1)[0]
+  const selected_randomisation = jsPsych.randomization.randomInt(1, 4)
   var sub_id
   jsPsych.data.addProperties({
     selected_randomisation
   });
 
-  const randomisation = randomisation_lists[selected_randomisation].ALL;
-
-  const block_size = 50;
-
-  const blocks = [
-    randomisation.slice(0, block_size),
-    randomisation.slice(block_size, 2 * block_size),
-    randomisation.slice(2 * block_size, 3 * block_size),
-    randomisation.slice(3 * block_size, 4 * block_size)
-  ]
+  const blocks = await Promise.all([
+    fetch(`assets/text/S${selected_randomisation}A.json`).then((response) => response.json()),
+    fetch(`assets/text/S${selected_randomisation}B.json`).then((response) => response.json()),
+    fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
+    fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
+  ])
 
   const timeline = [];
 
@@ -605,18 +525,16 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   
   timeline.push({
     timeline: [
-      make_clarity_question(true),
+      make_clarity_question(true,roundIndex),
       ...make_word_question(true),
-      ask_prior(true),
-      conditional_prior(true),
-      //make_confidence_question(true)
-
+      make_confidence_question(true)
     ],
     
     on_timeline_finish() {
       if (typeof jatos !== 'undefined') {
         jatos.submitResultData(jsPsych.data.get().json()) // send the whole data every time, it's not that big
       }
+      roundIndex+=1;
     }
   });
 
