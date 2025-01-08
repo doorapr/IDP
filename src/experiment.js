@@ -45,7 +45,7 @@ const langs = {
     "confidence-labels": ["Very unconfident<br>0%", "<span id='slider-value'>50%</span>", "Very confident<br>100%"],
     "confidence-question": "<p>How confident are you in your answer?</p>",
     "explanation-pre-playback": "<p>You will hear a woman reading a sentence in which the last word will be somewhat unclear. Please press \"Next\" to hear the sentence.</p>",
-    "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. </p><br> <p>After that, you will be asked whether the word you heard matches the word you expected.</p><br> <p>If you expected a different word, please indicate this.</p><br> <p>Next, rate how clearly you heard the word, and finally, provide the word you heard.</p>",
+    "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then indicate how clearly you heard the last word.</p>",
     "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Click \"Next\" to continue with the next sentence.</p>",
     "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. The experiment will now begin.</p>",
     "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
