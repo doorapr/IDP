@@ -346,6 +346,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         if (!record_data) { return }
         data.fileName = filename_for_upload
         data.type = "clarity"
+        
       }
     };
   }
@@ -395,11 +396,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 console.log("File was successfully uploaded");
                 data.response = filename_for_upload;
                 data.fileName = filename_for_upload;
+                data.roundIndex=roundIndex;
                 data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
             data.response = filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+            console.log(roundIndex)
           }
         }
       }
@@ -511,7 +514,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     randomisation.slice(2 * block_size, 3 * block_size),
     randomisation.slice(3 * block_size, 4 * block_size)
   ]
-
+  var roundIndex=1;
   const timeline = [];
 
   // 4 Blöcke â 50 Sätze
@@ -528,7 +531,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
   timeline.push({
     timeline: [
-      make_clarity_question(true),
+      make_clarity_question(true,roundIndex),
       ...make_word_question(true),
       make_confidence_question(true)
 
@@ -537,6 +540,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       if (typeof jatos !== 'undefined') {
         jatos.submitResultData(jsPsych.data.get().json()) // send the whole data every time, it's not that big
       }
+      roundIndex+=1;
     }
   });
 
