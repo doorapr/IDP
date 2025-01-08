@@ -20,7 +20,7 @@
     "@jspsych/plugin-survey": "^2.0.1",
     "@jspsych/plugin-survey-multi-choice": "^2.0.1",
     "@jspsych/plugin-survey-multi-select": "^2.0.1",
-    "@jspsych/plugin-survey-text": "^2.0.0",
+    "@jspsych/plugin-survey-text": "^2.1.0",
     "convert-csv-to-json": "^2.49.0",
     "csv-reader": "^1.0.12",
     "fs": "^0.0.1-security",
