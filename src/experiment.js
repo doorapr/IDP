@@ -3,7 +3,7 @@
  * @description 
  * @version 0.1.0
  *
- * @assets Stimuli/,assets/images,assets/audio/training
+ * @assets Stimuli/,assets/images,assets/audio/training,assets/text
  * 
  */
 
@@ -120,14 +120,6 @@ const langs = {
     }
   }
 };
-
-
-const randomisation_lists = {
-  S1: require('/assets/text/S1.js'),
-  S2: require('/assets/text/S2_ALL.js'),
-  S3: require('/assets/text/S3_ALL.js'),
-  S4: require('/assets/text/S4_ALL.js'),
-}
 
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
@@ -498,23 +490,19 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }
   ];
 
-  const selected_randomisation = jsPsych.randomization.sampleWithoutReplacement(Object.keys(randomisation_lists), 1)[0]
+  const selected_randomisation = jsPsych.randomization.randomInt(1, 4)
   var sub_id
   jsPsych.data.addProperties({
     selected_randomisation
   });
 
-  const randomisation = randomisation_lists[selected_randomisation].ALL;
+  const blocks = await Promise.all([
+    fetch(`assets/text/S${selected_randomisation}A.json`).then((response) => response.json()),
+    fetch(`assets/text/S${selected_randomisation}B.json`).then((response) => response.json()),
+    fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
+    fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
+  ])
 
-  const block_size = 50;
-
-  const blocks = [
-    randomisation.slice(0, block_size),
-    randomisation.slice(block_size, 2 * block_size),
-    randomisation.slice(2 * block_size, 3 * block_size),
-    randomisation.slice(3 * block_size, 4 * block_size)
-  ]
-  var roundIndex=1;
   const timeline = [];
 
   // 4 Blöcke â 50 Sätze
@@ -534,7 +522,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       make_clarity_question(true,roundIndex),
       ...make_word_question(true),
       make_confidence_question(true)
-
     ],
     on_timeline_finish() {
       if (typeof jatos !== 'undefined') {
