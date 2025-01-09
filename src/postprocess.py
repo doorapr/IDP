@@ -164,7 +164,7 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
         
         output_row=[
             subject_id,
-            shortened_key,
+            shortened_key, # redundant weil wir ja schon audio unter "Single Word" abspeichern
             values.get("roundIndex",""),
             values.get("transcription", ""),
             values.get("confidence", ""),
