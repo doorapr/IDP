@@ -3,7 +3,7 @@
  * @description 
  * @version 0.1.0
  *
- * @assets Stimuli/,assets/images,assets/audio/training,assets/text
+ * @assets Stimuli/,assets/images,assets/audio/training,assets/text,assets/typo-dictionaries
  * 
  */
 
@@ -22,6 +22,8 @@ import { initJsPsych } from "jspsych";
 import survey from '@jspsych/plugin-survey';
 import '@jspsych/plugin-survey/css/survey.css'
 import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
+import Typo from "typo-js";
+import Spellchecker from "hunspell-spellchecker";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
@@ -55,6 +57,11 @@ const langs = {
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
     "begin-training-session": "<p><b>Training</b><br>You will now be guided through the experiment using a few examples.<br>Please read the instructions carefully.</p>",
     "begin-technical":"<p><b>Technical setting</b><br>In the next step, we ask you to select and test your microphone and adjust the volume. Please carry out the experiment with headphones.</p>",
+    "begin-titration": "<p>We will now configure the experiment for your sensory threshold.</p><p>You will hear a sound which may or may not contain a word. Please answer the questions to the best of your ability.</p>",
+    "language-detected-question": "<p>Did you hear language in the sample?</p>",
+    "word-detected-question": "<p>Did you hear a specific word?</p>",
+    "titration-which-word-question": "Which word did you hear?",
+    "titration-typo-question": "<p>Is this the word you wanted to enter: ",
     "id": {
       "umlaut":"<p><b>Before the experiment begins, first create a personal test person code. Please note that umlauts are replaced by the corresponding vowel (e.g. ä by ae) and ß by ss. Upper and lower case is not important.</b></p>",
       "city": "Please provide the first two letters of the city you were born in:",
@@ -97,6 +104,11 @@ const langs = {
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
     "begin-training-session": "<p><b>Training</b><br>Anhand einiger Beispiele werden Sie nun durch den Ablauf des Experiments geführt.<br>Bitte lesen Sie sich die Instruktionen aufmerksam durch.</p>",
     "begin-technical":"<p><b>Technische Einstellung</b><br>Im nächsten Schritt bitten wir Sie, Ihr Mikrofon auszuwählen und zu testen und die Lautstärke einzustellen. Bitte führen Sie das Experiment mit Kopfhörern durch.</p>",
+    "begin-titration": "<p>Wir werden jetzt das Experiment für Sie kalibrieren.</p><p>Sie hören Audio, dass eventuell ein gesprochenes Wort enthält. Bitte beantworten Sie die Fragen so gut Sie können.</p>",
+    "language-detected-question": "<p>Hat das Audio Sprache enthalten?</p>",
+    "word-detected-question": "<p>Haben Sie ein konkretes Wort verstanden?</p>",
+    "titration-which-word-question": "Welches Wort haben Sie verstanden?",
+    "titration-typo-question": "<p>Wollten Sie dieses Wort eingeben: ",
     "id": {
       "umlaut":"<p><b>Bevor das Experiment beginnt, erstellen Sie zunächst einen persönlichen Probandencode. Bitte beachten Sie, dass Umlaute durch den entsprechenden Vokal ersetzt werden (z.B. ä durch ae) und ß durch ss. Groß- und Kleinschreibung spielt keine Rolle.</b></p>",
       "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an:",
@@ -145,7 +157,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         timeline: [{
           type: AudioButtonResponsePlugin,
           stimulus: () => {
-            const last_trial_data = jsPsych.data.get().last(1).values()[0];
+            const last_trial_data = jsPsych.data.getLastTrialData();
             return last_trial_data.audio_url || last_trial_data.stimulus;
           },
           on_load() {
@@ -197,9 +209,34 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }
   }
 
+  const affData = await fetch('assets/typo-dictionaries/de.aff').then(response => response.text());
+  const dicData = await fetch('assets/typo-dictionaries/de.dic').then(response => response.text());
+
+  // const typo = new Typo(
+  //   'de',
+  //   affData,
+  //   dicData,
+  //   null
+  // );
+
+  // typo.check('test');
+
+  const spellcheck = new Spellchecker();
+  const dict = spellcheck.parse({aff: affData, dic: dicData});
+  spellcheck.use(dict);
+  console.log(spellcheck.check("test"));
 
 
-  function make_titration_cycle() {
+  const fake_titration_data = [
+    {
+      stimulus: "s_em_lc_247tw",
+      target_word: "hals"
+    }
+  ]
+
+  let current_channel_count = 1;  
+
+  function make_titration_cycle(timeline_variables) {
     // show word
     // ask if language detected
     // -> only if true: 
@@ -211,55 +248,106 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
     
     // show word
-    [
-      { // delay
-        type: HtmlKeyboardResponsePlugin,
-        stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-        choices: "NO_KEYS",
-        trial_duration: 150,
-        record_data: false
-      }, { // actual playback
-        type: audioKeyboardResponse,
-        stimulus: 'assets/audio/training/t_382tw.wav',
-        choices: "NO_KEYS",
-        prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-        trial_ends_after_audio: true,
-        record_data: false
-      }, { // ask if language detected
-        type: HtmlButtonResponsePlugin,
-        stimulus: selected_language['language-detected-question'],
-        choices: [selected_language['yes-button'], selected_language['no-button']],
-        record_data: false
-      }
-    ]
-
-    [
-      { //    ask if word understood
-        type: HtmlButtonResponsePlugin,
-        stimulus: selected_language['word-detected-question'],
-        choices: [selected_language['yes-button'], selected_language['no-button']],
-        record_data: false
-      }
-    ]
-
-    [
-      { //       ask for word
-        type: SurveyTextPlugin,
-        questions: [selected_language['titration-which-word-question']],
-        button_label: selected_language['done-button'],
-        record_data: false,
-        on_finish(result) {
-          // do typo-correction on the result
+    return {
+      timeline: [{
+        timeline: [
+          { // delay
+            type: HtmlKeyboardResponsePlugin,
+            stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+            choices: "NO_KEYS",
+            trial_duration: 150,
+            record_data: false
+          }, { // actual playback
+            type: audioKeyboardResponse,
+            stimulus() {
+              return `Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${current_channel_count}.wav`;
+            },
+            choices: "NO_KEYS",
+            prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+            trial_ends_after_audio: true,
+            record_data: false
+          }, { // ask if language detected
+            type: HtmlButtonResponsePlugin,
+            stimulus: selected_language['language-detected-question'],
+            choices: [selected_language['yes-button'], selected_language['no-button']],
+          }
+        ]
+      }, {
+        timeline: [
+          { //    ask if word understood
+            type: HtmlButtonResponsePlugin,
+            stimulus: selected_language['word-detected-question'],
+            choices: [selected_language['yes-button'], selected_language['no-button']],
+          }
+        ],
+        conditional_function() { // This references the language detected question
+          return jsPsych.data.getLastTrialData().values()[0].response == 0
         }
-      }, { //       ask if typo corrected is intended
-        type: HtmlButtonResponsePlugin,
-        stimulus: selected_language['titration-typo-question'] + "<corrected-word>",
-        choices: [selected_language['yes-button'], selected_language['no-button']],
-        on_finish(result) {
-          // check if the correct word was understood and increase/update the score
+      }, {
+        timeline: [
+          { //       ask for word
+            type: SurveyTextPlugin,
+            questions: [{
+              prompt: selected_language['titration-which-word-question'],
+              name: 'understood_word',
+              required: true,
+
+            }],
+            button_label: selected_language['done-button'],
+            on_finish(result) {
+              // do typo-correction on the result
+              result.corrected_word = typo.suggest(result.understood_word)[0]
+            }
+          }, { //       ask if typo corrected is intended
+            type: HtmlButtonResponsePlugin,
+            stimulus: () => {
+              const entered_word = jsPsych.data.getLastTrialData().values()[0].understood_word;
+              const corrected_word = jsPsych.data.getLastTrialData().values()[0].understood_word;
+              return selected_language['titration-typo-question'] + corrected_word + " instead of:" + entered_word + "</p>";
+            },
+            choices: [selected_language['yes-button'], selected_language['no-button']],
+            on_finish(result) { // if not, go back to the word question, if yes check the result and update the score
+              if (result.response == 0) {
+                const understood_word = jsPsych.data.get().last(2)[0].values().corrected_word;
+                console.log("Understood word: ", understood_word, ", correct word: ", jsPsych.evaluateTimelineVariable('target_word'));
+                result.correct = understood_word == target_word;
+              }
+            }
+          }
+        ],
+        conditional_function() { // This references the specific word detected question
+          return jsPsych.data.getLastTrialData().values()[0].response == 0;
+        },
+        loop_function(data) {
+          return data.values().reverse()[0].response == 1;
         }
-      }
-    ]
+      }],
+      on_timeline_start() {
+        current_channel_count = 1;
+      },
+      loop_function(data) {
+        console.log(data);
+        const continue_loop = !(data.values().reverse()[0].correct || current_channel_count == 12);
+        switch(current_channel_count) {
+          case 1:
+            current_channel_count = 3;
+            break;
+          case 3:
+            current_channel_count = 6;
+            break;
+          case 6:
+            current_channel_count = 12;
+            break;
+          case 12:
+            break;
+          default:
+            throw('Channel count was wrong: ' + current_channel_count);
+        }
+
+        return continue_loop;
+      },
+      timeline_variables
+    };
   }
 
   const sensory_titration = {
@@ -269,7 +357,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         stimulus: selected_language['begin-titration'],
         choices: [selected_language['done-button']],
         record_data: false
-      }
+      },
+      make_titration_cycle(fake_titration_data)
     ]
   }
 
@@ -599,6 +688,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   }
 
   await jsPsych.run([
+    sensory_titration,
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['consent-form'],

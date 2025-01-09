@@ -24,13 +24,15 @@
     "convert-csv-to-json": "^2.49.0",
     "csv-reader": "^1.0.12",
     "fs": "^0.0.1-security",
+    "hunspell-spellchecker": "^1.0.2",
     "jspsych": "^8.0.2",
     "openai": "^4.71.0",
     "panda": "^0.6.5",
     "pandas": "^0.0.3",
     "papaparse": "^5.4.1",
     "pd": "^0.8.1",
-    "read-excel-file": "^5.8.6"
+    "read-excel-file": "^5.8.6",
+    "typo-js": "^1.2.5"
   },
   "devDependencies": {
     "jspsych-builder": "^4.4.0"
