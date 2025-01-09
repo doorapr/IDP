@@ -454,9 +454,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 jatos.uploadResultFile(data.response, prior_filename_for_upload)
                   .then(() => {
                     console.log("File was successfully uploaded");
-                    data.response = prior_filename_for_upload;
+                    data.response = prior_filename_for_upload; // Remove response data from RAM, we already saved it to the server.
                     data.fileName = filename_for_upload;
-                    data.type="prior_input"; // Remove response data from RAM, we already saved it to the server.
+                    data.type="prior_input"; 
                   })
                   .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
               } else {
