@@ -24,6 +24,7 @@ import '@jspsych/plugin-survey/css/survey.css'
 import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 import Typo from "typo-js";
 import Spellchecker from "hunspell-spellchecker";
+import CallFunctionPlugin from "@jspsych/plugin-call-function";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
@@ -124,6 +125,17 @@ const langs = {
   }
 };
 
+async function init_typo() {
+  const aff = await fetch('assets/typo-dictionaries/de_DE/de_DE.aff').then(result => result.text());
+  const dic = await fetch('assets/typo-dictionaries/de_DE/de_DE.dic').then(result => result.text());
+
+  return new Typo('de_DE', aff, dic); // Use a worker for this for true background work?
+}
+
+function normalize_word(word) {
+  return word.trim().toLowerCase();
+}
+
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
@@ -209,14 +221,26 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }
   }
 
+  const typo = await init_typo();
+
   const fake_titration_data = [
     {
       stimulus: "s_em_lc_247tw",
       target_word: "hals"
-    }
+    },
+    {
+      stimulus: "s_eh_400tw",
+      target_word: "muster"
+    },
+    {
+      stimulus: "s_em_hc_259tw",
+      target_word: "uhr"
+    },
+    {
+      stimulus: "s_em_hc_164tw",
+      target_word: "tauben"
+    },
   ]
-
-  let current_channel_count = 1;  
 
   function make_titration_cycle(timeline_variables) {
     // show word
@@ -227,107 +251,100 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     //       ask for word
     //       ask if typo corrected is intended
     //       check for correctness
-
-    
     // show word
     return {
       timeline: [{
-        timeline: [
-          { // delay
-            type: HtmlKeyboardResponsePlugin,
-            stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-            choices: "NO_KEYS",
-            trial_duration: 150,
-            record_data: false
-          }, { // actual playback
-            type: audioKeyboardResponse,
-            stimulus() {
-              return `Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${current_channel_count}.wav`;
-            },
-            choices: "NO_KEYS",
-            prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-            trial_ends_after_audio: true,
-            record_data: false
-          }, { // ask if language detected
-            type: HtmlButtonResponsePlugin,
-            stimulus: selected_language['language-detected-question'],
-            choices: [selected_language['yes-button'], selected_language['no-button']],
-          }
-        ]
-      }, {
-        timeline: [
-          { //    ask if word understood
-            type: HtmlButtonResponsePlugin,
-            stimulus: selected_language['word-detected-question'],
-            choices: [selected_language['yes-button'], selected_language['no-button']],
-          }
-        ],
-        conditional_function() { // This references the language detected question
-          return jsPsych.data.getLastTrialData().values()[0].response == 0
-        }
-      }, {
-        timeline: [
-          { //       ask for word
-            type: SurveyTextPlugin,
-            questions: [{
-              prompt: selected_language['titration-which-word-question'],
-              name: 'understood_word',
-              required: true,
-
-            }],
-            button_label: selected_language['done-button'],
-            on_finish(result) {
-              // do typo-correction on the result
-              result.corrected_word = result.response.understood_word; // typo.suggest(result.understood_word)[0]
+        timeline: [{
+          timeline: [
+            { // delay
+              type: HtmlKeyboardResponsePlugin,
+              stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+              choices: "NO_KEYS",
+              trial_duration: 150,
+              record_data: false
+            }, { // actual playback
+              type: audioKeyboardResponse,
+              stimulus() {
+                return `Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${jsPsych.evaluateTimelineVariable('num_channels')}.wav`;
+              },
+              choices: "NO_KEYS",
+              prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+              trial_ends_after_audio: true,
+              record_data: false
+            }, { // ask if language detected
+              type: HtmlButtonResponsePlugin,
+              stimulus: selected_language['language-detected-question'],
+              choices: [selected_language['yes-button'], selected_language['no-button']],
             }
-          }, { //       ask if typo corrected is intended
-            type: HtmlButtonResponsePlugin,
-            stimulus: () => {
-              const entered_word = jsPsych.data.getLastTrialData().values()[0].response.understood_word;
-              const corrected_word = jsPsych.data.getLastTrialData().values()[0].corrected_word;
-              return selected_language['titration-typo-question'] + corrected_word + " instead of: " + entered_word + "</p>";
-            },
-            choices: [selected_language['yes-button'], selected_language['no-button']],
-            on_finish(result) { // if not, go back to the word question, if yes check the result and update the score
-              if (result.response == 0) {
-                const understood_word = jsPsych.data.get().last(2).values()[0].corrected_word;
-                result.correct = understood_word == jsPsych.evaluateTimelineVariable('target_word');
+          ],
+          conditional_function() {
+            return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word'))
+          }
+        }, {
+          timeline: [
+            { //    ask if word understood
+              type: HtmlButtonResponsePlugin,
+              stimulus: selected_language['word-detected-question'],
+              choices: [selected_language['yes-button'], selected_language['no-button']],
+            }
+          ],
+          conditional_function() { // This references the language detected question
+            return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word')) && jsPsych.data.getLastTrialData().values()[0].response == 0
+          }
+        }, {
+          timeline: [
+            { //       ask for word
+              type: SurveyTextPlugin,
+              questions: [{
+                prompt: selected_language['titration-which-word-question'],
+                name: 'understood_word',
+                required: true,
+              }],
+              button_label: selected_language['done-button'],
+              on_finish(result) {
+                // do typo-correction on the result
+                result.corrected_word = typo.suggest(result.response.understood_word.toUpperCase())[0] || result.response.understood_word;
+              }
+            }, {//       ask if typo corrected is intended
+              timeline: [{
+                type: HtmlButtonResponsePlugin,
+                stimulus: () => {
+                  const entered_word = jsPsych.data.getLastTrialData().values()[0].response.understood_word;
+                  const corrected_word = jsPsych.data.getLastTrialData().values()[0].corrected_word;
+                  return selected_language['titration-typo-question'] + corrected_word + " instead of: " + entered_word + "</p>";
+                },
+                choices: [selected_language['yes-button'], selected_language['no-button']]
+              }],
+              conditional_function() {
+                const result = jsPsych.data.getLastTrialData().values()[0];
+                return result.response.understood_word != result.corrected_word;
               }
             }
+          ],
+          on_timeline_finish() {
+             const result = jsPsych.data.get().last(1).values()[0];
+             result.correct = normalize_word(result.corrected_word) == normalize_word(jsPsych.evaluateTimelineVariable('target_word'));
+             result.target_word = jsPsych.evaluateTimelineVariable('target_word');
+          },
+          conditional_function() { // This references the specific word detected question
+            return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word')) && jsPsych.data.getLastTrialData().values()[0].response == 0;
+          },
+          loop_function(data) {
+            return data.values().reverse()[0].response == 1;
           }
-        ],
-        conditional_function() { // This references the specific word detected question
-          return jsPsych.data.getLastTrialData().values()[0].response == 0;
-        },
-        loop_function(data) {
-          return data.values().reverse()[0].response == 1;
-        }
+        }],
+        timeline_variables: [
+          {num_channels: 1},
+          {num_channels: 3},
+          {num_channels: 6},
+          {num_channels: 12},
+        ]
       }],
-      on_timeline_start() {
-        current_channel_count = 1;
-      },
-      loop_function(data) {
-        console.log(data);
-        const continue_loop = !(data.values().reverse()[0].correct || current_channel_count == 12);
-        switch(current_channel_count) {
-          case 1:
-            current_channel_count = 3;
-            break;
-          case 3:
-            current_channel_count = 6;
-            break;
-          case 6:
-            current_channel_count = 12;
-            break;
-          case 12:
-            break;
-          default:
-            throw('Channel count was wrong: ' + current_channel_count);
-        }
-
-        return continue_loop;
-      },
-      timeline_variables
+      timeline_variables,
+      on_timeline_finish() {
+        jsPsych.data.displayData();
+        console.log(jsPsych.data.get());
+      }
     };
   }
 
