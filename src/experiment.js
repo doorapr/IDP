@@ -232,8 +232,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false,
       on_finish() {
         const path = (typeof second_stimulus === 'string') ? second_stimulus : jsPsych.evaluateTimelineVariable(second_stimulus.name);
-        filename_for_upload = path.substr(8).split(".")[0] + ".txt";
+        filename_for_upload = "response_"+path.substr(8).split(".")[0] + ".txt";
         console.log(filename_for_upload);
+        console.log("FILENAME")
       }
     }];
   }
@@ -491,7 +492,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
   ])
-
+  var roundIndex=1;
   const timeline = [];
 
   // 4 Blöcke â 50 Sätze
