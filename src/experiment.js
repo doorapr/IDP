@@ -209,24 +209,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }
   }
 
-  const affData = await fetch('assets/typo-dictionaries/de.aff').then(response => response.text());
-  const dicData = await fetch('assets/typo-dictionaries/de.dic').then(response => response.text());
-
-  // const typo = new Typo(
-  //   'de',
-  //   affData,
-  //   dicData,
-  //   null
-  // );
-
-  // typo.check('test');
-
-  const spellcheck = new Spellchecker();
-  const dict = spellcheck.parse({aff: affData, dic: dicData});
-  spellcheck.use(dict);
-  console.log(spellcheck.check("test"));
-
-
   const fake_titration_data = [
     {
       stimulus: "s_em_lc_247tw",
@@ -296,21 +278,20 @@ export async function run({ assetPaths, input = {}, environment, title, version,
             button_label: selected_language['done-button'],
             on_finish(result) {
               // do typo-correction on the result
-              result.corrected_word = typo.suggest(result.understood_word)[0]
+              result.corrected_word = result.response.understood_word; // typo.suggest(result.understood_word)[0]
             }
           }, { //       ask if typo corrected is intended
             type: HtmlButtonResponsePlugin,
             stimulus: () => {
-              const entered_word = jsPsych.data.getLastTrialData().values()[0].understood_word;
-              const corrected_word = jsPsych.data.getLastTrialData().values()[0].understood_word;
-              return selected_language['titration-typo-question'] + corrected_word + " instead of:" + entered_word + "</p>";
+              const entered_word = jsPsych.data.getLastTrialData().values()[0].response.understood_word;
+              const corrected_word = jsPsych.data.getLastTrialData().values()[0].corrected_word;
+              return selected_language['titration-typo-question'] + corrected_word + " instead of: " + entered_word + "</p>";
             },
             choices: [selected_language['yes-button'], selected_language['no-button']],
             on_finish(result) { // if not, go back to the word question, if yes check the result and update the score
               if (result.response == 0) {
-                const understood_word = jsPsych.data.get().last(2)[0].values().corrected_word;
-                console.log("Understood word: ", understood_word, ", correct word: ", jsPsych.evaluateTimelineVariable('target_word'));
-                result.correct = understood_word == target_word;
+                const understood_word = jsPsych.data.get().last(2).values()[0].corrected_word;
+                result.correct = understood_word == jsPsych.evaluateTimelineVariable('target_word');
               }
             }
           }
