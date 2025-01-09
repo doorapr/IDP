@@ -236,8 +236,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false,
       on_finish() {
         const path = (typeof second_stimulus === 'string') ? second_stimulus : jsPsych.evaluateTimelineVariable(second_stimulus.name);
-        filename_for_upload = path.substr(8).split(".")[0] + ".txt";
+        filename_for_upload = "response_"+path.substr(8).split(".")[0] + ".txt";
         console.log(filename_for_upload);
+        console.log("FILENAME")
       }
     }];
   }
@@ -466,7 +467,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           }
         }];
       }
-// TODO: Explanation an prior anpassen
+
   const explanation = [
     {
       type: PreloadPlugin,
@@ -581,7 +582,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       make_clarity_question(true),
       ...make_word_question(true),
       ask_prior(true),
-      conditional_prior(false)
+      conditional_prior(true)
     ],
     
     on_timeline_finish() {

@@ -157,16 +157,18 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
     
     for key, values in transcription_map.items():
         
-        with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'rb') as f:
+        with open(os.path.join(path_original_csv,"S"+str(values.get("randomisation")))+".csv", 'rb') as f:
             raw_data = f.read()
             detected_encoding = detect(raw_data)['encoding']
-        with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'r',encoding=detected_encoding) as original_file:
+        with open(os.path.join(path_original_csv,"S"+str(values.get("randomisation")))+".csv", 'r',encoding=detected_encoding) as original_file:
             reader = csv.reader(original_file, delimiter=';')
             source_header = next(reader) #the column names
             source_index_map = {col: idx for idx, col in enumerate(source_header)}
             matching_row = None
+            #hier key umändern, so dass respond am anfang weg ist
+            shortened_key=key[9:]
             for row in reader:
-                if row[source_index_map.get("Single_Word", -1)] == key:
+                if row[source_index_map.get("Single_Word", -1)] == shortened_key:
                     matching_row = row
                     break
                     
@@ -177,7 +179,7 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
         
         output_row=[
             subject_id,
-            key,
+            shortened_key, # redundant weil wir ja schon audio unter "Single Word" abspeichern
             values.get("roundIndex",""),
             values.get("transcription", ""),
             values.get("confidence", ""),
