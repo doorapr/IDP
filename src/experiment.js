@@ -133,6 +133,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     },
   ]
 
+  var titration_trial_data = {}
+
   function make_titration_cycle(timeline_variables) {
     // show word
     // ask if language detected
@@ -166,6 +168,15 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               type: HtmlButtonResponsePlugin,
               stimulus: lang['language-detected-question'],
               choices: [lang['yes-button'], lang['no-button']],
+              on_finish(data) {
+                titration_trial_data.language_detected_response_time = data.rt;
+                titration_trial_data.language_detected = (data.response == 0);
+                if (data.response == 1) {
+                  // this trial ends here
+                  console.log(titration_trial_data);
+                  titration_trial_data = {};
+                }
+              }
             }
           ],
           conditional_function() {
@@ -176,11 +187,18 @@ export async function run({ assetPaths, input = {}, environment, title, version,
             { //    ask if word understood
               type: HtmlButtonResponsePlugin,
               stimulus: lang['word-detected-question'],
-              choices: [lang['yes-button'], lang['no-button']],
+              choices: [lang['yes-button'], lang['no-button']]
             }
           ],
           conditional_function() { // This references the language detected question
             return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word')) && jsPsych.data.getLastTrialData().values()[0].response == 0
+          },
+          on_finish(data) {
+            if (data.response == 1) {
+              // this trial ends here
+              console.log(titration_trial_data);
+              titration_trial_data = {};
+            }
           }
         }, {
           timeline: [
@@ -191,7 +209,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 name: 'understood_word',
                 required: true,
               }],
-              button_label: lang['done-button']
+              button_label: lang['done-button'],
+              on_finish(data) {
+                if (!('entered_words' in titration_trial_data)) {
+                  titration_trial_data.entered_words = [];
+                }
+                
+                titration_trial_data.entered_words.push(data.response.understood_word);
+              }
             }, {//       ask if entered word is intended
               timeline: [{
                 type: HtmlButtonResponsePlugin,
@@ -199,7 +224,15 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                   const entered_word = jsPsych.data.getLastTrialData().values()[0].response.understood_word;
                   return lang['titration-typo-question'] + entered_word;
                 },
-                choices: [lang['yes-button'], lang['no-button']]
+                choices: [lang['yes-button'], lang['no-button']],
+                on_finish(data) {
+                  if (data.response == 0) {
+                    titration_trial_data.understood_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
+                    // this trial ends here
+                    console.log(titration_trial_data);
+                    titration_trial_data = {};
+                  }
+                }
               }]
             }
           ],
@@ -220,13 +253,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           {num_channels: 3},
           {num_channels: 6},
           {num_channels: 12},
-        ]
+        ],
       }],
       timeline_variables,
-      on_timeline_finish() {
-        jsPsych.data.displayData();
-        console.log(jsPsych.data.get());
-      }
     };
   }
 
