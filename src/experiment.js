@@ -555,12 +555,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     selected_randomisation
   });
 
-  const blocks = await Promise.all([
+  const blocks = jsPsych.randomization.shuffle(await Promise.all([
     fetch(`assets/text/S${selected_randomisation}A.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}B.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
-  ])
+  ]))
   var roundIndex=1;
   const timeline = [];
 
