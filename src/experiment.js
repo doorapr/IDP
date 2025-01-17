@@ -88,7 +88,7 @@ const langs = {
     "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich. Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</p>",
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
     "end-of-tutorial": "<p>Vielen Dank! Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
-    "ready-for-next-stimulus": "<p>Bereit für den nächsten Satz?</p>",
+    "ready-for-next-stimulus": "<p>Sind Sie bereit für den nächsten Satz?</p>",
     "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind, klicken Sie auf \"Weiter\".</p>",
     "did-not-accept-message": "Sie haben die Einverständniserklärung nicht akzeptiert. Dieser Tab wird sich jetzt schließen.",
     "consent-form": "Willkommen & Einverständniserklärung",
@@ -208,7 +208,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       type: HtmlKeyboardResponsePlugin,
       stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
       choices: "NO_KEYS",
-      trial_duration: 150,
+      trial_duration: 300,
       record_data: false
     }, { // Prior (first part of the sentence)
       type: audioKeyboardResponse,
@@ -221,7 +221,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       type: HtmlKeyboardResponsePlugin,
       stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
       choices: "NO_KEYS",
-      trial_duration: 150,
+      trial_duration: 300,
       record_data: false
     }, { // Stimulus (last word of the sentence + distortion)
       type: audioKeyboardResponse,
