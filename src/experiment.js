@@ -33,11 +33,11 @@ import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 const langs = {
   "en": {
     "title": "Language Task",
-    "mic-select-text": "<p>Please select the microphone you want to use for the study. You will test it shortly and can return here if it doesn't work.</p>",
+    "mic-select-text": "<p>Please select your microphone.<br>You will test it right away and can return to this page if it does not work.</p>",
     "mic-select-button": "Use this microphone",
     "word-response-stimulus": "<p>Which word did you hear at the end of the sentence?</p>",
     "done-button": "Next",
-    "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please say \"NOTHING\".</p>",
+    "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please loudly say the word \"NOTHING\".</p>",
     "clarity-question": "<p>How clearly did you hear the last word?</p>",
     "clarity-labels": ["Very unclear<br>0%", "<span id='slider-value'>50%</span>", "Very clear<br>100%"],
     "confidence-labels": ["Very unconfident<br>0%", "<span id='slider-value'>50%</span>", "Very confident<br>100%"],
@@ -56,12 +56,12 @@ const langs = {
     "recording-check": "<p>Did you hear the word you recorded? If you want to try recording again press \"Change microphone\". If you want to hear the recording again press \"Listen again\". If you're finished setting up press \"Next\".</p>",
     "listen-again-button": "Listen again",
     "change-microphone-button": "Change microphone",
-    "speaker-check": "<p>You will now hear a sentence. Please adjust your volume so you can understand the sentence clearly.</p>",
+    "speaker-check": "<p>When you click on \"Next\", a sentence will be played to you. Please adjust the volume of your headphones so that you can hear the sentence clearly.</p>",
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
-    "begin-training-session": "<p>You will now start the <b>training</b> session.</p>",
-    "begin-technical":"<p>In the next step, you will be asked to make some <b>technical</b> configurations to optimize the experiment.</p>",
+    "begin-training-session": "<p><b>Training</b><br>You will now be guided through the experiment using a few examples.<br>Please read the instructions carefully.</p>",
+    "begin-technical":"<p>In the next step, we ask you to select and test your microphone and adjust the volume. Please carry out the experiment with headphones.</p>",
     "id": {
-      "umlaut":"<p><b>Umlauts are replaced by the corresponding vowel, e.g. ä → a, ü → u, etc.</b></p>",
+      "umlaut":"<p><b>Before the experiment begins, first create a personal test person code. Please note that umlauts are replaced by the corresponding vowel (e.g. ä by ae) and ß by ss. Upper and lower case is not important.</b></p>",
       "city": "Please provide the first two letters of the city you were born in:",
       "birthMonth": "Enter your birth month:",
       "mother": "Please provide the first two letters of your Mother's first name:",  
@@ -75,11 +75,11 @@ const langs = {
   },
   "de": {
     "title": "Sprachbasierter Task",
-    "mic-select-text": "<p>Bitte suchen Sie das Mikrofon aus, das verwendet werden soll. Sie werden es gleich testen und können hierher zurückkehren, falls es nicht funktioniert.</p>",
+    "mic-select-text": "<p>Bitte suchen Sie Ihr Mikrofon aus.<br>Sie werden es gleich testen und können auf diese Seite zurückkehren, falls es nicht funktioniert.</p>",
     "mic-select-button": "Dieses Mikrofon verwenden",
     "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "done-button": "Weiter",
-    "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p> Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn Sie nichts verstanden haben, sagen Sie bitte \"NICHTS\".</p>",
+    "word-question": "<p>Welches Wort haben Sie gehört?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p> Es kann auch nur eine VERMUTUNG sein, aber bitte raten Sie nicht. Wenn Sie nichts verstanden haben, sagen Sie bitte laut das Wort \"NICHTS\".</p>",
     "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
     "clarity-labels": ["Sehr undeutlich<br>0%", "<span id='slider-value'>50%</span>", "Sehr deutlich<br>100%"],
@@ -95,15 +95,15 @@ const langs = {
     "yes-button": "Ja",
     "no-button": "Nein",
     "mic-test": "<p>Bitte sagen Sie ein Wort, um Ihr Mikrofon zu testen. Sprechen Sie dafür <b>laut</b> und <b>deutlich</b>.</p>",
-    "recording-check": "<p'>Haben Sie das Wort gehört, das Sie aufgenommen haben?</p><p>Wenn Sie die Aufnahme nochmal probieren wollen drücken Sie \"Mikrofon ändern\".</p><p>Wenn Sie die Aufnahme nochmal anhören wollen drücken Sie \"Aufnahme abspielen\".</p><p>Wenn Sie mit der Aufnahme zufrieden sind drücken Sie \"Weiter\".</p>",
+    "recording-check": "<p'>Haben Sie das Wort gehört, das Sie aufgenommen haben?</p><p>Wenn Sie die Aufnahme wiederholen wollen, drücken Sie \"Mikrofon ändern\".</p><p>Wenn Sie die Aufnahme nochmal anhören wollen, drücken Sie \"Aufnahme abspielen\".</p><p>Wenn Sie mit der Aufnahme zufrieden sind, drücken Sie \"Weiter\".</p>",
     "change-microphone-button": "Mikrofon ändern",
     "listen-again-button": "Aufnahme abspielen",
-    "speaker-check": "<p>Sie hören jetzt einen Satz. Bitte stellen Sie Ihre Lautstärke so ein, dass der Satz klar verständlich ist.</p>",
+    "speaker-check": "<p>Wenn Sie auf \"Weiter\" klicken, wird Ihnen ein Satz vorgespielt. Bitte stellen Sie die Lautstärke Ihrer Kopfhörer so ein, dass Sie den Satz klar und deutlich verstehen.</p>",
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
-    "begin-training-session": "<p>Sie beginnen jetzt die <b>Trainingssession</b>.</p>",
-    "begin-technical":"<p>Im nächsten Schritt werden Sie gebeten einige <b>technische Konfigurationen</b> vorzunehmen, um das Experiment optimal anzupassen.</p>",
+    "begin-training-session": "<p><b>Training</b><br>Anhand einiger Beispiele werden Sie nun durch den Ablauf des Experiments geführt.<br>Bitte lesen Sie sich die Instruktionen aufmerksam durch.</p>",
+    "begin-technical":"<p>Im nächsten Schritt bitten wir Sie, Ihr Mikrofon auszuwählen und zu testen und die Lautstärke einzustellen. Bitte führen Sie das Experiment mit Kopfhörern durch.</p>",
     "id": {
-      "umlaut":"<p><b>Umlaute werden durch den entsprechenden Vokal ersetzt, z. B. ä → a, ü → u, etc.</b></p>",
+      "umlaut":"<p><b>Bevor das Experiment beginnt, erstellen Sie zunächst einen persönlichen Probandencode. Bitte beachten Sie, dass Umlaute durch den entsprechenden Vokal ersetzt werden (z.B. ä durch ae) und ß durch ss. Groß- und Kleinschreibung spielt keine Rolle.</b></p>",
       "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an:",
       "birthMonth": "Wählen Sie Ihren Geburtsmonat:",
       "mother": "Geben Sie die ersten zwei Buchstaben des Vornamens Ihrer Mutter an:",
@@ -261,7 +261,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               },
               
               isRequired: true,
-              description: "Munich -> mu"
+              description: "München → mu"
             },
             {
               type: 'dropdown',
@@ -280,13 +280,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 pattern: "aa"
               },
               isRequired: true,
-              description: "Emma -> em"
+              description: "Emma → em"
             },
             {
               type: 'text',
               title: selected_language['id']['birthname'],
               name: 'birthname',
-              description: "Mustermann -> nn",
+              description: "Mustermann → nn",
               showCommentArea: true,
               maskType: "pattern",
               maskSettings: {
