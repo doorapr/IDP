@@ -404,7 +404,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }]
   }
 
-  function ask_prior(record_data){ //TODO: check how explain part influences csv
+  function ask_prior(record_data,in_training){ //TODO: check how explain part influences csv
     return {
         type: HtmlButtonResponsePlugin,
         // TODO: den namen schöner
@@ -414,6 +414,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         on_finish(data){
           data.type="prior_expectation";
           data.fileName = filename_for_upload;
+          if (in_training){ 
+            data.training="true";
+          }
         }
 
       }}
@@ -509,7 +512,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
     make_clarity_question(false),
     ...make_word_question(false),
-   // make_confidence_question(false),
+    make_confidence_question(false),
+    ask_prior(true,true),
+    conditional_prior(true),
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['end-of-first-tutorial-sentence'],
@@ -523,7 +528,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
        
         make_clarity_question(false),
         ...make_word_question(false),
-        //make_confidence_question(false),
+        make_confidence_question(false),
+        ask_prior(true,true),
+        conditional_prior(true),
       ],
       timeline_variables: [
         {
@@ -581,7 +588,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     timeline: [
       make_clarity_question(true),
       ...make_word_question(true),
-      ask_prior(true),
+      make_confidence_question(true),
+      ask_prior(true,false),
       conditional_prior(true)
     ],
     
