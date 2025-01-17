@@ -112,7 +112,7 @@ print("Recognized " + str(len(files)) + " words in " + str(overall_end - overall
 study_data = open(data_file, "r").read()
 
 json_object = json.loads(study_data)
-subject_id = json_object[0].get("subject_id", "unknown_subject")
+subject_id = json_object[1].get("subject_id", "unknown_subject")
 randomisation = json_object[0].get("selected_randomisation", "unknown_randomisation")
 for x in range(0, len(json_object)):
     if "fileName" in json_object[x]:

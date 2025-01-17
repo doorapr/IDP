@@ -528,7 +528,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   }
 
   await jsPsych.run([
-    make_id_input,
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['consent-form'],
@@ -540,6 +539,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         }
       }
     },
+    make_id_input,
     {
       type: HtmlButtonResponsePlugin,
       stimulus: selected_language['begin-technical'],
