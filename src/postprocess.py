@@ -124,6 +124,8 @@ randomisation = json_object[0].get("selected_randomisation", "unknown_randomisat
 print(randomisation)
 for x in range(0, len(json_object)):
     if "fileName" in json_object[x]:
+        if json_object[x].get("training") == "true":
+            continue
         key = json_object[x]["fileName"].replace('.txt', '.wav')
         transcription_map[key]["subject_id"]= subject_id
         transcription_map[key]["randomisation"]= randomisation
@@ -140,8 +142,8 @@ for x in range(0, len(json_object)):
             transcription_map[key]["confidence"] = confidence
         if json_object[x]["type"] == "prior_input":
             prior_audio = json_object[x]["response"]
-            transcription_map[key]["prior_audio"] = prior_audio
             print(prior_audio)
+            transcription_map[key]["prior_audio"] = prior_audio
         if json_object[x]["type"] == "prior_expectation":
             prior_expectation = json_object[x]["response"]
             transcription_map[key]["prior_expectation"] = prior_expectation

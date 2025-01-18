@@ -381,11 +381,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           if (typeof jatos !== 'undefined') {
             jatos.uploadResultFile(data.response, filename_for_upload)
               .then(() => {
-                console.log("File was successfully uploaded");
                 data.response = filename_for_upload;
                 data.fileName = filename_for_upload;
                 data.roundIndex=roundIndex;
                 data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
+                console.log("File was successfully uploaded");
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
@@ -458,15 +458,18 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 var prior_filename_for_upload= "prior_"+filename_for_upload
                 jatos.uploadResultFile(data.response, prior_filename_for_upload)
                   .then(() => {
-                    console.log("File was successfully uploaded");
                     data.response = prior_filename_for_upload; // Remove response data from RAM, we already saved it to the server.
                     data.fileName = filename_for_upload;
                     data.type="prior_input"; 
+                    console.log(data.response)
+                    console.log(prior_filename_for_upload)
+                    console.log("File was successfully uploaded");
                   })
                   .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
               } else {
                 data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
                 data.fileName = filename_for_upload;
+                data.type="prior_input";
               }
             }
           }
