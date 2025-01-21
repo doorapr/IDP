@@ -33,7 +33,10 @@
     "read-excel-file": "^5.8.6"
   },
   "devDependencies": {
-    "jspsych-builder": "^4.4.0"
+    "css-loader": "^7.1.2",
+    "jspsych-builder": "^4.4.0",
+    "sass": "^1.83.4",
+    "sass-loader": "^16.0.4"
   },
   "browserslist": ">0.25%, not dead"
 }

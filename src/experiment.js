@@ -321,7 +321,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data,
       labels: selected_language['clarity-labels'],
       require_movement: true,
-      slider_width: 600,
+      //slider_width: 600,
       subject_id: sub_id,
       on_load() {
         const slider = document.getElementById('jspsych-html-slider-response-response');
@@ -347,7 +347,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data,
       labels: selected_language['confidence-labels'],
       require_movement: true,
-      slider_width: 600,
+      //slider_width: 600,
       on_load() {
         const slider = document.getElementById('jspsych-html-slider-response-response');
         slider.oninput = () => {
