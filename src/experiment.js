@@ -62,7 +62,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         timeline: [{
           type: AudioButtonResponsePlugin,
           stimulus: () => {
-            const last_trial_data = jsPsych.data.getLastTrialData();
+            const last_trial_data = jsPsych.data.getLastTrialData().values()[0];
             return last_trial_data.audio_url || last_trial_data.stimulus;
           },
           on_load() {
@@ -236,6 +236,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 on_finish(data) {
                   if (data.response == 0) {
                     titration_trial_data.understood_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
+                    data.correct = normalize_word(titration_trial_data.understood_word) == normalize_word(jsPsych.evaluateTimelineVariable('target_word'));
+                    data.target_word = jsPsych.evaluateTimelineVariable('target_word');
                     // this trial ends here
                     console.log(titration_trial_data);
                     titration_trial_data = {};
@@ -244,11 +246,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               }]
             }
           ],
-          on_timeline_finish() {
-             const result = jsPsych.data.get().last(2).values()[0];
-             result.correct = normalize_word(result.response.understood_word) == normalize_word(jsPsych.evaluateTimelineVariable('target_word'));
-             result.target_word = jsPsych.evaluateTimelineVariable('target_word');
-          },
           conditional_function() { // This references the specific word detected question
             return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word')) && jsPsych.data.getLastTrialData().values()[0].response == 0;
           },
@@ -291,7 +288,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       type: HtmlKeyboardResponsePlugin,
       stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
       choices: "NO_KEYS",
-      trial_duration: 150,
+      trial_duration: 300,
       record_data: false
     }, { // Prior (first part of the sentence)
       type: audioKeyboardResponse,
@@ -304,7 +301,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       type: HtmlKeyboardResponsePlugin,
       stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
       choices: "NO_KEYS",
-      trial_duration: 150,
+      trial_duration: 300,
       record_data: false
     }, { // Stimulus (last word of the sentence + distortion)
       type: audioKeyboardResponse,
@@ -315,8 +312,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false,
       on_finish() {
         const path = (typeof second_stimulus === 'string') ? second_stimulus : jsPsych.evaluateTimelineVariable(second_stimulus.name);
-        filename_for_upload = path.substr(8).split(".")[0] + ".txt";
+        filename_for_upload = "response_"+path.substr(8).split(".")[0] + ".txt";
         console.log(filename_for_upload);
+        console.log("FILENAME")
       }
     }];
   }
@@ -328,22 +326,22 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         completeText: lang['done-button'],
         showQuestionNumbers: false,
         elements:
-          [
+          [{
+            readOnly:true,
+            html:lang['id']['umlaut'],
+            type:'html'
+          },
             {
-              type: 'dropdown',
-              title: lang['id']['cityFirst'],
-              name: 'cityFirst',
-              choices: lang['id']['alphabet'],
+              type: 'text',
+              title: lang['id']['city'],
+              name: 'city',
+              maskType: "pattern",
+              maskSettings: {
+                pattern: "aa"
+              },
+              
               isRequired: true,
-              placeholder: lang['id']['placeholder']
-            },
-            {
-              type: 'dropdown',
-              title: lang['id']['citySecond'],
-              name: 'citySecond',
-              choices: lang['id']['alphabet'],
-              isRequired: true,
-              placeholder: lang['id']['placeholder']
+              description: "München → mu"
             },
             {
               type: 'dropdown',
@@ -354,41 +352,34 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               placeholder: lang['id']['placeholder']
             },
             {
-              type: 'dropdown',
-              title: lang['id']['motherFirst'],
-              name: 'motherFirst',
-              choices: lang['id']['alphabet'],
+              type: 'text',
+              title: lang['id']['mother'],
+              name: 'mother',
+              maskType: "pattern",
+              maskSettings: {
+                pattern: "aa"
+              },
               isRequired: true,
-              placeholder: lang['id']['placeholder']
+              description: "Emma → em"
             },
             {
-              type: 'dropdown',
-              title: lang['id']['motherSecond'],
-              name: 'motherSecond',
-              choices: lang['id']['alphabet'],
+              type: 'text',
+              title: lang['id']['birthname'],
+              name: 'birthname',
+              description: "Mustermann → nn",
+              showCommentArea: true,
+              maskType: "pattern",
+              maskSettings: {
+                pattern: "aa",
+                
+              },
               isRequired: true,
-              placeholder: lang['id']['placeholder']
-            },
-            {
-              type: 'dropdown',
-              title: lang['id']['birthSecondLast'],
-              name: 'birthSecondLast',
-              choices: lang['id']['alphabet'],
-              isRequired: true,
-              placeholder: lang['id']['placeholder']
-            },
-            {
-              type: 'dropdown',
-              title: lang['id']['birthLast'],
-              name: 'birthLast',
-              choices: lang['id']['alphabet'],
-              isRequired: true,
-              placeholder: lang['id']['placeholder']
+               
             }
           ]
       },
       on_finish(data) {
-        sub_id = data.response.cityFirst + data.response.citySecond + data.response.birthMonth + data.response.motherFirst + data.response.motherSecond + data.response.birthSecondLast + data.response.birthLast
+        sub_id = data.response.city + data.response.birthMonth + data.response.mother  + data.response.birthname
         jsPsych.data.addProperties({
           subject_id: sub_id
         })
@@ -417,6 +408,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         if (!record_data) { return }
         data.fileName = filename_for_upload
         data.type = "clarity"
+        
       }
     };
   }
@@ -466,11 +458,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 console.log("File was successfully uploaded");
                 data.response = filename_for_upload;
                 data.fileName = filename_for_upload;
+                data.roundIndex=roundIndex;
                 data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
             data.response = filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+            console.log(roundIndex)
           }
         }
       }
@@ -572,13 +566,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     selected_randomisation
   });
 
-  const blocks = await Promise.all([
+  const blocks = jsPsych.randomization.shuffle(await Promise.all([
     fetch(`assets/text/S${selected_randomisation}A.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}B.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
-  ])
-
+  ]))
+  var roundIndex=1;
   const timeline = [];
 
   // 4 Blöcke â 50 Sätze
@@ -603,6 +597,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       if (typeof jatos !== 'undefined') {
         jatos.submitResultData(jsPsych.data.get().json()) // send the whole data every time, it's not that big
       }
+      roundIndex+=1;
     }
   });
 
@@ -614,7 +609,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   await jsPsych.run([
     sensory_titration,
-    make_id_input,
     {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['consent-form'],
@@ -625,6 +619,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           window.close();
         }
       }
+    },
+    make_id_input,
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['begin-technical'],
+      choices: [lang['done-button']],
+      record_data: false
     },
     configure_microphone,
     configure_speakers,

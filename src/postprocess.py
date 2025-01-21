@@ -112,7 +112,7 @@ print("Recognized " + str(len(files)) + " words in " + str(overall_end - overall
 study_data = open(data_file, "r").read()
 
 json_object = json.loads(study_data)
-subject_id = json_object[0].get("subject_id", "unknown_subject")
+subject_id = json_object[1].get("subject_id", "unknown_subject")
 randomisation = json_object[0].get("selected_randomisation", "unknown_randomisation")
 for x in range(0, len(json_object)):
     if "fileName" in json_object[x]:
@@ -128,6 +128,8 @@ for x in range(0, len(json_object)):
         if json_object[x]["type"] == "mic_input":
             response_audio = json_object[x]["response"]
             transcription_map[key]["response_audio"] = response_audio
+            roundIndex = json_object[x]["roundIndex"]
+            transcription_map[key]["roundIndex"]=roundIndex
 
     # print(json_object[x])
 
@@ -140,27 +142,30 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
     writer = None
     
     for key, values in transcription_map.items():
-        with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'rb') as f:
+        with open(os.path.join(path_original_csv,"S"+str(values.get("randomisation")))+".csv", 'rb') as f:
             raw_data = f.read()
             detected_encoding = detect(raw_data)['encoding']
-        with open(os.path.join(path_original_csv,values.get("randomisation"))+".csv", 'r',encoding=detected_encoding) as original_file:
+        with open(os.path.join(path_original_csv,"S"+str(values.get("randomisation")))+".csv", 'r',encoding=detected_encoding) as original_file:
             reader = csv.reader(original_file, delimiter=';')
             source_header = next(reader)
             source_index_map = {col: idx for idx, col in enumerate(source_header)}
             matching_row = None
+            #hier key umändern, so dass respond am anfang weg ist
+            shortened_key=key[9:]
             for row in reader:
-                if row[source_index_map.get("Single_Word", -1)] == key:
+                if row[source_index_map.get("Single_Word", -1)] == shortened_key:
                     matching_row = row
                     break
                     
         if not writer:        
-            field = ["subject_id","audio" ,"transcription", "confidence", "clarity", "response_audio","randomisation",]+ source_header
+            field = ["subject_id","audio" ,"trial","transcription", "confidence", "clarity", "response_audio","randomisation",]+ source_header
             writer = csv.writer(file)
             writer.writerow(field)
         
         output_row=[
             subject_id,
-            key,
+            shortened_key, # redundant weil wir ja schon audio unter "Single Word" abspeichern
+            values.get("roundIndex",""),
             values.get("transcription", ""),
             values.get("confidence", ""),
             values.get("clarity", ""),
