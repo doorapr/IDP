@@ -149,11 +149,19 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       timeline: [{
         timeline: [{
           timeline: [
+            {
+              type: PreloadPlugin,
+              audio() {
+                return [`Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${jsPsych.evaluateTimelineVariable('num_channels')}.wav`];
+              },
+              show_progress_bar: false,
+              record_data: false
+            },
             { // delay
               type: HtmlKeyboardResponsePlugin,
               stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
               choices: "NO_KEYS",
-              trial_duration: 150,
+              trial_duration: 500,
               record_data: false
             }, { // actual playback
               type: audioKeyboardResponse,
@@ -264,6 +272,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       {
         type: HtmlButtonResponsePlugin,
         stimulus: lang['begin-titration'],
+        choices: [lang['done-button']],
+        record_data: false
+      },
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: lang['titration-before-first'],
         choices: [lang['done-button']],
         record_data: false
       },
