@@ -22,6 +22,7 @@ import { initJsPsych } from "jspsych";
 import survey from '@jspsych/plugin-survey';
 import '@jspsych/plugin-survey/css/survey.css'
 import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
+import CallFunctionPlugin from "@jspsych/plugin-call-function";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
@@ -133,7 +134,21 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     },
   ]
 
-  var titration_trial_data = {}
+  var titration_trial_data = {};
+  var word_understood_correctly = false;
+
+  const titration_csv_header = "subject;target_word;num_channels;"
+
+  function reset_titration_data() {
+    titration_trial_data.target_word = jsPsych.evaluateTimelineVariable('target_word');
+    titration_trial_data.num_channels = jsPsych.evaluateTimelineVariable('num_channels');
+
+    console.log(titration_trial_data);
+
+    jsPsych.data.get().addToLast({titration_data: titration_trial_data});
+
+    titration_trial_data = {};
+  }
 
   function make_titration_cycle(timeline_variables) {
     // show word
@@ -148,6 +163,26 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     return {
       timeline: [{
         timeline: [{
+          timeline: [
+            {
+              type: CallFunctionPlugin,
+              func: reset_titration_data
+            }
+          ],
+          conditional_function() {
+            return word_understood_correctly;
+          }
+         }, {
+          timeline: [
+            {
+              type: CallFunctionPlugin,
+              func: reset_titration_data
+            }
+          ],
+          conditional_function() {
+            return word_understood_correctly;
+          }
+         }, {
           timeline: [
             {
               type: PreloadPlugin,
@@ -181,14 +216,13 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 titration_trial_data.language_detected = (data.response == 0);
                 if (data.response == 1) {
                   // this trial ends here
-                  console.log(titration_trial_data);
-                  titration_trial_data = {};
+                  reset_titration_data();
                 }
               }
             }
           ],
           conditional_function() {
-            return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word'))
+            return !word_understood_correctly;
           }
         }, {
           timeline: [
@@ -199,13 +233,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
             }
           ],
           conditional_function() { // This references the language detected question
-            return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word')) && jsPsych.data.getLastTrialData().values()[0].response == 0
+            return !word_understood_correctly && jsPsych.data.getLastTrialData().values()[0].response == 0;
           },
           on_finish(data) {
             if (data.response == 1) {
               // this trial ends here
-              console.log(titration_trial_data);
-              titration_trial_data = {};
+              reset_titration_data();
             }
           }
         }, {
@@ -237,8 +270,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                   if (data.response == 0) {
                     titration_trial_data.understood_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
                     // this trial ends here
-                    console.log(titration_trial_data);
-                    titration_trial_data = {};
+                    reset_titration_data();
                   }
                 }
               }]
@@ -247,10 +279,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           on_timeline_finish() {
              const result = jsPsych.data.get().last(2).values()[0];
              result.correct = normalize_word(result.response.understood_word) == normalize_word(jsPsych.evaluateTimelineVariable('target_word'));
+             word_understood_correctly = result.correct;
              result.target_word = jsPsych.evaluateTimelineVariable('target_word');
           },
           conditional_function() { // This references the specific word detected question
-            return !(jsPsych.data.getLastTrialData().values()[0]?.correct && jsPsych.data.getLastTrialData().values()[0].target_word == jsPsych.evaluateTimelineVariable('target_word')) && jsPsych.data.getLastTrialData().values()[0].response == 0;
+            return !word_understood_correctly && jsPsych.data.getLastTrialData().values()[0].response == 0;
           },
           loop_function(data) {
             return data.values().reverse()[0].response == 1;
@@ -262,8 +295,14 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           {num_channels: 6},
           {num_channels: 12},
         ],
+        on_timeline_finish() {
+          word_understood_correctly = false;
+        }
       }],
       timeline_variables,
+      on_timeline_finish() {
+        console.log(jsPsych.data.get().filterCustom(data => 'titration_data' in data).csv())
+      }
     };
   }
 
