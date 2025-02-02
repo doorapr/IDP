@@ -59,7 +59,7 @@ const langs = {
     "speaker-check": "<p>When you click on \"Next\", a sentence will be played to you. Please adjust the volume of your headphones so that you can hear the sentence clearly.</p>",
     "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
     "begin-training-session": "<p><b>Training</b><br>You will now be guided through the experiment using a few examples.<br>Please read the instructions carefully.</p>",
-    "begin-technical":"<p>In the next step, we ask you to select and test your microphone and adjust the volume. Please carry out the experiment with headphones.</p>",
+    "begin-technical":"<p><b>Technical setting</b><br>In the next step, we ask you to select and test your microphone and adjust the volume. Please carry out the experiment with headphones.</p>",
     "id": {
       "umlaut":"<p><b>Before the experiment begins, first create a personal test person code. Please note that umlauts are replaced by the corresponding vowel (e.g. ä by ae) and ß by ss. Upper and lower case is not important.</b></p>",
       "city": "Please provide the first two letters of the city you were born in:",
@@ -101,7 +101,7 @@ const langs = {
     "speaker-check": "<p>Wenn Sie auf \"Weiter\" klicken, wird Ihnen ein Satz vorgespielt. Bitte stellen Sie die Lautstärke Ihrer Kopfhörer so ein, dass Sie den Satz klar und deutlich verstehen.</p>",
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
     "begin-training-session": "<p><b>Training</b><br>Anhand einiger Beispiele werden Sie nun durch den Ablauf des Experiments geführt.<br>Bitte lesen Sie sich die Instruktionen aufmerksam durch.</p>",
-    "begin-technical":"<p>Im nächsten Schritt bitten wir Sie, Ihr Mikrofon auszuwählen und zu testen und die Lautstärke einzustellen. Bitte führen Sie das Experiment mit Kopfhörern durch.</p>",
+    "begin-technical":"<p><b>Technische Einstellung</b><br>Im nächsten Schritt bitten wir Sie, Ihr Mikrofon auszuwählen und zu testen und die Lautstärke einzustellen. Bitte führen Sie das Experiment mit Kopfhörern durch.</p>",
     "id": {
       "umlaut":"<p><b>Bevor das Experiment beginnt, erstellen Sie zunächst einen persönlichen Probandencode. Bitte beachten Sie, dass Umlaute durch den entsprechenden Vokal ersetzt werden (z.B. ä durch ae) und ß durch ss. Groß- und Kleinschreibung spielt keine Rolle.</b></p>",
       "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an:",
