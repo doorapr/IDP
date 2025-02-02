@@ -147,6 +147,9 @@ for x in range(0, len(json_object)):
         if json_object[x]["type"] == "prior_expectation":
             prior_expectation = json_object[x]["response"]
             transcription_map[key]["prior_expectation"] = prior_expectation
+        if json_object[x]["type"] == "expectation_confidence":
+            expecation_confidence = json_object[x]["response"]
+            transcription_map[key]["expecation_confidence"] = expecation_confidence
 
     # print(json_object[x])
 
@@ -176,7 +179,7 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
                     break
                     
         if not writer:        
-            field = ["subject_id","audio" ,"trial","transcription", "clarity","confidence", "response_audio","randomisation","expected_prior_audio","expected_prior_transcription","was_prior_as_expected"]+ source_header
+            field = ["subject_id","audio" ,"trial","transcription", "clarity","confidence", "response_audio","randomisation","expected_prior_audio","expected_prior_transcription","was_prior_as_expected","expecation_confidence"]+ source_header
             writer = csv.writer(file)
             writer.writerow(field)
         
@@ -191,7 +194,8 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
             values.get("randomisation", ""),
             values.get("prior_audio",""),
             values.get("transcription_prior",""),
-            values.get("prior_expectation","")
+            values.get("prior_expectation",""),
+            values.get("expecation_confidence","")
         ]
         output_row.extend(matching_row)
         writer.writerow(output_row)

@@ -43,7 +43,9 @@ const langs = {
     "clarity-question": "<p>How clearly did you hear the last word?</p>",
     "clarity-labels": ["Very unclear<br>0%", "<span id='slider-value'>50%</span>", "Very clear<br>100%"],
     "confidence-labels": ["Very unconfident<br>0%", "<span id='slider-value'>50%</span>", "Very confident<br>100%"],
+    "expectation-labels": ["Not at all<br>0%", "<span id='slider-value'>50%</span>", "Very strongly<br>100%"],
     "confidence-question": "<p>How confident are you in your answer?</p>",
+    "expectation-question":"<p>How strongly did you expect this word?</p>",
     "explanation-pre-playback": "<p>You will hear a woman reading a sentence in which the last word will be somewhat unclear. Please press \"Next\" to hear the sentence.</p>",
     "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then indicate how clearly you heard the last word.</p>",
     "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Click \"Next\" to continue with the next sentence.</p>",
@@ -87,6 +89,8 @@ const langs = {
     "word-question-prior": "<p>Welches Wort haben Sie als Satzende erwartet?</p><br><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie erwartet haben.</p>",
     "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
+    "expectation-question":"<p>Wie stark haben Sie dieses Wort erwartet?</p>",
+    "expectation-labels": ["Überhaupt nicht<br>0%", "<span id='slider-value'>50%</span>", "Sehr stark<br>100%"],
     "clarity-labels": ["Sehr undeutlich<br>0%", "<span id='slider-value'>50%</span>", "Sehr deutlich<br>100%"],
     "confidence-labels": ["Sehr unsicher<br>0%", "<span id='slider-value'>50%</span>", "Sehr sicher<br>100%"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
@@ -472,6 +476,27 @@ export async function run({ assetPaths, input = {}, environment, title, version,
                 data.type="prior_input";
               }
             }
+          }
+        },
+        { // Expectation confidence
+          type: HtmlSliderResponsePlugin,
+          stimulus: selected_language['expectation-question'],
+          button_label: selected_language['done-button'],
+          record_data,
+          labels: selected_language['expectation-labels'],
+          require_movement: true,
+          //slider_width: 600,
+          on_load() {
+            const slider = document.getElementById('jspsych-html-slider-response-response');
+            slider.oninput = () => {
+              const span = document.getElementById('slider-value');
+              span.textContent = `${slider.value}%`
+            };
+          },
+          on_finish(data) {
+            if (!record_data) { return }
+            data.fileName = filename_for_upload
+            data.type = "expectation_confidence"
           }
         }];
       }
