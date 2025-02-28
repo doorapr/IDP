@@ -90,7 +90,7 @@ const langs = {
     "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
     "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
     "expectation-question":"<p>Wie stark haben Sie dieses Wort erwartet?</p>",
-    "expectation-labels": ["Überhaupt nicht<br>0%", "<span id='slider-value'>50%</span>", "Sehr stark<br>100%"],
+    "expectation-labels": ["Sehr schwach<br>0%", "<span id='slider-value'>50%</span>", "Sehr stark<br>100%"],
     "clarity-labels": ["Sehr undeutlich<br>0%", "<span id='slider-value'>50%</span>", "Sehr deutlich<br>100%"],
     "confidence-labels": ["Sehr unsicher<br>0%", "<span id='slider-value'>50%</span>", "Sehr sicher<br>100%"],
     "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
