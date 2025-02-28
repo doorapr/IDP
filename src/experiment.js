@@ -36,11 +36,18 @@ function normalize_word(word) {
  * @type {import("jspsych-builder").RunFunction}
  * 
  */
-export async function run({ assetPaths, input = {}, environment, title, version, stimulus, record_data }) {
+export async function run({ assetPaths, input, environment, title, version, stimulus, record_data }) {
+  if (!input) {
+    input = {
+      titration: "LINEAR",
+      question_prior: true
+    }
+  }
+
 
   const jsPsych = initJsPsych();
 
-  jsPsych.data.addProperties({selected_language: 'de'})
+  jsPsych.data.addProperties({ selected_language: 'de' })
   const lang = await fetch('assets/text/langs/de.json').then(response => response.json()); // selecting the language introduced problems and will be fed in from JATOS anyway.
 
   const configure_microphone = {
@@ -73,9 +80,9 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           prompt: lang['recording-check'],
           choices: [lang['change-microphone-button'], lang['listen-again-button'], lang['done-button']]
         }],
-        loop_function(data) { 
+        loop_function(data) {
           if (data.values()[0].response == 1) { // if listen again is pressed, listen again
-            return true; 
+            return true;
           } else { // if listen again is not pressed, revoke the URL object to save RAM
             URL.revokeObjectURL(data.values()[0].stimulus);
             return false;
@@ -115,40 +122,32 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }
   }
 
-  const fake_titration_data = [
-    {
-      stimulus: "s_em_lc_247tw",
-      target_word: "hals"
-    },
-    {
-      stimulus: "s_eh_400tw",
-      target_word: "muster"
-    },
-    {
-      stimulus: "s_em_hc_259tw",
-      target_word: "uhr"
-    },
-    {
-      stimulus: "s_em_hc_164tw",
-      target_word: "tauben"
-    },
-  ]
-
-  var titration_trial_data = {};
-  var word_understood_correctly = false;
+  var titration_trial_data = undefined;
+  var understood_word = undefined;
 
   const titration_csv_header = "subject;target_word;num_channels;"
 
+  /**
+   * Save and reset the titration_trial_data variable, has to be called once per target_word / num_channels combination.
+   */
   function reset_titration_data() {
     titration_trial_data.target_word = jsPsych.evaluateTimelineVariable('target_word');
     titration_trial_data.num_channels = jsPsych.evaluateTimelineVariable('num_channels');
 
-    console.log(titration_trial_data);
+    jsPsych.data.get().addToLast(titration_trial_data);
 
-    jsPsych.data.get().addToLast({titration_data: titration_trial_data});
-
-    titration_trial_data = {};
+    titration_trial_data = undefined;
   }
+
+  /**
+   * 
+   * @returns boolean True if subsequent trials regarding the current word should be skipped
+   */
+  function word_done() {
+    // We don't want to show trials or save data if the word was understood correctly AND THE RESULT SAVED
+    return understood_word == normalize_word(jsPsych.evaluateTimelineVariable('target_word')) && titration_trial_data === undefined;
+  }
+
 
   function make_titration_cycle(timeline_variables) {
     // show word
@@ -162,166 +161,171 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     // show word
     return {
       timeline: [{
-        timeline: [{
-          timeline: [
-            {
-              type: CallFunctionPlugin,
-              func: reset_titration_data
-            }
-          ],
-          conditional_function() {
-            return word_understood_correctly;
-          }
-         }, {
-          timeline: [
-            {
-              type: CallFunctionPlugin,
-              func: reset_titration_data
-            }
-          ],
-          conditional_function() {
-            return word_understood_correctly;
-          }
-         }, {
-          timeline: [
-            {
-              type: PreloadPlugin,
-              audio() {
-                return [`Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${jsPsych.evaluateTimelineVariable('num_channels')}.wav`];
-              },
-              show_progress_bar: false,
-              record_data: false
+        timeline: [
+          {
+            type: PreloadPlugin,
+            audio() {
+              return [`Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${jsPsych.evaluateTimelineVariable('num_channels')}.wav`];
             },
-            { // delay
-              type: HtmlKeyboardResponsePlugin,
-              stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-              choices: "NO_KEYS",
-              trial_duration: 500,
-              record_data: false
-            }, { // actual playback
-              type: audioKeyboardResponse,
-              stimulus() {
-                return `Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${jsPsych.evaluateTimelineVariable('num_channels')}.wav`;
-              },
-              choices: "NO_KEYS",
-              prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-              trial_ends_after_audio: true,
-              record_data: false
-            }, { // ask if language detected
+            show_progress_bar: false,
+            record_data: false
+          },
+          { // delay
+            type: HtmlKeyboardResponsePlugin,
+            stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+            choices: "NO_KEYS",
+            trial_duration: 500,
+            record_data: false
+          }, { // actual playback
+            type: audioKeyboardResponse,
+            stimulus() {
+              return `Stimuli/${jsPsych.evaluateTimelineVariable('stimulus')}_${jsPsych.evaluateTimelineVariable('num_channels')}.wav`;
+            },
+            choices: "NO_KEYS",
+            prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
+            trial_ends_after_audio: true,
+            record_data: false
+          }, { // ask if language detected
+            type: HtmlButtonResponsePlugin,
+            stimulus: lang['language-detected-question'],
+            choices: [lang['yes-button'], lang['no-button']],
+            on_finish(data) {
+              titration_trial_data = {};
+              titration_trial_data.language_detected_response_time = data.rt;
+              titration_trial_data.language_detected = (data.response == 0);
+            }
+          }
+        ],
+        conditional_function() {
+          return !word_done();
+        }
+      }, {
+        timeline: [
+          { //    ask if word understood
+            type: HtmlButtonResponsePlugin,
+            stimulus: lang['word-detected-question'],
+            choices: [lang['yes-button'], lang['no-button']]
+          }
+        ],
+        conditional_function() { // This references the language detected question
+          return !word_done() && jsPsych.data.getLastTrialData().values()[0].response == 0;
+        },
+      }, {
+        timeline: [
+          { //       ask for word
+            type: SurveyTextPlugin,
+            questions: [{
+              prompt: lang['titration-which-word-question'],
+              name: 'understood_word',
+              required: true,
+            }],
+            button_label: lang['done-button'],
+            on_finish(data) {
+              if (!('entered_words' in titration_trial_data)) {
+                titration_trial_data.entered_words = [];
+              }
+
+              titration_trial_data.entered_words.push(data.response.understood_word);
+            }
+          }, {//       ask if entered word is intended
+            timeline: [{
               type: HtmlButtonResponsePlugin,
-              stimulus: lang['language-detected-question'],
+              stimulus: () => {
+                const entered_word = jsPsych.data.getLastTrialData().values()[0].response.understood_word;
+                return lang['titration-typo-question'] + entered_word;
+              },
               choices: [lang['yes-button'], lang['no-button']],
               on_finish(data) {
-                titration_trial_data.language_detected_response_time = data.rt;
-                titration_trial_data.language_detected = (data.response == 0);
-                if (data.response == 1) {
-                  // this trial ends here
-                  reset_titration_data();
+                if (data.response == 0) {
+                  titration_trial_data.understood_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
+                  titration_trial_data.correct = normalize_word(titration_trial_data.understood_word) == normalize_word(jsPsych.evaluateTimelineVariable('target_word'));
+                  understood_word = titration_trial_data.understood_word
                 }
               }
-            }
-          ],
-          conditional_function() {
-            return !word_understood_correctly;
+            }]
           }
-        }, {
-          timeline: [
-            { //    ask if word understood
-              type: HtmlButtonResponsePlugin,
-              stimulus: lang['word-detected-question'],
-              choices: [lang['yes-button'], lang['no-button']]
-            }
-          ],
-          conditional_function() { // This references the language detected question
-            return !word_understood_correctly && jsPsych.data.getLastTrialData().values()[0].response == 0;
-          },
-          on_finish(data) {
-            if (data.response == 1) {
-              // this trial ends here
-              reset_titration_data();
-            }
-          }
-        }, {
-          timeline: [
-            { //       ask for word
-              type: SurveyTextPlugin,
-              questions: [{
-                prompt: lang['titration-which-word-question'],
-                name: 'understood_word',
-                required: true,
-              }],
-              button_label: lang['done-button'],
-              on_finish(data) {
-                if (!('entered_words' in titration_trial_data)) {
-                  titration_trial_data.entered_words = [];
-                }
-                
-                titration_trial_data.entered_words.push(data.response.understood_word);
-              }
-            }, {//       ask if entered word is intended
-              timeline: [{
-                type: HtmlButtonResponsePlugin,
-                stimulus: () => {
-                  const entered_word = jsPsych.data.getLastTrialData().values()[0].response.understood_word;
-                  return lang['titration-typo-question'] + entered_word;
-                },
-                choices: [lang['yes-button'], lang['no-button']],
-                on_finish(data) {
-                  if (data.response == 0) {
-                    titration_trial_data.understood_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
-                    // this trial ends here
-                    reset_titration_data();
-                  }
-                }
-              }]
-            }
-          ],
-          on_timeline_finish() {
-             const result = jsPsych.data.get().last(2).values()[0];
-             result.correct = normalize_word(result.response.understood_word) == normalize_word(jsPsych.evaluateTimelineVariable('target_word'));
-             word_understood_correctly = result.correct;
-             result.target_word = jsPsych.evaluateTimelineVariable('target_word');
-          },
-          conditional_function() { // This references the specific word detected question
-            return !word_understood_correctly && jsPsych.data.getLastTrialData().values()[0].response == 0;
-          },
-          loop_function(data) {
-            return data.values().reverse()[0].response == 1;
-          }
-        }],
-        timeline_variables: [
-          {num_channels: 1},
-          {num_channels: 3},
-          {num_channels: 6},
-          {num_channels: 12},
         ],
-        on_timeline_finish() {
-          word_understood_correctly = false;
+        conditional_function() { // This references the specific word detected question
+          return !word_done() && jsPsych.data.getLastTrialData().values()[0].response == 0;
+        },
+        loop_function(data) {
+          return data.values().reverse()[0].response == 1;
         }
-      }],
+      }, {
+        timeline: [
+          {
+            type: CallFunctionPlugin,
+            func: reset_titration_data
+          }
+        ],
+        conditional_function() {
+          return !word_done();
+        }
+      },
+      ],
       timeline_variables,
       on_timeline_finish() {
-        console.log(jsPsych.data.get().filterCustom(data => 'titration_data' in data).csv())
+        console.log(jsPsych.data.get().filterCustom(data => 'target_word' in data).csv())
       }
     };
   }
 
-  const sensory_titration = {
-    timeline: [
-      {
-        type: HtmlButtonResponsePlugin,
-        stimulus: lang['begin-titration'],
-        choices: [lang['done-button']],
-        record_data: false
-      },
-      {
-        type: HtmlButtonResponsePlugin,
-        stimulus: lang['titration-before-first'],
-        choices: [lang['done-button']],
-        record_data: false
-      },
-      make_titration_cycle(fake_titration_data)
-    ]
+  const fake_titration_sheet = [
+    {
+      stimulus: "s_em_lc_247tw",
+      target_word: "hals",
+      syllables: 1
+    },
+    {
+      stimulus: "s_eh_400tw",
+      target_word: "muster",
+      syllables: 2
+    },
+    {
+      stimulus: "s_em_hc_259tw",
+      target_word: "uhr",
+      syllables: 1
+    },
+    {
+      stimulus: "s_em_hc_164tw",
+      target_word: "tauben",
+      syllables: 2,
+    },
+  ]
+
+  const channels = jsPsych.randomization.shuffle([
+    1, 3, 6, 12
+  ])
+
+  const stimuli = jsPsych.randomization.sampleWithoutReplacement(fake_titration_sheet, channels.length)
+
+  const cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => jsPsych.utils.deepMerge(d, e))));
+
+  let fake_titration_data;
+  if (input.titration == "RANDOM") {
+    fake_titration_data = stimuli.map((stimulus, index) => ({ ...stimulus, num_channels: channels[index] }));
+  } else if (input.titration == "LINEAR") {
+    fake_titration_data = [...cartesian(fake_titration_sheet, [{ num_channels: 1 }, { num_channels: 3 }, { num_channels: 6 }, { num_channels: 12 }])];
+  }
+
+  function make_sensory_titration() {
+    return input.titration ? {
+      timeline: [
+        {
+          type: HtmlButtonResponsePlugin,
+          stimulus: lang['begin-titration'],
+          choices: [lang['done-button']],
+          record_data: false
+        },
+        {
+          type: HtmlButtonResponsePlugin,
+          stimulus: lang['titration-before-first'],
+          choices: [lang['done-button']],
+          record_data: false
+        },
+        make_titration_cycle(fake_titration_data)
+      ]
+    } : { timeline: [] }
   }
 
   var filename_for_upload;
@@ -354,7 +358,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false,
       on_finish() {
         const path = (typeof second_stimulus === 'string') ? second_stimulus : jsPsych.evaluateTimelineVariable(second_stimulus.name);
-        filename_for_upload = "response_"+path.substr(8).split(".")[0] + ".txt";
+        filename_for_upload = "response_" + path.substr(8).split(".")[0] + ".txt";
         console.log(filename_for_upload);
         console.log("FILENAME")
       }
@@ -369,59 +373,59 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         showQuestionNumbers: false,
         elements:
           [{
-            readOnly:true,
-            html:lang['id']['umlaut'],
-            type:'html'
+            readOnly: true,
+            html: lang['id']['umlaut'],
+            type: 'html'
           },
-            {
-              type: 'text',
-              title: lang['id']['city'],
-              name: 'city',
-              maskType: "pattern",
-              maskSettings: {
-                pattern: "aa"
-              },
-              
-              isRequired: true,
-              description: "München → mu"
+          {
+            type: 'text',
+            title: lang['id']['city'],
+            name: 'city',
+            maskType: "pattern",
+            maskSettings: {
+              pattern: "aa"
             },
-            {
-              type: 'dropdown',
-              title: lang['id']['birthMonth'],
-              name: 'birthMonth',
-              choices: lang['id']['months'],
-              isRequired: true,
-              placeholder: lang['id']['placeholder']
+
+            isRequired: true,
+            description: "München → mu"
+          },
+          {
+            type: 'dropdown',
+            title: lang['id']['birthMonth'],
+            name: 'birthMonth',
+            choices: lang['id']['months'],
+            isRequired: true,
+            placeholder: lang['id']['placeholder']
+          },
+          {
+            type: 'text',
+            title: lang['id']['mother'],
+            name: 'mother',
+            maskType: "pattern",
+            maskSettings: {
+              pattern: "aa"
             },
-            {
-              type: 'text',
-              title: lang['id']['mother'],
-              name: 'mother',
-              maskType: "pattern",
-              maskSettings: {
-                pattern: "aa"
-              },
-              isRequired: true,
-              description: "Emma → em"
+            isRequired: true,
+            description: "Emma → em"
+          },
+          {
+            type: 'text',
+            title: lang['id']['birthname'],
+            name: 'birthname',
+            description: "Mustermann → nn",
+            showCommentArea: true,
+            maskType: "pattern",
+            maskSettings: {
+              pattern: "aa",
+
             },
-            {
-              type: 'text',
-              title: lang['id']['birthname'],
-              name: 'birthname',
-              description: "Mustermann → nn",
-              showCommentArea: true,
-              maskType: "pattern",
-              maskSettings: {
-                pattern: "aa",
-                
-              },
-              isRequired: true,
-               
-            }
+            isRequired: true,
+
+          }
           ]
       },
       on_finish(data) {
-        sub_id = data.response.city + data.response.birthMonth + data.response.mother  + data.response.birthname
+        sub_id = data.response.city + data.response.birthMonth + data.response.mother + data.response.birthname
         jsPsych.data.addProperties({
           subject_id: sub_id
         })
@@ -450,7 +454,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         if (!record_data) { return }
         data.fileName = filename_for_upload
         data.type = "clarity"
-        
+
       }
     };
   }
@@ -499,8 +503,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
               .then(() => {
                 data.response = filename_for_upload;
                 data.fileName = filename_for_upload;
-                data.roundIndex=roundIndex;
-                data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
+                data.roundIndex = roundIndex;
+                data.type = "mic_input"; // Remove response data from RAM, we already saved it to the server.
                 console.log("File was successfully uploaded");
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
@@ -512,7 +516,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       }
     }];
   }
-  
+
   function ready_next_sentence(record_data) {
     return [{
       type: HtmlButtonResponsePlugin,
@@ -522,96 +526,96 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     }]
   }
 
-  function ask_prior(record_data,in_training){ //TODO: check how explain part influences csv
-    return {
-        type: HtmlButtonResponsePlugin,
-        // TODO: den namen schöner
-        stimulus: lang['word-question-prior-question'],
-        choices: [lang['yes-button'],lang['no-button'],lang['not-understood']],
-        record_data,
-        on_finish(data){
-          data.type="prior_expectation";
-          data.fileName = filename_for_upload;
-          if (in_training){ 
-            data.training="true";
-          }
-        }
-
-      }}
-
-  function conditional_prior(record_data){
-        return {
-          timeline: make_word_question_prior(record_data),// The trial to execute conditionally
-          record_data:true, 
-          conditional_function: function() {
-            const data = jsPsych.data.get().last(1).values()[0];
-            if(data.response == 0){
-              return false;
-            } else {
-              return true;
-          }
-        }
+  function ask_prior(record_data, in_training) { //TODO: check how explain part influences csv
+    return input.question_prior ? {
+      type: HtmlButtonResponsePlugin,
+      // TODO: den namen schöner
+      stimulus: lang['word-question-prior-question'],
+      choices: [lang['yes-button'], lang['no-button'], lang['not-understood']],
+      record_data,
+      on_finish(data) {
+        data.type = "prior_expectation";
+        data.fileName = filename_for_upload;
+        if (in_training) {
+          data.training = "true";
         }
       }
-  function make_word_question_prior(record_data) {
+    } : { timeline: [] };
+  }
 
-        return [
-          {
-          type: HtmlButtonResponsePlugin,
-          stimulus: lang['word-question-prior'],
-          choices: [lang['done-button']],
-          record_data: false,   
-        }, { // Which word was understood?
-          type: htmlAudioResponse,
-          stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
-          recording_duration: 7500,
-          show_done_button: true,
-          done_button_label: lang['done-button'],
-          record_data,
-          on_finish(data) {
-            if (record_data) {
-              if (typeof jatos !== 'undefined') {
-                var prior_filename_for_upload= "prior_"+filename_for_upload
-                jatos.uploadResultFile(data.response, prior_filename_for_upload)
-                  .then(() => {
-                    data.response = prior_filename_for_upload; // Remove response data from RAM, we already saved it to the server.
-                    data.fileName = filename_for_upload;
-                    data.type="prior_input"; 
-                    console.log(data.response)
-                    console.log(prior_filename_for_upload)
-                    console.log("File was successfully uploaded");
-                  })
-                  .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
-              } else {
-                data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
-                data.fileName = filename_for_upload;
-                data.type="prior_input";
-              }
+  function conditional_prior(record_data) {
+    return input.question_prior ? {
+      timeline: make_word_question_prior(record_data),// The trial to execute conditionally
+      record_data: true,
+      conditional_function: function () {
+        const data = jsPsych.data.get().last(1).values()[0];
+        if (data.response == 0) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    } : { timeline: [] };
+  }
+
+  function make_word_question_prior(record_data) {
+    return [
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: lang['word-question-prior'],
+        choices: [lang['done-button']],
+        record_data: false,
+      }, { // Which word was understood?
+        type: htmlAudioResponse,
+        stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+        recording_duration: 7500,
+        show_done_button: true,
+        done_button_label: lang['done-button'],
+        record_data,
+        on_finish(data) {
+          if (record_data) {
+            if (typeof jatos !== 'undefined') {
+              var prior_filename_for_upload = "prior_" + filename_for_upload
+              jatos.uploadResultFile(data.response, prior_filename_for_upload)
+                .then(() => {
+                  data.response = prior_filename_for_upload; // Remove response data from RAM, we already saved it to the server.
+                  data.fileName = filename_for_upload;
+                  data.type = "prior_input";
+                  console.log(data.response)
+                  console.log(prior_filename_for_upload)
+                  console.log("File was successfully uploaded");
+                })
+                .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
+            } else {
+              data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+              data.fileName = filename_for_upload;
+              data.type = "prior_input";
             }
           }
+        }
+      },
+      { // Expectation confidence
+        type: HtmlSliderResponsePlugin,
+        stimulus: lang['expectation-question'],
+        button_label: lang['done-button'],
+        record_data,
+        labels: lang['expectation-labels'],
+        require_movement: true,
+        //slider_width: 600,
+        on_load() {
+          const slider = document.getElementById('jspsych-html-slider-response-response');
+          slider.oninput = () => {
+            const span = document.getElementById('slider-value');
+            span.textContent = `${slider.value}%`
+          };
         },
-        { // Expectation confidence
-          type: HtmlSliderResponsePlugin,
-          stimulus: lang['expectation-question'],
-          button_label: lang['done-button'],
-          record_data,
-          labels: lang['expectation-labels'],
-          require_movement: true,
-          //slider_width: 600,
-          on_load() {
-            const slider = document.getElementById('jspsych-html-slider-response-response');
-            slider.oninput = () => {
-              const span = document.getElementById('slider-value');
-              span.textContent = `${slider.value}%`
-            };
-          },
-          on_finish(data) {
-            if (!record_data) { return }
-            data.fileName = filename_for_upload
-            data.type = "expectation_confidence"
-          }
-        }];
-      }
+        on_finish(data) {
+          if (!record_data) { return }
+          data.fileName = filename_for_upload
+          data.type = "expectation_confidence"
+        }
+      }];
+  }
 
   const explanation = [
     {
@@ -655,7 +659,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     make_clarity_question(false),
     ...make_word_question(false),
     make_confidence_question(false),
-    ask_prior(true,true),
+    ask_prior(true, true),
     conditional_prior(true),
     {
       type: HtmlButtonResponsePlugin,
@@ -667,11 +671,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     {
       timeline: [
         ...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')),
-       
+
         make_clarity_question(false),
         ...make_word_question(false),
         make_confidence_question(false),
-        ask_prior(true,true),
+        ask_prior(true, true),
         conditional_prior(true),
       ],
       timeline_variables: [
@@ -710,7 +714,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
     fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
   ]))
-  var roundIndex=1;
+  var roundIndex = 1;
   const timeline = [];
 
   // 4 Blöcke â 50 Sätze
@@ -725,21 +729,21 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push(ready_next_sentence(true));
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
-  
+
   timeline.push({
     timeline: [
       make_clarity_question(true),
       ...make_word_question(true),
       make_confidence_question(true),
-      ask_prior(true,false),
+      ask_prior(true, false),
       conditional_prior(true)
     ],
-    
+
     on_timeline_finish() {
       if (typeof jatos !== 'undefined') {
         jatos.submitResultData(jsPsych.data.get().json()) // send the whole data every time, it's not that big
       }
-      roundIndex+=1;
+      roundIndex += 1;
     }
   });
 
@@ -750,7 +754,6 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   }
 
   await jsPsych.run([
-    sensory_titration,
     {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['consent-form'],
@@ -771,25 +774,26 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     },
     configure_microphone,
     configure_speakers,
+    make_sensory_titration(),
     explanation,
     {
       timeline,
       timeline_variables: blocks[0],
       randomize_order: true
     },
-    pause, 
+    pause,
     {
       timeline,
       timeline_variables: blocks[1],
       randomize_order: true
-    }, 
-    pause, 
+    },
+    pause,
     {
       timeline,
       timeline_variables: blocks[2],
       randomize_order: true
-    }, 
-    pause, 
+    },
+    pause,
     {
       timeline,
       timeline_variables: blocks[3],
