@@ -437,7 +437,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data,
       labels: lang['clarity-labels'],
       require_movement: true,
-      slider_width: 600,
+      //slider_width: 600,
       subject_id: sub_id,
       on_load() {
         const slider = document.getElementById('jspsych-html-slider-response-response');
@@ -463,7 +463,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data,
       labels: lang['confidence-labels'],
       require_movement: true,
-      slider_width: 600,
+      //slider_width: 600,
       on_load() {
         const slider = document.getElementById('jspsych-html-slider-response-response');
         slider.oninput = () => {
@@ -497,11 +497,11 @@ export async function run({ assetPaths, input = {}, environment, title, version,
           if (typeof jatos !== 'undefined') {
             jatos.uploadResultFile(data.response, filename_for_upload)
               .then(() => {
-                console.log("File was successfully uploaded");
                 data.response = filename_for_upload;
                 data.fileName = filename_for_upload;
                 data.roundIndex=roundIndex;
                 data.type="mic_input"; // Remove response data from RAM, we already saved it to the server.
+                console.log("File was successfully uploaded");
               })
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
@@ -512,7 +512,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       }
     }];
   }
-
+  
   function ready_next_sentence(record_data) {
     return [{
       type: HtmlButtonResponsePlugin,
@@ -521,6 +521,97 @@ export async function run({ assetPaths, input = {}, environment, title, version,
       record_data: false
     }]
   }
+
+  function ask_prior(record_data,in_training){ //TODO: check how explain part influences csv
+    return {
+        type: HtmlButtonResponsePlugin,
+        // TODO: den namen schöner
+        stimulus: selected_language['word-question-prior-question'],
+        choices: [selected_language['yes-button'],selected_language['no-button'],selected_language['not-understood']],
+        record_data,
+        on_finish(data){
+          data.type="prior_expectation";
+          data.fileName = filename_for_upload;
+          if (in_training){ 
+            data.training="true";
+          }
+        }
+
+      }}
+
+  function conditional_prior(record_data){
+        return {
+          timeline: make_word_question_prior(record_data),// The trial to execute conditionally
+          record_data:true, 
+          conditional_function: function() {
+            const data = jsPsych.data.get().last(1).values()[0];
+            if(data.response == 0){
+              return false;
+            } else {
+              return true;
+          }
+        }
+        }
+      }
+  function make_word_question_prior(record_data) {
+
+        return [
+          {
+          type: HtmlButtonResponsePlugin,
+          stimulus: selected_language['word-question-prior'],
+          choices: [selected_language['done-button']],
+          record_data: false,   
+        }, { // Which word was understood?
+          type: htmlAudioResponse,
+          stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+          recording_duration: 7500,
+          show_done_button: true,
+          done_button_label: selected_language['done-button'],
+          record_data,
+          on_finish(data) {
+            if (record_data) {
+              if (typeof jatos !== 'undefined') {
+                var prior_filename_for_upload= "prior_"+filename_for_upload
+                jatos.uploadResultFile(data.response, prior_filename_for_upload)
+                  .then(() => {
+                    data.response = prior_filename_for_upload; // Remove response data from RAM, we already saved it to the server.
+                    data.fileName = filename_for_upload;
+                    data.type="prior_input"; 
+                    console.log(data.response)
+                    console.log(prior_filename_for_upload)
+                    console.log("File was successfully uploaded");
+                  })
+                  .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
+              } else {
+                data.response = prior_filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
+                data.fileName = filename_for_upload;
+                data.type="prior_input";
+              }
+            }
+          }
+        },
+        { // Expectation confidence
+          type: HtmlSliderResponsePlugin,
+          stimulus: selected_language['expectation-question'],
+          button_label: selected_language['done-button'],
+          record_data,
+          labels: selected_language['expectation-labels'],
+          require_movement: true,
+          //slider_width: 600,
+          on_load() {
+            const slider = document.getElementById('jspsych-html-slider-response-response');
+            slider.oninput = () => {
+              const span = document.getElementById('slider-value');
+              span.textContent = `${slider.value}%`
+            };
+          },
+          on_finish(data) {
+            if (!record_data) { return }
+            data.fileName = filename_for_upload
+            data.type = "expectation_confidence"
+          }
+        }];
+      }
 
   const explanation = [
     {
@@ -564,6 +655,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     make_clarity_question(false),
     ...make_word_question(false),
     make_confidence_question(false),
+    ask_prior(true,true),
+    conditional_prior(true),
     {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['end-of-first-tutorial-sentence'],
@@ -574,9 +667,12 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     {
       timeline: [
         ...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')),
+       
         make_clarity_question(false),
         ...make_word_question(false),
         make_confidence_question(false),
+        ask_prior(true,true),
+        conditional_prior(true),
       ],
       timeline_variables: [
         {
@@ -629,12 +725,16 @@ export async function run({ assetPaths, input = {}, environment, title, version,
   });
   timeline.push(ready_next_sentence(true));
   timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
+  
   timeline.push({
     timeline: [
       make_clarity_question(true),
       ...make_word_question(true),
-      make_confidence_question(true)
+      make_confidence_question(true),
+      ask_prior(true,false),
+      conditional_prior(true)
     ],
+    
     on_timeline_finish() {
       if (typeof jatos !== 'undefined') {
         jatos.submitResultData(jsPsych.data.get().json()) // send the whole data every time, it's not that big

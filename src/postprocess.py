@@ -99,10 +99,17 @@ for fileName in files:
         audio_data = recognizer.record(source)
         result = json_decoder.decode(recognizer.recognize_vosk(audio_data, 'de'))['text']
         filename = os.path.basename(wavPath)
-        if filename not in transcription_map:
-            transcription_map[filename] = {"transcription": result}
-        else:
-            transcription_map[filename]["transcription"] = result
+        if filename.startswith("prior_"): 
+            og_filename = filename[len("prior_"):]
+            if og_filename not in transcription_map:
+                transcription_map[og_filename] = {"transcription_prior": result}
+            else:
+                transcription_map[og_filename]["transcription_prior"] = result
+        else:        
+            if filename not in transcription_map:
+                transcription_map[filename] = {"transcription": result}
+            else:
+                transcription_map[filename]["transcription"] = result
         end = time.time()
         print("Recognized word " + result + " for file " + wavPath + " in " + str(end - start) + " seconds.")
     
@@ -114,26 +121,39 @@ study_data = open(data_file, "r").read()
 json_object = json.loads(study_data)
 subject_id = json_object[1].get("subject_id", "unknown_subject")
 randomisation = json_object[0].get("selected_randomisation", "unknown_randomisation")
+print(randomisation)
 for x in range(0, len(json_object)):
     if "fileName" in json_object[x]:
+        if json_object[x].get("training") == "true":
+            continue
         key = json_object[x]["fileName"].replace('.txt', '.wav')
         transcription_map[key]["subject_id"]= subject_id
         transcription_map[key]["randomisation"]= randomisation
         if json_object[x]["type"] == "clarity":
             clarity = json_object[x]["response"]
             transcription_map[key]["clarity"] = clarity
-        if json_object[x]["type"] == "confidence":
-            confidence = json_object[x]["response"]
-            transcription_map[key]["confidence"] = confidence
         if json_object[x]["type"] == "mic_input":
             response_audio = json_object[x]["response"]
             transcription_map[key]["response_audio"] = response_audio
             roundIndex = json_object[x]["roundIndex"]
             transcription_map[key]["roundIndex"]=roundIndex
+        if json_object[x]["type"] == "confidence":
+            confidence = json_object[x]["response"]
+            transcription_map[key]["confidence"] = confidence
+        if json_object[x]["type"] == "prior_input":
+            prior_audio = json_object[x]["response"]
+            print(prior_audio)
+            transcription_map[key]["prior_audio"] = prior_audio
+        if json_object[x]["type"] == "prior_expectation":
+            prior_expectation = json_object[x]["response"]
+            transcription_map[key]["prior_expectation"] = prior_expectation
+        if json_object[x]["type"] == "expectation_confidence":
+            expecation_confidence = json_object[x]["response"]
+            transcription_map[key]["expecation_confidence"] = expecation_confidence
 
     # print(json_object[x])
 
-#print(transcription_map)
+#path to the S1,S2,S3,S4 csv
 path_original_csv="assets/text"
 
 
@@ -142,12 +162,13 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
     writer = None
     
     for key, values in transcription_map.items():
+        
         with open(os.path.join(path_original_csv,"S"+str(values.get("randomisation")))+".csv", 'rb') as f:
             raw_data = f.read()
             detected_encoding = detect(raw_data)['encoding']
         with open(os.path.join(path_original_csv,"S"+str(values.get("randomisation")))+".csv", 'r',encoding=detected_encoding) as original_file:
             reader = csv.reader(original_file, delimiter=';')
-            source_header = next(reader)
+            source_header = next(reader) #the column names
             source_index_map = {col: idx for idx, col in enumerate(source_header)}
             matching_row = None
             #hier key umändern, so dass respond am anfang weg ist
@@ -158,7 +179,7 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
                     break
                     
         if not writer:        
-            field = ["subject_id","audio" ,"trial","transcription", "confidence", "clarity", "response_audio","randomisation",]+ source_header
+            field = ["subject_id","audio" ,"trial","transcription", "clarity","confidence", "response_audio","randomisation","expected_prior_audio","expected_prior_transcription","was_prior_as_expected","expecation_confidence"]+ source_header
             writer = csv.writer(file)
             writer.writerow(field)
         
@@ -167,10 +188,14 @@ with open(os.path.join(os.path.dirname(data_file), f"results_{subject_id}.csv"),
             shortened_key, # redundant weil wir ja schon audio unter "Single Word" abspeichern
             values.get("roundIndex",""),
             values.get("transcription", ""),
-            values.get("confidence", ""),
             values.get("clarity", ""),
+            values.get("confidence", ""),
             values.get("response_audio", ""),
-            values.get("randomisation", "")
+            values.get("randomisation", ""),
+            values.get("prior_audio",""),
+            values.get("transcription_prior",""),
+            values.get("prior_expectation",""),
+            values.get("expecation_confidence","")
         ]
         output_row.extend(matching_row)
         writer.writerow(output_row)
