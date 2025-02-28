@@ -40,7 +40,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
 
   const jsPsych = initJsPsych();
 
-  jsPsych.data.addProperties({lang: 'de'})
+  jsPsych.data.addProperties({selected_language: 'de'})
   const lang = await fetch('assets/text/langs/de.json').then(response => response.json()); // selecting the language introduced problems and will be fed in from JATOS anyway.
 
   const configure_microphone = {
@@ -63,7 +63,7 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         timeline: [{
           type: AudioButtonResponsePlugin,
           stimulus: () => {
-            const last_trial_data = jsPsych.data.getLastTrialData();
+            const last_trial_data = jsPsych.data.getLastTrialData().values()[0];
             return last_trial_data.audio_url || last_trial_data.stimulus;
           },
           on_load() {
@@ -526,8 +526,8 @@ export async function run({ assetPaths, input = {}, environment, title, version,
     return {
         type: HtmlButtonResponsePlugin,
         // TODO: den namen schöner
-        stimulus: selected_language['word-question-prior-question'],
-        choices: [selected_language['yes-button'],selected_language['no-button'],selected_language['not-understood']],
+        stimulus: lang['word-question-prior-question'],
+        choices: [lang['yes-button'],lang['no-button'],lang['not-understood']],
         record_data,
         on_finish(data){
           data.type="prior_expectation";
@@ -558,15 +558,15 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         return [
           {
           type: HtmlButtonResponsePlugin,
-          stimulus: selected_language['word-question-prior'],
-          choices: [selected_language['done-button']],
+          stimulus: lang['word-question-prior'],
+          choices: [lang['done-button']],
           record_data: false,   
         }, { // Which word was understood?
           type: htmlAudioResponse,
           stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
           recording_duration: 7500,
           show_done_button: true,
-          done_button_label: selected_language['done-button'],
+          done_button_label: lang['done-button'],
           record_data,
           on_finish(data) {
             if (record_data) {
@@ -592,10 +592,10 @@ export async function run({ assetPaths, input = {}, environment, title, version,
         },
         { // Expectation confidence
           type: HtmlSliderResponsePlugin,
-          stimulus: selected_language['expectation-question'],
-          button_label: selected_language['done-button'],
+          stimulus: lang['expectation-question'],
+          button_label: lang['done-button'],
           record_data,
-          labels: selected_language['expectation-labels'],
+          labels: lang['expectation-labels'],
           require_movement: true,
           //slider_width: 600,
           on_load() {
