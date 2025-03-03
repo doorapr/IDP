@@ -4,13 +4,17 @@
   background-color: #ffffff;
 }
 
+html {
+  background-color: ivory;
+}
+
 .jspsych-content-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  //background-color: #EDE8D0;
   line-height: 1.6;
   min-height: 100vh;
+  background-color: ivory;
 }
 
 #jspsych-content {
@@ -25,6 +29,7 @@
   border-radius: 10px;
   width: 600px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
 }
 
 /**.heading {

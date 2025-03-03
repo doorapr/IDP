@@ -3,7 +3,7 @@
  * @description 
  * @version 0.1.0
  *
- * @assets Stimuli/,assets/images,assets/audio/training,assets/text,assets/typo-dictionaries
+ * @assets Stimuli/,assets/images,assets/audio/training,assets/text
  * 
  */
 
@@ -39,7 +39,10 @@ function normalize_word(word) {
 export async function run({ assetPaths, input, environment, title, version, stimulus, record_data }) {
   if (!input) {
     input = {
-      titration: "LINEAR",
+      titration: {
+        linear: [1, 2, 3, 4, 5, 6],
+        random: [1, 3, 5, 6, 7, 8, 12]
+      },
       question_prior: true
     }
   }
@@ -105,7 +108,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
       },
       { // Prior (first part of the sentence)
         type: audioKeyboardResponse,
-        stimulus: 'assets/audio/training/audio_test.wav', // audio file here
+        stimulus: 'assets/audio/training/audio_test.wav',
         choices: "NO_KEYS",
         prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
         trial_ends_after_audio: true,
@@ -125,10 +128,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
   var titration_trial_data = undefined;
   var understood_word = undefined;
 
-  const titration_csv_header = "subject;target_word;num_channels;"
-
   /**
-   * Save and reset the titration_trial_data variable, has to be called once per target_word / num_channels combination.
+   * Save and reset the titration_trial_data variable, has to be called once per row in the resulting dataset combination.
    */
   function reset_titration_data() {
     titration_trial_data.target_word = jsPsych.evaluateTimelineVariable('target_word');
@@ -149,16 +150,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
   }
 
 
+  // TODO: "Jetzt beginnt ein neues Wort + Sprechblase"
   function make_titration_cycle(timeline_variables) {
-    // show word
-    // ask if language detected
-    // -> only if true: 
-    //    ask if word understood
-    //    -> only if true:
-    //       ask for word
-    //       ask if typo corrected is intended
-    //       check for correctness
-    // show word
     return {
       timeline: [{
         timeline: [
@@ -238,7 +231,6 @@ export async function run({ assetPaths, input, environment, title, version, stim
               on_finish(data) {
                 if (data.response == 0) {
                   titration_trial_data.understood_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
-                  titration_trial_data.correct = normalize_word(titration_trial_data.understood_word) == normalize_word(jsPsych.evaluateTimelineVariable('target_word'));
                   understood_word = titration_trial_data.understood_word
                 }
               }
@@ -312,7 +304,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     return input.titration ? {
       timeline: [
         {
-          type: HtmlButtonResponsePlugin,
+          type: HtmlButtonResponsePlugin, //TODO: Second Titration Page, linear vs. random
           stimulus: lang['begin-titration'],
           choices: [lang['done-button']],
           record_data: false
@@ -324,6 +316,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
           record_data: false
         },
         make_titration_cycle(fake_titration_data)
+        //TODO: End of titration
       ]
     } : { timeline: [] }
   }
