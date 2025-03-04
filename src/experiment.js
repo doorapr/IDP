@@ -281,7 +281,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       stimulus: "s_em_hc_164tw",
-      target_word: "tauben",
+      target_word: "",
       syllables: 2,
     },
   ]
