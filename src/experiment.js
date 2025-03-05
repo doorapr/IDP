@@ -48,6 +48,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
     }
   }
 
+  input.titration.random = (input.titration.random || []);
+  input.titration.linear = (input.titration.linear || []);
+
   const jsPsych = initJsPsych();
 
   jsPsych.data.addProperties({ selected_language: 'de' })
@@ -128,7 +131,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
   var titration_trial_data = undefined;
   var skip_rest = false;
 
-  function make_titration(stimulus, num_channels) {
+  function make_titration(stimulus, num_channels, reversed) {
     return [{
       timeline: [
         {
@@ -156,7 +159,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
           record_data: false
         }, { // ask if language detected
           type: HtmlButtonResponsePlugin,
-          stimulus: lang['language-detected-question'],
+          stimulus: lang['language-detected-question'] + (reversed ? '<p style="color: red">Pretend the audio played in reverse, this is a reverse trial.</p>' : ''),
           choices: [lang['yes-button'], lang['no-button']],
           on_finish(data) {
             titration_trial_data = {};
@@ -221,7 +224,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
   function make_titration_cycle(timeline_variables) {
     return {
       timeline: timeline_variables.map(it => {
-        const { target_word, stimulus, channel_list } = it;
+        const { target_word, stimulus, channel_list, reversed } = it;
         return ([
           {
             type: HtmlKeyboardResponsePlugin,
@@ -238,7 +241,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
           },
           channel_list.flatMap(num_channels => ({
             timeline: [
-              ...make_titration(stimulus, num_channels),
+              ...make_titration(stimulus, num_channels, reversed),
               {
                 type: CallFunctionPlugin,
                 func() {
@@ -246,7 +249,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
                   titration_trial_data.num_channels = num_channels;
                   jsPsych.data.get().addToLast(titration_trial_data);
 
-                  skip_rest = titration_trial_data.understood_word === target_word;
+                  skip_rest = !reversed && titration_trial_data.understood_word === target_word;
                   titration_trial_data = undefined;
                 }
               }
@@ -263,7 +266,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     };
   }
 
-  const fake_titration_sheet = [
+  const linear_titration_sheet = input.titration.linear.length ? [
     {
       stimulus: "s_em_lc_247tw",
       target_word: "hals",
@@ -281,15 +284,43 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       stimulus: "s_em_hc_164tw",
-      target_word: "",
+      target_word: "tauben",
       syllables: 2,
     },
-  ]
+  ] : [];
 
-  const sheet_entries = jsPsych.randomization.sampleWithoutReplacement(fake_titration_sheet, (input.titration.random || []).length)
-  const random_titration_data = jsPsych.randomization.shuffle(sheet_entries.map((entry, index) => ({ ...entry, channel_list: [input.titration.random[index]] }))); // TODO: Fit the reverse in here somewhere, introduce an internal target word
+  const random_titration_sheet = input.titration.random.length ? [
+    {
+      stimulus: "s_em_lc_247tw",
+      target_word: "hals",
+      syllables: 1
+    },
+    {
+      stimulus: "s_em_hc_259tw",
+      target_word: "uhr",
+      syllables: 1
+    },
+    {
+      stimulus: "s_em_hc_164tw",
+      target_word: "tauben",
+      syllables: 2,
+    },
+    {
+      stimulus: "s_eh_400tw",
+      target_word: "muster",
+      syllables: 2
+    },
+  ] : [];
 
-  const linear_titration_data = (input.titration.linear || []).length ? jsPsych.randomization.shuffle(fake_titration_sheet).map(it => ({ ...it, channel_list: input.titration.linear })) : []
+  const random_titration_data = jsPsych.randomization.shuffle([
+    ...jsPsych.randomization.sampleWithoutReplacement(random_titration_sheet, input.titration.random.length).map((it, index) => ({ ...it, reversed: false, channel_list: [input.titration.random[index]] })),
+    ...jsPsych.randomization.sampleWithoutReplacement(random_titration_sheet, input.titration.random.length).map((it, index) => ({ ...it, reversed: true, channel_list: [input.titration.random[index]] }))
+  ]);
+
+  const linear_titration_data = jsPsych.randomization.shuffle([
+    ...linear_titration_sheet.map(it => ({ ...it, channel_list: input.titration.linear, reversed: false })),
+    ...linear_titration_sheet.map(it => ({ ...it, channel_list: input.titration.linear, reversed: true }))
+  ]);
 
   function make_sensory_titration() {
     return (linear_titration_data.length || random_titration_data.length) ? {
@@ -306,12 +337,6 @@ export async function run({ assetPaths, input, environment, title, version, stim
           choices: [lang['done-button']],
           record_data: false
         }] : [],
-        ...random_titration_data.length ? [{
-          type: HtmlButtonResponsePlugin,
-          stimulus: lang['begin-titration-random-sampling'],
-          choices: [lang['done-button']],
-          record_data: false
-        }] : [],
         {
           type: HtmlButtonResponsePlugin,
           stimulus: lang['titration-before-first'],
@@ -319,7 +344,17 @@ export async function run({ assetPaths, input, environment, title, version, stim
           record_data: false
         },
         ...(linear_titration_data.length ? [make_titration_cycle(linear_titration_data)] : []),
-        ...(random_titration_data.length ? [make_titration_cycle(random_titration_data)] : []),
+        ...(random_titration_data.length ?
+          [
+            {
+              type: HtmlButtonResponsePlugin,
+              stimulus: lang['begin-titration-random-sampling'],
+              choices: [lang['done-button']],
+              record_data: false
+            },
+            make_titration_cycle(random_titration_data)
+          ] : []
+        ),
         {
           type: HtmlButtonResponsePlugin,
           stimulus: lang['end-titration'],
