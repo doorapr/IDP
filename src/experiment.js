@@ -1,9 +1,9 @@
 /**
  * @title IDP
  * @description 
- * @version 0.1.0
+ * @version 0.9.0
  *
- * @assets Stimuli/,assets/images,assets/audio/training,assets/text
+ * @assets Stimuli/,assets/images,assets/audio,assets/text
  * 
  */
 
@@ -17,17 +17,22 @@ import HtmlSliderResponsePlugin from "@jspsych/plugin-html-slider-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
-import { initJsPsych } from "jspsych";
+import { DataCollection, initJsPsych } from "jspsych";
 import survey from '@jspsych/plugin-survey';
 import '@jspsych/plugin-survey/css/survey.css'
 import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 import CallFunctionPlugin from "@jspsych/plugin-call-function";
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
+import Papa from "papaparse";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
-function normalize_word(word) {
-  return word.trim().toLowerCase();
+async function fetch_csv(csv) {
+  return new Promise(
+    (resolve, reject) => 
+      Papa.parse(csv, {download: true, header: true, skipEmptyLines: true, complete: resolve, error: reject})
+  )
+  .then(results => results.data)
 }
 
 /**
@@ -40,11 +45,12 @@ export async function run({ assetPaths, input, environment, title, version, stim
   if (!input) {
     input = {
       titration: {
-        linear: [1, 3, 6, 12],
-        random: [1, 12]
+        random: [],
+        linear: [1, 2]
       },
-      question_prior: true,
-      lang_task: false
+      question_prior: false,
+      lang_task: false,
+      lang_task_training: false
     }
   }
 
@@ -128,16 +134,20 @@ export async function run({ assetPaths, input, environment, title, version, stim
     }
   }
 
-  var titration_trial_data = undefined;
+  const titration_data = new DataCollection();
+  var titration_trial_data = {
+    typed_word: "N/A",
+    entered_words: []
+  };
   var skip_rest = false;
 
-  function make_titration(stimulus, num_channels, reversed) {
+  function make_titration(stimulus) {
     return [{
       timeline: [
         {
           type: PreloadPlugin,
           audio() {
-            return [`Stimuli/${stimulus}_${num_channels}.wav`];
+            return [`assets/audio/titration/${stimulus}`];
           },
           show_progress_bar: false,
           record_data: false
@@ -151,7 +161,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         }, { // actual playback
           type: AudioKeyboardResponsePlugin,
           stimulus() {
-            return `Stimuli/${stimulus}_${num_channels}.wav`;
+            return `assets/audio/titration/${stimulus}`;
           },
           choices: "NO_KEYS",
           prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
@@ -159,10 +169,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
           record_data: false
         }, { // ask if language detected
           type: HtmlButtonResponsePlugin,
-          stimulus: lang['language-detected-question'] + (reversed ? '<p style="color: red">Pretend the audio played in reverse, this is a reverse trial.</p>' : ''),
+          stimulus: lang['language-detected-question'],
           choices: [lang['yes-button'], lang['no-button']],
           on_finish(data) {
-            titration_trial_data = {};
             titration_trial_data.language_detected_response_time = data.rt;
             titration_trial_data.language_detected = (data.response == 0);
           }
@@ -190,10 +199,6 @@ export async function run({ assetPaths, input, environment, title, version, stim
           }],
           button_label: lang['done-button'],
           on_finish(data) {
-            if (!('entered_words' in titration_trial_data)) {
-              titration_trial_data.entered_words = [];
-            }
-
             titration_trial_data.entered_words.push(data.response.understood_word);
           }
         }, {//       ask if entered word is intended
@@ -206,7 +211,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
             choices: [lang['yes-button'], lang['no-button']],
             on_finish(data) {
               if (data.response == 0) {
-                titration_trial_data.understood_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
+                titration_trial_data.typed_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
               }
             }
           }]
@@ -224,7 +229,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
   function make_titration_cycle(timeline_variables) {
     return {
       timeline: timeline_variables.map(it => {
-        const { target_word, stimulus, channel_list, reversed } = it;
+        const { word, channel_list, reversed } = it;
+        const { Target_word, syllables, frequency_ZipfSUBTLEX } = word;
         return ([
           {
             type: HtmlKeyboardResponsePlugin,
@@ -241,16 +247,27 @@ export async function run({ assetPaths, input, environment, title, version, stim
           },
           channel_list.flatMap(num_channels => ({
             timeline: [
-              ...make_titration(stimulus, num_channels, reversed),
+              ...make_titration(`${reversed ? 'reversed' : 'original'}_${syllables}_${Target_word}_${num_channels}.wav`),
               {
                 type: CallFunctionPlugin,
                 func() {
-                  titration_trial_data.target_word = target_word;
-                  titration_trial_data.num_channels = num_channels;
-                  jsPsych.data.get().addToLast(titration_trial_data);
+                  titration_data.push({
+                    ...titration_trial_data,
+                    entered_words: titration_trial_data.entered_words.length == 0 ? "NA" : titration_trial_data.entered_words,
+                    num_channels, 
+                    syllables,
+                    Target_word: Target_word + (reversed ? '_reversed' : ''),
+                    actual_word: Target_word,
+                    frequency_ZipfSUBTLEX: reversed ? 'NA' : frequency_ZipfSUBTLEX,
+                    reversed,
+                    subject_id: sub_id
+                  });
 
-                  skip_rest = !reversed && titration_trial_data.understood_word === target_word;
-                  titration_trial_data = undefined;
+                  skip_rest = !reversed && titration_trial_data.typed_word === Target_word;
+                  titration_trial_data = {
+                    entered_words: [],
+                    typed_word: "NA",
+                  };
                 }
               }
             ],
@@ -261,65 +278,41 @@ export async function run({ assetPaths, input, environment, title, version, stim
         ]);
       }),
       on_timeline_finish() {
-        console.log(jsPsych.data.get().filterCustom(data => 'target_word' in data).csv())
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+        }
       }
     };
   }
 
-  const linear_titration_sheet = input.titration.linear.length ? [
-    {
-      stimulus: "s_em_lc_247tw",
-      target_word: "hals",
-      syllables: 1
-    },
-    {
-      stimulus: "s_eh_400tw",
-      target_word: "muster",
-      syllables: 2
-    },
-    {
-      stimulus: "s_em_hc_259tw",
-      target_word: "uhr",
-      syllables: 1
-    },
-    {
-      stimulus: "s_em_hc_164tw",
-      target_word: "tauben",
-      syllables: 2,
-    },
-  ] : [];
+  const titration_sheet = await fetch_csv('assets/text/titration.csv')
 
-  const random_titration_sheet = input.titration.random.length ? [
-    {
-      stimulus: "s_em_lc_247tw",
-      target_word: "hals",
-      syllables: 1
-    },
-    {
-      stimulus: "s_em_hc_259tw",
-      target_word: "uhr",
-      syllables: 1
-    },
-    {
-      stimulus: "s_em_hc_164tw",
-      target_word: "tauben",
-      syllables: 2,
-    },
-    {
-      stimulus: "s_eh_400tw",
-      target_word: "muster",
-      syllables: 2
-    },
-  ] : [];
+  const linear_titration_sheet = input.titration.linear.length ? titration_sheet : [];
 
-  const random_titration_data = jsPsych.randomization.shuffle([
-    ...jsPsych.randomization.sampleWithoutReplacement(random_titration_sheet, input.titration.random.length).map((it, index) => ({ ...it, reversed: false, channel_list: [input.titration.random[index]] })),
-    ...jsPsych.randomization.sampleWithoutReplacement(random_titration_sheet, input.titration.random.length).map((it, index) => ({ ...it, reversed: true, channel_list: [input.titration.random[index]] }))
-  ]);
+  const random_titration_sheet = input.titration.random.length ? titration_sheet : [];
+
+  const syllable_groups = random_titration_sheet.reduce((acc, it) => {
+    if (!(it.syllables in acc))
+      acc[it.syllables] = [];
+
+    acc[it.syllables].push(it);
+    return acc;
+  }, {});
+
+  let random_titration_data = [];
+
+  for (const syllables in syllable_groups) {
+    random_titration_data.push(
+      ...jsPsych.randomization.sampleWithoutReplacement(syllable_groups[syllables], input.titration.random.length).map((it, index) => ({ ...it, reversed: false, channel_list: [input.titration.random[index]] })),
+      ...jsPsych.randomization.sampleWithoutReplacement(syllable_groups[syllables], input.titration.random.length).map((it, index) => ({ ...it, reversed: true, channel_list: [input.titration.random[index]] }))
+    )
+  }
+
+  random_titration_data = jsPsych.randomization.shuffle(random_titration_data);
 
   const linear_titration_data = jsPsych.randomization.shuffle([
-    ...linear_titration_sheet.map(it => ({ ...it, channel_list: input.titration.linear, reversed: false })),
-    ...linear_titration_sheet.map(it => ({ ...it, channel_list: input.titration.linear, reversed: true }))
+    ...linear_titration_sheet.map(it => ({ word: it, channel_list: input.titration.linear, reversed: false })),
+    ...linear_titration_sheet.map(it => ({ word: it, channel_list: input.titration.linear, reversed: true }))
   ]);
 
   function make_sensory_titration() {
@@ -737,18 +730,20 @@ export async function run({ assetPaths, input, environment, title, version, stim
     }
   ];
 
-  const selected_randomisation = jsPsych.randomization.randomInt(1, 4)
+  const selected_randomisation = jsPsych.randomization.randomInt(1, 4);
+  console.log("Selected randomisation: ", selected_randomisation);
   var sub_id
   jsPsych.data.addProperties({
     selected_randomisation
   });
 
   const blocks = jsPsych.randomization.shuffle(await Promise.all([
-    fetch(`assets/text/S${selected_randomisation}A.json`).then((response) => response.json()),
-    fetch(`assets/text/S${selected_randomisation}B.json`).then((response) => response.json()),
-    fetch(`assets/text/S${selected_randomisation}C.json`).then((response) => response.json()),
-    fetch(`assets/text/S${selected_randomisation}D.json`).then((response) => response.json()),
+    fetch_csv(`assets/text/S${selected_randomisation}A.csv`),
+    fetch_csv(`assets/text/S${selected_randomisation}B.csv`),
+    fetch_csv(`assets/text/S${selected_randomisation}C.csv`),
+    fetch_csv(`assets/text/S${selected_randomisation}D.csv`),
   ]))
+
   var roundIndex = 1;
   const timeline = [];
 
@@ -812,7 +807,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     make_sensory_titration(),
     {
       timeline: [
-        explanation,
+        ...(input.lang_task_training ? explanation : []),
         {
           timeline,
           timeline_variables: blocks[0],
