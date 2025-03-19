@@ -35,6 +35,32 @@ async function fetch_csv(csv) {
   .then(results => results.data)
 }
 
+const replacers = [{from: 'ä', to: 'ae'}, {from: 'ü', to: 'ue'}, {from: 'ö', to: 'oe'}, {from: 'ß', to: 'ss'}]
+
+/**
+ * Returns true if any of target_words can be constructed from understood_word by lowercasing and replacing umlauts according to the replacement rules replacers.
+ * 
+ * @param {Array<string>} target_words Words to match against
+ * @param {String} understood_word Word to match
+ * @returns {boolean} true if the words match, false otherwise
+ */
+function words_match(target_words, understood_word) {
+  if (understood_word === undefined || understood_word === null) {
+    return false;
+  }
+
+  const alternatives = new Set();
+  alternatives.add(understood_word.toLowerCase());
+
+  for (const {from, to} of replacers) {
+    for (const alt of [...alternatives].map(it => it.replaceAll(from, to))) {
+      alternatives.add(alt);
+    }
+  }
+
+  return target_words.some(it => alternatives.has(it))
+}
+
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
@@ -46,7 +72,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     input = {
       titration: {
         random: [],
-        linear: [1, 2]
+        linear: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
       },
       question_prior: false,
       lang_task: false,
@@ -230,7 +256,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     return {
       timeline: timeline_variables.map(it => {
         const { word, channel_list, reversed } = it;
-        const { Target_word, syllables, frequency_ZipfSUBTLEX } = word;
+        const { Target_word, Target_word_sing_plural, syllables, frequency_ZipfSUBTLEX } = word;
         return ([
           {
             type: HtmlKeyboardResponsePlugin,
@@ -263,7 +289,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
                     subject_id: sub_id
                   });
 
-                  skip_rest = !reversed && titration_trial_data.typed_word === Target_word;
+                  skip_rest = !reversed && words_match([Target_word, Target_word_sing_plural], titration_trial_data.typed_word);
                   titration_trial_data = {
                     entered_words: [],
                     typed_word: "NA",
