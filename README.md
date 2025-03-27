@@ -38,6 +38,7 @@ To start the project, use the following command in the terminal:
 
     ```sh
     npm start
+    ```
 
 The project will be available at http://localhost:3000/ in your browser by default.
 
@@ -47,6 +48,7 @@ Create a .jzip that can be imported with a JATOS server:
 
     ```sh
     npm run jatos
+    ```
 
 
 
