@@ -8,7 +8,7 @@ This project uses [jsPsych](https://www.jspsych.org/), a JavaScript library for 
 
 Before you start the project, make sure the following software is installed:
 
-- [Node.js](https://nodejs.org/) (recommended: LTS version)
+- [Node.js](https://nodejs.org/) 
 - npm (installed with Node.js)
 
 ## Installing Node.js and npm
