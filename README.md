@@ -40,8 +40,8 @@ The project will be available at http://localhost:3000/ in your browser by defau
 
 ## Creating a .jzip for Jatos
 Create a .jzip that can be imported with a JATOS server:
-```sh
-npm run jatos
+    ```sh
+    npm run jatos
 
 
 
