@@ -71,22 +71,22 @@ export async function run({ assetPaths, input, environment, title, version, stim
   if (!input) {
     input = {
       titration: {
-        random: [],
-        linear: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
       },
-      question_prior: false,
-      lang_task: false,
-      lang_task_training: false
+      question_prior: true,
+      selected_language: 'en',
+      lang_task: true,
+      lang_task_training: true
     }
   }
 
+  input.titration = (input.titration || {});
   input.titration.random = (input.titration.random || []);
   input.titration.linear = (input.titration.linear || []);
 
   const jsPsych = initJsPsych();
 
-  jsPsych.data.addProperties({ selected_language: 'de' })
-  const lang = await fetch('assets/text/langs/de.json').then(response => response.json()); // selecting the language introduced problems and will be fed in from JATOS anyway.
+  jsPsych.data.addProperties({ selected_language: input.selected_language })
+  const lang = await fetch(`assets/text/langs/${input.selected_language}.json`).then(response => response.json()); // selecting the language introduced problems and will be fed in from JATOS anyway.
 
   const configure_microphone = {
     timeline: [
