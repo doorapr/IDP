@@ -162,7 +162,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   const titration_data = new DataCollection();
   var titration_trial_data = {
-    typed_word: "N/A",
+    typed_word: "NA",
     entered_words: []
   };
   var skip_rest = false;
@@ -289,6 +289,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
                     subject_id: sub_id
                   });
 
+                  if (typeof jatos !== 'undefined') {
+                    jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+                  }
+
                   skip_rest = !reversed && words_match([Target_word, Target_word_sing_plural], titration_trial_data.typed_word);
                   titration_trial_data = {
                     entered_words: [],
@@ -302,12 +306,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
             }
           }))
         ]);
-      }),
-      on_timeline_finish() {
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
-        }
-      }
+      })
     };
   }
 
