@@ -1,6 +1,6 @@
 /**
- * @title IDP
- * @description 
+ * @title LangTask
+ * @description Language task to assess word recognition in distorted speech, modulated by a prior sentence stimulus. Includes sensory titration and assessment of prior expectation.
  * @version 0.9.0
  *
  * @assets Stimuli/,assets/images,assets/audio,assets/text

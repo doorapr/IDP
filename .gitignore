@@ -2,5 +2,3 @@ node_modules
 .jspsych-builder
 packaged
 src/de-big
-# too big...
-assets/audio/titration
