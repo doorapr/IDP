@@ -29,13 +29,13 @@ import Papa from "papaparse";
 
 async function fetch_csv(csv) {
   return new Promise(
-    (resolve, reject) => 
-      Papa.parse(csv, {download: true, header: true, skipEmptyLines: true, complete: resolve, error: reject})
+    (resolve, reject) =>
+      Papa.parse(csv, { download: true, header: true, skipEmptyLines: true, complete: resolve, error: reject })
   )
-  .then(results => results.data)
+    .then(results => results.data)
 }
 
-const replacers = [{from: 'ä', to: 'ae'}, {from: 'ü', to: 'ue'}, {from: 'ö', to: 'oe'}, {from: 'ß', to: 'ss'}]
+const replacers = [{ from: 'ä', to: 'ae' }, { from: 'ü', to: 'ue' }, { from: 'ö', to: 'oe' }, { from: 'ß', to: 'ss' }]
 
 /**
  * Returns true if any of target_words can be constructed from understood_word by lowercasing and replacing umlauts according to the replacement rules replacers.
@@ -52,7 +52,7 @@ function words_match(target_words, understood_word) {
   const alternatives = new Set();
   alternatives.add(understood_word.toLowerCase());
 
-  for (const {from, to} of replacers) {
+  for (const { from, to } of replacers) {
     for (const alt of [...alternatives].map(it => it.replaceAll(from, to))) {
       alternatives.add(alt);
     }
@@ -71,11 +71,13 @@ export async function run({ assetPaths, input, environment, title, version, stim
   if (!input) {
     input = {
       titration: {
+        linear: [5, 10, 15, 20],
+        random: [5, 10, 15, 20]
       },
-      question_prior: true,
-      selected_language: 'en',
-      lang_task: true,
-      lang_task_training: true
+      selected_language: 'de',
+      question_prior: false,
+      lang_task: false,
+      lang_task_training: false,
     }
   }
 
@@ -166,6 +168,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
     entered_words: []
   };
   var skip_rest = false;
+  var last_understood_word = "NA";
+  var language_detected;
+  var word_understood;
 
   function make_titration(stimulus) {
     return [{
@@ -200,6 +205,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
           on_finish(data) {
             titration_trial_data.language_detected_response_time = data.rt;
             titration_trial_data.language_detected = (data.response == 0);
+            language_detected = (data.response == 0);
+            word_understood = false;
           }
         }
       ]
@@ -208,11 +215,14 @@ export async function run({ assetPaths, input, environment, title, version, stim
         { //    ask if word understood
           type: HtmlButtonResponsePlugin,
           stimulus: lang['word-detected-question'],
-          choices: [lang['yes-button'], lang['no-button']]
+          choices: () => [lang['yes-button'], ...(last_understood_word != 'NA') ? [lang["same-as-last-button"]] : [], lang['no-button'], ],
+          on_finish(data) {
+            word_understood = data.response == 0 || (last_understood_word != 'NA' && data.response == 1);
+          }
         }
       ],
-      conditional_function() { // This references the language detected question
-        return jsPsych.data.getLastTrialData().values()[0].response == 0;
+      conditional_function() {
+        return language_detected;
       },
     }, {
       timeline: [
@@ -224,6 +234,15 @@ export async function run({ assetPaths, input, environment, title, version, stim
             required: true,
           }],
           button_label: lang['done-button'],
+          on_load() {
+            const input = document.getElementById("input-0");
+            input.pattern = "[A-ZÄÖÜa-zäöüß]+";
+            input.title = lang['titration-word-input-help'];
+
+            if (jsPsych.data.getLastTrialData().values()[0].response == 1) {
+              input.value = last_understood_word;
+            }
+          },
           on_finish(data) {
             titration_trial_data.entered_words.push(data.response.understood_word);
           }
@@ -244,7 +263,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         }
       ],
       conditional_function() { // This references the specific word detected question
-        return jsPsych.data.getLastTrialData().values()[0].response == 0;
+        return word_understood;
       },
       loop_function(data) {
         return data.values().reverse()[0].response == 1;
@@ -253,67 +272,81 @@ export async function run({ assetPaths, input, environment, title, version, stim
   }
 
   function make_titration_cycle(timeline_variables) {
-    return {
-      timeline: timeline_variables.map(it => {
-        const { word, channel_list, reversed } = it;
-        const { Target_word, Target_word_sing_plural, syllables, frequency_ZipfSUBTLEX } = word;
-        return ([
-          {
-            type: HtmlKeyboardResponsePlugin,
-            stimulus: lang['titration-next-word'],
-            choices: "NO_KEYS",
-            trial_duration: 2000,
-            record_data: false
+    const timeline = [];
+    for (const [index, it] of timeline_variables.entries()) {
+      const { word, channel_list, reversed } = it;
+      const { Target_word, Target_word_sing_plural, syllables, frequency_ZipfSUBTLEX } = word;
+      timeline.push([
+        {
+          type: HtmlKeyboardResponsePlugin,
+          stimulus: lang['titration-next-word'],
+          choices: "NO_KEYS",
+          trial_duration: 2000,
+          record_data: false
+        },
+        {
+          type: CallFunctionPlugin,
+          func() {
+            skip_rest = false;
+            last_understood_word = 'NA';
           },
-          {
-            type: CallFunctionPlugin,
-            func() {
-              skip_rest = false;
-            }
-          },
-          channel_list.flatMap(num_channels => ({
-            timeline: [
-              ...make_titration(`${reversed ? 'reversed' : 'original'}_${syllables}_${Target_word}_${num_channels}.wav`),
-              {
-                type: CallFunctionPlugin,
-                func() {
-                  titration_data.push({
-                    ...titration_trial_data,
-                    entered_words: titration_trial_data.entered_words.length == 0 ? "NA" : titration_trial_data.entered_words,
-                    num_channels, 
-                    syllables,
-                    Target_word: Target_word + (reversed ? '_reversed' : ''),
-                    actual_word: Target_word,
-                    frequency_ZipfSUBTLEX: reversed ? 'NA' : frequency_ZipfSUBTLEX,
-                    reversed,
-                    subject_id: sub_id
-                  });
+          record_data: false
+        },
+        channel_list.flatMap(num_channels => ({
+          timeline: [
+            ...make_titration(`${reversed ? 'reversed' : 'original'}_${syllables}_${Target_word}_${num_channels}.wav`),
+            {
+              type: CallFunctionPlugin,
+              func() {
+                titration_data.push({
+                  ...titration_trial_data,
+                  entered_words: titration_trial_data.entered_words.length == 0 ? "NA" : titration_trial_data.entered_words,
+                  num_channels,
+                  syllables,
+                  Target_word: Target_word + (reversed ? '_reversed' : ''),
+                  actual_word: Target_word,
+                  frequency_ZipfSUBTLEX: reversed ? 'NA' : frequency_ZipfSUBTLEX,
+                  reversed,
+                  subject_id: sub_id
+                });
 
-                  if (typeof jatos !== 'undefined') {
-                    jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
-                  }
-
-                  skip_rest = !reversed && words_match([Target_word, Target_word_sing_plural], titration_trial_data.typed_word);
-                  titration_trial_data = {
-                    entered_words: [],
-                    typed_word: "NA",
-                  };
+                if (typeof jatos !== 'undefined') {
+                  jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
                 }
-              }
-            ],
-            conditional_function() {
-              return !skip_rest;
+
+                skip_rest = !reversed && words_match([Target_word, Target_word_sing_plural], titration_trial_data.typed_word);
+                last_understood_word = titration_trial_data.typed_word;
+                titration_trial_data = {
+                  entered_words: [],
+                  typed_word: "NA",
+                };
+              },
+              record_data: false
             }
-          }))
-        ]);
-      })
-    };
+          ],
+          conditional_function() {
+            return !skip_rest;
+          }
+        }))
+      ]);
+      if ((index + 1) % 10 == 0) { // every 10 words
+        timeline.push({
+            type: HtmlButtonResponsePlugin,
+            stimulus: lang['titration-motivation'].replace("$1", index + 1).replace("$2", timeline_variables.length),
+            choices: [lang['done-button']],
+            record_data: false
+        })
+      }
+    }
+
+    return {
+      timeline
+    }
   }
 
   const titration_sheet = await fetch_csv('assets/text/titration.csv')
 
   const linear_titration_sheet = input.titration.linear.length ? titration_sheet : [];
-
   const random_titration_sheet = input.titration.random.length ? titration_sheet : [];
 
   const syllable_groups = random_titration_sheet.reduce((acc, it) => {
@@ -328,8 +361,12 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   for (const syllables in syllable_groups) {
     random_titration_data.push(
-      ...jsPsych.randomization.sampleWithoutReplacement(syllable_groups[syllables], input.titration.random.length).map((it, index) => ({ ...it, reversed: false, channel_list: [input.titration.random[index]] })),
-      ...jsPsych.randomization.sampleWithoutReplacement(syllable_groups[syllables], input.titration.random.length).map((it, index) => ({ ...it, reversed: true, channel_list: [input.titration.random[index]] }))
+      ...jsPsych.randomization
+        .sampleWithoutReplacement(syllable_groups[syllables], input.titration.random.length)
+        .flatMap((it, index) => ([
+          { word: it, reversed: false, channel_list: [input.titration.random[index]] },
+          { word: it, reversed: true, channel_list: [input.titration.random[index]] },
+        ])),
     )
   }
 
@@ -339,48 +376,64 @@ export async function run({ assetPaths, input, environment, title, version, stim
     ...linear_titration_sheet.map(it => ({ word: it, channel_list: input.titration.linear, reversed: false })),
     ...linear_titration_sheet.map(it => ({ word: it, channel_list: input.titration.linear, reversed: true }))
   ]);
-
+console.log(random_titration_data)
+console.log(linear_titration_data)
   function make_sensory_titration() {
-    return (linear_titration_data.length || random_titration_data.length) ? {
-      timeline: [
+    if (linear_titration_data.length || random_titration_data.length) {
+      const linear = (linear_titration_data.length ? [
         {
-          type: HtmlButtonResponsePlugin,
-          stimulus: lang['begin-titration'],
-          choices: [lang['done-button']],
-          record_data: false
-        },
-        ...linear_titration_data.length ? [{
           type: HtmlButtonResponsePlugin,
           stimulus: lang['begin-titration-linear'],
           choices: [lang['done-button']],
           record_data: false
-        }] : [],
+        },
         {
           type: HtmlButtonResponsePlugin,
           stimulus: lang['titration-before-first'],
           choices: [lang['done-button']],
           record_data: false
         },
-        ...(linear_titration_data.length ? [make_titration_cycle(linear_titration_data)] : []),
-        ...(random_titration_data.length ?
-          [
-            {
-              type: HtmlButtonResponsePlugin,
-              stimulus: lang['begin-titration-random-sampling'],
-              choices: [lang['done-button']],
-              record_data: false
-            },
-            make_titration_cycle(random_titration_data)
-          ] : []
-        ),
-        {
-          type: HtmlButtonResponsePlugin,
-          stimulus: lang['end-titration'],
-          choices: [lang['done-button']],
-          record_data: false
-        },
-      ]
-    } : { timeline: [] }
+        make_titration_cycle(linear_titration_data)
+      ] : []);
+
+      const random = (random_titration_data.length ?
+        [
+          {
+            type: HtmlButtonResponsePlugin,
+            stimulus: lang['begin-titration-random-sampling'],
+            choices: [lang['done-button']],
+            record_data: false
+          },
+          {
+            type: HtmlButtonResponsePlugin,
+            stimulus: lang['titration-before-first'],
+            choices: [lang['done-button']],
+            record_data: false
+          },
+          make_titration_cycle(random_titration_data)
+        ] : []
+      );
+
+      return {
+        timeline: [
+          {
+            type: HtmlButtonResponsePlugin,
+            stimulus: lang['begin-titration'],
+            choices: [lang['done-button']],
+            record_data: false
+          },
+          ...jsPsych.randomization.sampleWithoutReplacement([linear, random], 2).flat(1),
+          {
+            type: HtmlButtonResponsePlugin,
+            stimulus: lang['end-titration'],
+            choices: [lang['done-button']],
+            record_data: false
+          },
+        ]
+      }
+    } else {
+      return { timeline: [] };
+    }
   }
 
   var filename_for_upload;
@@ -859,6 +912,18 @@ export async function run({ assetPaths, input, environment, title, version, stim
       ],
       conditional_function() {
         return input.lang_task;
+      }
+    },
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['self-reporting-question'],
+      choices: [lang["yes-button"], lang["no-button"]],
+      on_finish(data) {
+        titration_data.addToAll({truthful: data.response == 0});
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+        }
       }
     }
   ]);
