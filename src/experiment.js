@@ -24,6 +24,7 @@ import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 import CallFunctionPlugin from "@jspsych/plugin-call-function";
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
 import Papa from "papaparse";
+import confetti from "canvas-confetti";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
@@ -61,6 +62,16 @@ function words_match(target_words, understood_word) {
   return target_words.some(it => alternatives.has(it))
 }
 
+function slider_percentages() {
+  const slider = document.getElementById('jspsych-html-slider-response-response');
+  slider.oninput = () => {
+    const span = document.getElementById('slider-value');
+    span.textContent = `${slider.value}%`
+  };
+}
+
+const titration_properties = {};
+
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
@@ -71,7 +82,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
   if (!input) {
     input = {
       titration: {
-        linear: [5, 10, 15, 20],
+        linear: [5, 20],
         random: [5, 10, 15, 20]
       },
       selected_language: 'de',
@@ -86,9 +97,11 @@ export async function run({ assetPaths, input, environment, title, version, stim
   input.titration.linear = (input.titration.linear || []);
 
   const jsPsych = initJsPsych();
+  const linear_titration_required = input.titration.linear.length > 0, random_titration_required = input.titration.random.length > 0;
+  const titration_required = linear_titration_required || random_titration_required;
 
   jsPsych.data.addProperties({ selected_language: input.selected_language })
-  const lang = await fetch(`assets/text/langs/${input.selected_language}.json`).then(response => response.json()); // selecting the language introduced problems and will be fed in from JATOS anyway.
+  const lang = await fetch(`assets/text/langs/${input.selected_language}.json`).then(response => response.json());
 
   const configure_microphone = {
     timeline: [
@@ -215,7 +228,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         { //    ask if word understood
           type: HtmlButtonResponsePlugin,
           stimulus: lang['word-detected-question'],
-          choices: () => [lang['yes-button'], ...(last_understood_word != 'NA') ? [lang["same-as-last-button"]] : [], lang['no-button'], ],
+          choices: () => [lang['yes-button'], ...(last_understood_word != 'NA') ? [lang["same-as-last-button"]] : [], lang['no-button'],],
           on_finish(data) {
             word_understood = data.response == 0 || (last_understood_word != 'NA' && data.response == 1);
           }
@@ -330,12 +343,20 @@ export async function run({ assetPaths, input, environment, title, version, stim
         }))
       ]);
       if ((index + 1) % 10 == 0) { // every 10 words
-        timeline.push({
+        timeline.push(
+          {
+            type: CallFunctionPlugin,
+            func() {
+              confetti()
+            }
+          },
+          {
             type: HtmlButtonResponsePlugin,
             stimulus: lang['titration-motivation'].replace("$1", index + 1).replace("$2", timeline_variables.length),
             choices: [lang['done-button']],
             record_data: false
-        })
+          },
+        )
       }
     }
 
@@ -346,8 +367,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   const titration_sheet = await fetch_csv('assets/text/titration.csv')
 
-  const linear_titration_sheet = input.titration.linear.length ? titration_sheet : [];
-  const random_titration_sheet = input.titration.random.length ? titration_sheet : [];
+  const linear_titration_sheet = linear_titration_required ? titration_sheet : [];
+  const random_titration_sheet = random_titration_required ? titration_sheet : [];
 
   const syllable_groups = random_titration_sheet.reduce((acc, it) => {
     if (!(it.syllables in acc))
@@ -376,11 +397,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
     ...linear_titration_sheet.map(it => ({ word: it, channel_list: input.titration.linear, reversed: false })),
     ...linear_titration_sheet.map(it => ({ word: it, channel_list: input.titration.linear, reversed: true }))
   ]);
-console.log(random_titration_data)
-console.log(linear_titration_data)
+
   function make_sensory_titration() {
-    if (linear_titration_data.length || random_titration_data.length) {
-      const linear = (linear_titration_data.length ? [
+    if (titration_required) {
+      const linear = (linear_titration_required ? [
         {
           type: HtmlButtonResponsePlugin,
           stimulus: lang['begin-titration-linear'],
@@ -396,7 +416,7 @@ console.log(linear_titration_data)
         make_titration_cycle(linear_titration_data)
       ] : []);
 
-      const random = (random_titration_data.length ?
+      const random = (random_titration_required ?
         [
           {
             type: HtmlButtonResponsePlugin,
@@ -414,18 +434,20 @@ console.log(linear_titration_data)
         ] : []
       );
 
+      const randomized = jsPsych.randomization.sampleWithoutReplacement([linear, random], 2);
       return {
         timeline: [
+          ...randomized[0],
           {
             type: HtmlButtonResponsePlugin,
-            stimulus: lang['begin-titration'],
+            stimulus: lang['end-titration-part1'],
             choices: [lang['done-button']],
             record_data: false
           },
-          ...jsPsych.randomization.sampleWithoutReplacement([linear, random], 2).flat(1),
+          ...randomized[1],
           {
             type: HtmlButtonResponsePlugin,
-            stimulus: lang['end-titration'],
+            stimulus: lang['end-titration-part2'],
             choices: [lang['done-button']],
             record_data: false
           },
@@ -549,13 +571,7 @@ console.log(linear_titration_data)
       require_movement: true,
       //slider_width: 600,
       subject_id: sub_id,
-      on_load() {
-        const slider = document.getElementById('jspsych-html-slider-response-response');
-        slider.oninput = () => {
-          const span = document.getElementById('slider-value');
-          span.textContent = `${slider.value}%`
-        };
-      },
+      on_load: slider_percentages,
       on_finish(data) {
         if (!record_data) { return }
         data.fileName = filename_for_upload
@@ -574,13 +590,7 @@ console.log(linear_titration_data)
       labels: lang['confidence-labels'],
       require_movement: true,
       //slider_width: 600,
-      on_load() {
-        const slider = document.getElementById('jspsych-html-slider-response-response');
-        slider.oninput = () => {
-          const span = document.getElementById('slider-value');
-          span.textContent = `${slider.value}%`
-        };
-      },
+      on_load: slider_percentages,
       on_finish(data) {
         if (!record_data) { return }
         data.fileName = filename_for_upload
@@ -708,13 +718,7 @@ console.log(linear_titration_data)
         labels: lang['expectation-labels'],
         require_movement: true,
         //slider_width: 600,
-        on_load() {
-          const slider = document.getElementById('jspsych-html-slider-response-response');
-          slider.oninput = () => {
-            const span = document.getElementById('slider-value');
-            span.textContent = `${slider.value}%`
-          };
-        },
+        on_load: slider_percentages,
         on_finish(data) {
           if (!record_data) { return }
           data.fileName = filename_for_upload
@@ -865,7 +869,7 @@ console.log(linear_titration_data)
     {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['consent-form'],
-      choices: [lang['yes-button'], lang['no-button']],
+      choices: [lang['consent-button'], lang['no-consent-button']],
       on_finish(data) {
         if (data.response == 1) { // Rejected
           window.alert(lang['did-not-accept-message']);
@@ -874,6 +878,12 @@ console.log(linear_titration_data)
       }
     },
     make_id_input,
+    ...(titration_required ? [{
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['begin-titration'],
+      choices: [lang['done-button']],
+      record_data: false
+    }] : []),
     {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['begin-technical'],
@@ -882,6 +892,19 @@ console.log(linear_titration_data)
     },
     ...(input.lang_task ? [configure_microphone] : []),
     configure_speakers,
+    { // Speaker intensity
+      type: HtmlSliderResponsePlugin,
+      stimulus: lang['speaker-intensity'],
+      button_label: lang['done-button'],
+      record_data: true,
+      labels: lang['speaker-intensity-labels'],
+      require_movement: true,
+      //slider_width: 600,
+      on_load: slider_percentages,
+      on_finish(data) {
+        titration_properties.speaker_intensity = data.response;
+      }
+    },
     make_sensory_titration(),
     {
       timeline: [
@@ -914,17 +937,99 @@ console.log(linear_titration_data)
         return input.lang_task;
       }
     },
-    {
-      type: HtmlButtonResponsePlugin,
-      stimulus: lang['self-reporting-question'],
-      choices: [lang["yes-button"], lang["no-button"]],
+    { // Concentration
+      type: HtmlSliderResponsePlugin,
+      stimulus: lang['concentration-question'],
+      button_label: lang['done-button'],
+      record_data: true,
+      labels: lang['concentration-labels'],
+      require_movement: true,
+      //slider_width: 600,
+      on_load: slider_percentages,
       on_finish(data) {
-        titration_data.addToAll({truthful: data.response == 0});
+        titration_data.addToAll({ concentration: data.response });
+        titration_data.addToAll({ speaker_intensity: titration_properties.speaker_intensity });
 
         if (typeof jatos !== 'undefined') {
           jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
         }
       }
+    },
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['self-report-random'],
+      choices: [lang["yes-button"], lang["no-button"]],
+      on_finish(data) {
+        titration_data.addToAll({ random: data.response == 0 });
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+        }
+      }
+    },
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['self-report-honest'],
+      choices: [lang["yes-button"], lang["no-button"]],
+      on_finish(data) {
+        titration_data.addToAll({ honest: data.response == 0 });
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+        }
+      }
+    },
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['self-report-headphones'],
+      choices: [lang["yes-button"], lang["no-button"]],
+      on_finish(data) {
+        titration_data.addToAll({ headphones: data.response == 0 });
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+        }
+      }
+    },
+    { // Quietness of environment
+      type: HtmlSliderResponsePlugin,
+      stimulus: lang['quietness-question'],
+      button_label: lang['done-button'],
+      record_data: true,
+      labels: lang['quietness-labels'],
+      require_movement: true,
+      //slider_width: 600,
+      on_load: slider_percentages,
+      on_finish(data) {
+        titration_data.addToAll({ quietness: data.response });
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+        }
+      }
+    },
+    { // Disruptiveness
+      type: HtmlSliderResponsePlugin,
+      stimulus: lang['disruptiveness-question'],
+      button_label: lang['done-button'],
+      record_data: true,
+      labels: lang['disruptiveness-labels'],
+      require_movement: true,
+      //slider_width: 600,
+      on_load: slider_percentages,
+      on_finish(data) {
+        titration_data.addToAll({ disruptiveness: data.response });
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+        }
+      }
+    },
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['end-titration-final'],
+      choices: [lang['done-button']],
+      record_data: false
     }
   ]);
 
