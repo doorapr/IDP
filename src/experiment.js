@@ -25,6 +25,7 @@ import CallFunctionPlugin from "@jspsych/plugin-call-function";
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
 import Papa from "papaparse";
 import confetti from "canvas-confetti";
+import BrowserCheckPlugin from "@jspsych/plugin-browser-check";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
@@ -69,8 +70,6 @@ function slider_percentages() {
     span.textContent = `${slider.value}%`
   };
 }
-
-const titration_properties = {};
 
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
@@ -176,6 +175,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
   }
 
   const titration_data = new DataCollection();
+  const experiment_data = new DataCollection([{}]);
   var titration_trial_data = {
     typed_word: "NA",
     entered_words: []
@@ -284,7 +284,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     }]
   }
 
-  function make_titration_cycle(timeline_variables) {
+  function make_titration_cycle(timeline_variables, variant) {
     const timeline = [];
     for (const [index, it] of timeline_variables.entries()) {
       const { word, channel_list, reversed } = it;
@@ -324,7 +324,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
                 });
 
                 if (typeof jatos !== 'undefined') {
-                  jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+                  jatos.uploadResultFile(titration_data.csv(), `titration_results_${variant}.csv`)
                 }
 
                 skip_rest = !reversed && words_match([Target_word, Target_word_sing_plural], titration_trial_data.typed_word);
@@ -408,12 +408,24 @@ export async function run({ assetPaths, input, environment, title, version, stim
           record_data: false
         },
         {
+          type: CallFunctionPlugin,
+          func() {
+            document.getElementsByTagName("html")[0].classList.add("task1");
+          }
+        },
+        {
           type: HtmlButtonResponsePlugin,
           stimulus: lang['titration-before-first'],
           choices: [lang['done-button']],
           record_data: false
         },
-        make_titration_cycle(linear_titration_data)
+        make_titration_cycle(linear_titration_data, "linear"),
+        {
+          type: CallFunctionPlugin,
+          func() {
+            document.getElementsByTagName("html")[0].classList.remove("task1");
+          }
+        },
       ] : []);
 
       const random = (random_titration_required ?
@@ -425,12 +437,24 @@ export async function run({ assetPaths, input, environment, title, version, stim
             record_data: false
           },
           {
+            type: CallFunctionPlugin,
+            func() {
+              document.getElementsByTagName("html")[0].classList.add("task2");
+            }
+          },
+          {
             type: HtmlButtonResponsePlugin,
             stimulus: lang['titration-before-first'],
             choices: [lang['done-button']],
             record_data: false
           },
-          make_titration_cycle(random_titration_data)
+          make_titration_cycle(random_titration_data, "random"),
+          {
+            type: CallFunctionPlugin,
+            func() {
+              document.getElementsByTagName("html")[0].classList.remove("task2");
+            }
+          },
         ] : []
       );
 
@@ -555,6 +579,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
       on_finish(data) {
         sub_id = data.response.city + data.response.birthMonth + data.response.mother + data.response.birthname
         jsPsych.data.addProperties({
+          subject_id: sub_id
+        })
+        experiment_data.addToAll({
           subject_id: sub_id
         })
       }
@@ -867,6 +894,16 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   await jsPsych.run([
     {
+      type: BrowserCheckPlugin,
+      on_finish(data) {
+        if (data.brower == 'safari') {
+          window.alert(lang['browser-exclusion-message']);
+          window.close();
+        }
+      },
+      record_data: true
+    },
+    {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['consent-form'],
       choices: [lang['consent-button'], lang['no-consent-button']],
@@ -902,10 +939,20 @@ export async function run({ assetPaths, input, environment, title, version, stim
       //slider_width: 600,
       on_load: slider_percentages,
       on_finish(data) {
-        titration_properties.speaker_intensity = data.response;
+        experiment_data.addToAll({ speaker_intensity: data.response })
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+        }
       }
     },
     make_sensory_titration(),
+    {
+      type: CallFunctionPlugin,
+      func() {
+        document.getElementsByTagName("html")[0].classList.add("task3");
+      }
+    },
     {
       timeline: [
         ...(input.lang_task_training ? explanation : []),
@@ -937,6 +984,12 @@ export async function run({ assetPaths, input, environment, title, version, stim
         return input.lang_task;
       }
     },
+    {
+      type: CallFunctionPlugin,
+      func() {
+        document.getElementsByTagName("html")[0].classList.remove("task3");
+      }
+    },
     { // Concentration
       type: HtmlSliderResponsePlugin,
       stimulus: lang['concentration-question'],
@@ -947,11 +1000,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
       //slider_width: 600,
       on_load: slider_percentages,
       on_finish(data) {
-        titration_data.addToAll({ concentration: data.response });
-        titration_data.addToAll({ speaker_intensity: titration_properties.speaker_intensity });
+        experiment_data.addToAll({ concentration: data.response });
 
         if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
         }
       }
     },
@@ -960,10 +1012,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
       stimulus: lang['self-report-random'],
       choices: [lang["yes-button"], lang["no-button"]],
       on_finish(data) {
-        titration_data.addToAll({ random: data.response == 0 });
+        experiment_data.addToAll({ random: data.response == 0 });
 
         if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
         }
       }
     },
@@ -972,10 +1024,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
       stimulus: lang['self-report-honest'],
       choices: [lang["yes-button"], lang["no-button"]],
       on_finish(data) {
-        titration_data.addToAll({ honest: data.response == 0 });
+        experiment_data.addToAll({ honest: data.response == 0 });
 
         if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
         }
       }
     },
@@ -984,10 +1036,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
       stimulus: lang['self-report-headphones'],
       choices: [lang["yes-button"], lang["no-button"]],
       on_finish(data) {
-        titration_data.addToAll({ headphones: data.response == 0 });
+        experiment_data.addToAll({ headphones: data.response == 0 });
 
         if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
         }
       }
     },
@@ -1001,10 +1053,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
       //slider_width: 600,
       on_load: slider_percentages,
       on_finish(data) {
-        titration_data.addToAll({ quietness: data.response });
+        experiment_data.addToAll({ quietness: data.response });
 
         if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
         }
       }
     },
@@ -1018,10 +1070,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
       //slider_width: 600,
       on_load: slider_percentages,
       on_finish(data) {
-        titration_data.addToAll({ disruptiveness: data.response });
+        experiment_data.addToAll({ disruptiveness: data.response });
 
         if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(titration_data.csv(), "titration_results.csv")
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
         }
       }
     },

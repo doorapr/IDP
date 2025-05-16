@@ -1,11 +1,19 @@
 @import "~jspsych/css/jspsych.css";
 
-.jspsych-display-element {
-  background-color: #ffffff;
+html.task1 {
+  background-color: #fff0f0;
+}
+
+html.task2 {
+  background-color: #f0fff0;
+}
+
+html.task3 {
+  background-color: #fffff0;
 }
 
 html {
-  background-color: ivory;
+  background-color: #f0f0f0;
 }
 
 .jspsych-content-wrapper {
@@ -14,7 +22,7 @@ html {
   align-items: center;
   line-height: 1.6;
   min-height: 100vh;
-  background-color: ivory;
+  background-color: inherit;
 }
 
 #jspsych-content {

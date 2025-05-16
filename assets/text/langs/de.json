@@ -1,5 +1,6 @@
 {
   "title": "Sprachbasierter Task",
+  "browser-exclusion-message": "Dieses Experiment unterstützt Safari nicht. Bitte verwenden Sie einen anderen Browser.",
   "mic-select-text": "<p><b>Bitte suchen Sie Ihr Mikrofon aus.</b></p><p>Sie werden es gleich testen und können auf diese Seite zurückkehren, falls es nicht funktioniert.</p>",
   "mic-select-button": "Dieses Mikrofon verwenden",
   "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
