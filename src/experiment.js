@@ -102,18 +102,29 @@ export async function run({ assetPaths, input, environment, title, version, stim
   jsPsych.data.addProperties({ selected_language: input.selected_language })
   const lang = await fetch(`assets/text/langs/${input.selected_language}.json`).then(response => response.json());
 
+  let titration_data;
+  const experiment_data = new DataCollection([{ start_time: jsPsych.getStartTime() }]);
+  var titration_trial_data = {
+    typed_word: "NA",
+    entered_words: []
+  };
+  var skip_rest = false;
+  var last_understood_word = "NA";
+  var language_detected;
+  var word_understood;
+
   const configure_microphone = {
     timeline: [
       {
         type: initializeMicrophone,
-        button_label: lang['mic-select-button'],
-        device_select_message: lang['mic-select-text'],
+        button_label: lang['TECHNICAL_SETTINGS']['mic-select-button'],
+        device_select_message: lang['TECHNICAL_SETTINGS']['mic-select-text'],
         record_data: false
       },
       {
         type: htmlAudioResponse,
-        stimulus: lang['mic-test'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'>",
-        done_button_label: lang['done-button'],
+        stimulus: lang['TECHNICAL_SETTINGS']['mic-test'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'>",
+        done_button_label: lang['BUTTONS']['done-button'],
         recording_duration: 7500,
         record_data: true,
         save_audio_url: true
@@ -129,8 +140,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
             const content = document.getElementById('jspsych-content');
             content.replaceChildren(content.children[1], content.children[0]); // make the text appear on top of the buttons, this only works in this specific case. YAGNI.
           },
-          prompt: lang['recording-check'],
-          choices: [lang['change-microphone-button'], lang['listen-again-button'], lang['done-button']]
+          prompt: lang['TECHNICAL_SETTINGS']['recording-check'],
+          choices: [lang['TECHNICAL_SETTINGS']['change-microphone-button'], lang['TECHNICAL_SETTINGS']['listen-again-button'], lang['BUTTONS']['done-button']]
         }],
         loop_function(data) {
           if (data.values()[0].response == 1) { // if listen again is pressed, listen again
@@ -151,8 +162,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     timeline: [
       {
         type: HtmlButtonResponsePlugin,
-        stimulus: lang['speaker-check'],
-        choices: [lang['done-button']],
+        stimulus: lang['TECHNICAL_SETTINGS']['speaker-check'],
+        choices: [lang['BUTTONS']['done-button']],
         record_data: false
       },
       { // Prior (first part of the sentence)
@@ -165,25 +176,14 @@ export async function run({ assetPaths, input, environment, title, version, stim
       },
       {
         type: HtmlButtonResponsePlugin,
-        stimulus: lang['speaker-check-restart'],
-        choices: [lang['yes-button'], lang['no-button']]
+        stimulus: lang['TECHNICAL_SETTINGS']['speaker-check-restart'],
+        choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button']]
       }
     ],
     loop_function(data) {
       return data.values()[0].response == 1;
     }
   }
-
-  const titration_data = new DataCollection();
-  const experiment_data = new DataCollection([{}]);
-  var titration_trial_data = {
-    typed_word: "NA",
-    entered_words: []
-  };
-  var skip_rest = false;
-  var last_understood_word = "NA";
-  var language_detected;
-  var word_understood;
 
   function make_titration(stimulus) {
     return [{
@@ -213,8 +213,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
           record_data: false
         }, { // ask if language detected
           type: HtmlButtonResponsePlugin,
-          stimulus: lang['language-detected-question'],
-          choices: [lang['yes-button'], lang['no-button']],
+          stimulus: lang['TITRATION']['language-detected-question'],
+          choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button']],
           on_finish(data) {
             titration_trial_data.language_detected_response_time = data.rt;
             titration_trial_data.language_detected = (data.response == 0);
@@ -227,8 +227,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
       timeline: [
         { //    ask if word understood
           type: HtmlButtonResponsePlugin,
-          stimulus: lang['word-detected-question'],
-          choices: () => [lang['yes-button'], ...(last_understood_word != 'NA') ? [lang["same-as-last-button"]] : [], lang['no-button'],],
+          stimulus: lang['TITRATION']['word-detected-question'],
+          choices: () => [lang['BUTTONS']['yes-button'], ...(last_understood_word != 'NA') ? [lang['BUTTONS']["same-as-last-button"]] : [], lang['BUTTONS']['no-button'],],
           on_finish(data) {
             word_understood = data.response == 0 || (last_understood_word != 'NA' && data.response == 1);
           }
@@ -242,15 +242,15 @@ export async function run({ assetPaths, input, environment, title, version, stim
         { //       ask for word
           type: SurveyTextPlugin,
           questions: [{
-            prompt: lang['titration-which-word-question'],
+            prompt: lang['TITRATION']['titration-which-word-question'],
             name: 'understood_word',
             required: true,
           }],
-          button_label: lang['done-button'],
+          button_label: lang['BUTTONS']['done-button'],
           on_load() {
             const input = document.getElementById("input-0");
             input.pattern = "[A-ZÄÖÜa-zäöüß]+";
-            input.title = lang['titration-word-input-help'];
+            input.title = lang['TITRATION']['titration-word-input-help'];
 
             if (jsPsych.data.getLastTrialData().values()[0].response == 1) {
               input.value = last_understood_word;
@@ -264,9 +264,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
             type: HtmlButtonResponsePlugin,
             stimulus: () => {
               const entered_word = jsPsych.data.getLastTrialData().values()[0].response.understood_word;
-              return lang['titration-typo-question'] + entered_word;
+              return lang['TITRATION']['titration-typo-question'] + entered_word;
             },
-            choices: [lang['yes-button'], lang['no-button']],
+            choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button']],
             on_finish(data) {
               if (data.response == 0) {
                 titration_trial_data.typed_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
@@ -292,7 +292,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
       timeline.push([
         {
           type: HtmlKeyboardResponsePlugin,
-          stimulus: lang['titration-next-word'],
+          stimulus: lang['TITRATION']['titration-next-word'],
           choices: "NO_KEYS",
           trial_duration: 2000,
           record_data: false
@@ -352,8 +352,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
           },
           {
             type: HtmlButtonResponsePlugin,
-            stimulus: lang['titration-motivation'].replace("$1", index + 1).replace("$2", timeline_variables.length),
-            choices: [lang['done-button']],
+            stimulus: lang['TITRATION']['titration-motivation'].replace("$1", index + 1).replace("$2", timeline_variables.length),
+            choices: [lang['BUTTONS']['done-button']],
             record_data: false
           },
         )
@@ -400,79 +400,100 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   function make_sensory_titration() {
     if (titration_required) {
-      const linear = (linear_titration_required ? [
-        {
-          type: HtmlButtonResponsePlugin,
-          stimulus: lang['begin-titration-linear'],
-          choices: [lang['done-button']],
-          record_data: false
-        },
-        {
-          type: CallFunctionPlugin,
-          func() {
-            document.getElementsByTagName("html")[0].classList.add("task1");
-          }
-        },
-        {
-          type: HtmlButtonResponsePlugin,
-          stimulus: lang['titration-before-first'],
-          choices: [lang['done-button']],
-          record_data: false
-        },
-        make_titration_cycle(linear_titration_data, "linear"),
-        {
-          type: CallFunctionPlugin,
-          func() {
-            document.getElementsByTagName("html")[0].classList.remove("task1");
-          }
-        },
-      ] : []);
-
-      const random = (random_titration_required ?
-        [
+      const choices = {
+        linear: (linear_titration_required ? [
+          {
+            type: CallFunctionPlugin,
+            func() {
+              titration_data = new DataCollection();
+            },
+            record_data: false
+          },
           {
             type: HtmlButtonResponsePlugin,
-            stimulus: lang['begin-titration-random-sampling'],
-            choices: [lang['done-button']],
+            stimulus: lang['TITRATION']['begin-titration-linear'],
+            choices: [lang['BUTTONS']['done-button']],
             record_data: false
           },
           {
             type: CallFunctionPlugin,
             func() {
-              document.getElementsByTagName("html")[0].classList.add("task2");
-            }
+              document.getElementsByTagName("html")[0].classList.add("task1");
+            },
+            record_data: false
           },
           {
             type: HtmlButtonResponsePlugin,
-            stimulus: lang['titration-before-first'],
-            choices: [lang['done-button']],
+            stimulus: lang['TITRATION']['titration-before-first'],
+            choices: [lang['BUTTONS']['done-button']],
             record_data: false
           },
-          make_titration_cycle(random_titration_data, "random"),
+          make_titration_cycle(linear_titration_data, "linear"),
           {
             type: CallFunctionPlugin,
             func() {
-              document.getElementsByTagName("html")[0].classList.remove("task2");
-            }
+              document.getElementsByTagName("html")[0].classList.remove("task1");
+            },
+            record_data: false
           },
-        ] : []
-      );
+        ] : []),
 
-      const randomized = jsPsych.randomization.sampleWithoutReplacement([linear, random], 2);
+        random: (random_titration_required ?
+          [
+            {
+              type: CallFunctionPlugin,
+              func() {
+                titration_data = new DataCollection();
+              },
+              record_data: false
+            },
+            {
+              type: HtmlButtonResponsePlugin,
+              stimulus: lang['TITRATION']['begin-titration-random-sampling'],
+              choices: [lang['BUTTONS']['done-button']],
+              record_data: false
+            },
+            {
+              type: CallFunctionPlugin,
+              func() {
+                document.getElementsByTagName("html")[0].classList.add("task2");
+              }
+            },
+            {
+              type: HtmlButtonResponsePlugin,
+              stimulus: lang['TITRATION']['titration-before-first'],
+              choices: [lang['BUTTONS']['done-button']],
+              record_data: false
+            },
+            make_titration_cycle(random_titration_data, "random"),
+            {
+              type: CallFunctionPlugin,
+              func() {
+                document.getElementsByTagName("html")[0].classList.remove("task2");
+              }
+            },
+          ] : []
+        )
+      }
+
+      const randomized = jsPsych.randomization.sampleWithoutReplacement(["linear", "random"], 2);
+
+      experiment_data.addToAll({ linear_first: randomized[0] == "linear", random_first: randomized[0] == "random" });
+
       return {
         timeline: [
-          ...randomized[0],
+          ...choices[randomized[0]],
           {
             type: HtmlButtonResponsePlugin,
-            stimulus: lang['end-titration-part1'],
-            choices: [lang['done-button']],
+            stimulus: lang['TITRATION']['end-titration-part1'],
+            choices: [lang['BUTTONS']['done-button']],
             record_data: false
           },
-          ...randomized[1],
+          ...choices[randomized[1]],
           {
             type: HtmlButtonResponsePlugin,
-            stimulus: lang['end-titration-part2'],
-            choices: [lang['done-button']],
+            stimulus: lang['TITRATION']['end-titration-part2'],
+            choices: [lang['BUTTONS']['done-button']],
             record_data: false
           },
         ]
@@ -521,17 +542,17 @@ export async function run({ assetPaths, input, environment, title, version, stim
     timeline: [{
       type: survey,
       survey_json: {
-        completeText: lang['done-button'],
+        completeText: lang['BUTTONS']['done-button'],
         showQuestionNumbers: false,
         elements:
           [{
             readOnly: true,
-            html: lang['id']['umlaut'],
+            html: lang['ID']['umlaut'],
             type: 'html'
           },
           {
             type: 'text',
-            title: lang['id']['city'],
+            title: lang['ID']['city'],
             name: 'city',
             maskType: "pattern",
             maskSettings: {
@@ -543,15 +564,15 @@ export async function run({ assetPaths, input, environment, title, version, stim
           },
           {
             type: 'dropdown',
-            title: lang['id']['birthMonth'],
+            title: lang['ID']['birthMonth'],
             name: 'birthMonth',
-            choices: lang['id']['months'],
+            choices: lang['ID']['months'],
             isRequired: true,
-            placeholder: lang['id']['placeholder']
+            placeholder: lang['ID']['placeholder']
           },
           {
             type: 'text',
-            title: lang['id']['mother'],
+            title: lang['ID']['mother'],
             name: 'mother',
             maskType: "pattern",
             maskSettings: {
@@ -562,7 +583,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
           },
           {
             type: 'text',
-            title: lang['id']['birthname'],
+            title: lang['ID']['birthname'],
             name: 'birthname',
             description: "Mustermann → nn",
             showCommentArea: true,
@@ -591,10 +612,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
   function make_clarity_question(record_data) {
     return { // Clarity
       type: HtmlSliderResponsePlugin,
-      stimulus: lang['clarity-question'],
-      button_label: lang['done-button'],
+      stimulus: lang['PLANG']['clarity-question'],
+      button_label: lang['BUTTONS']['done-button'],
       record_data,
-      labels: lang['clarity-labels'],
+      labels: lang['PLANG']['clarity-labels'],
       require_movement: true,
       //slider_width: 600,
       subject_id: sub_id,
@@ -611,10 +632,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
   function make_confidence_question(record_data) {
     return { // Confidence
       type: HtmlSliderResponsePlugin,
-      stimulus: lang['confidence-question'],
-      button_label: lang['done-button'],
+      stimulus: lang['PLANG']['confidence-question'],
+      button_label: lang['BUTTONS']['done-button'],
       record_data,
-      labels: lang['confidence-labels'],
+      labels: lang['PLANG']['confidence-labels'],
       require_movement: true,
       //slider_width: 600,
       on_load: slider_percentages,
@@ -629,15 +650,15 @@ export async function run({ assetPaths, input, environment, title, version, stim
   function make_word_question(record_data) {
     return [{
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['word-question'],
-      choices: [lang['done-button']],
+      stimulus: lang['PLANG']['word-question'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     }, { // Which word was understood?
       type: htmlAudioResponse,
       stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
       recording_duration: 7500,
       show_done_button: true,
-      done_button_label: lang['done-button'],
+      done_button_label: lang['BUTTONS']['done-button'],
       record_data,
       on_finish(data) {
         if (record_data) {
@@ -663,8 +684,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
   function ready_next_sentence(record_data) {
     return [{
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['ready-for-next-stimulus'],
-      choices: [lang['done-button']],
+      stimulus: lang['PLANG']['ready-for-next-stimulus'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     }]
   }
@@ -673,8 +694,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     return input.question_prior ? {
       type: HtmlButtonResponsePlugin,
       // TODO: den namen schöner
-      stimulus: lang['word-question-prior-question'],
-      choices: [lang['yes-button'], lang['no-button'], lang['not-understood']],
+      stimulus: lang['PLANG']['word-question-prior-question'],
+      choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button'], lang['BUTTONS']['not-understood']],
       record_data,
       on_finish(data) {
         data.type = "prior_expectation";
@@ -705,15 +726,15 @@ export async function run({ assetPaths, input, environment, title, version, stim
     return [
       {
         type: HtmlButtonResponsePlugin,
-        stimulus: lang['word-question-prior'],
-        choices: [lang['done-button']],
+        stimulus: lang['PLANG']['word-question-prior'],
+        choices: [lang['BUTTONS']['done-button']],
         record_data: false,
       }, { // Which word was understood?
         type: htmlAudioResponse,
         stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
         recording_duration: 7500,
         show_done_button: true,
-        done_button_label: lang['done-button'],
+        done_button_label: lang['BUTTONS']['done-button'],
         record_data,
         on_finish(data) {
           if (record_data) {
@@ -739,10 +760,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
       },
       { // Expectation confidence
         type: HtmlSliderResponsePlugin,
-        stimulus: lang['expectation-question'],
-        button_label: lang['done-button'],
+        stimulus: lang['PLANG']['expectation-question'],
+        button_label: lang['BUTTONS']['done-button'],
         record_data,
-        labels: lang['expectation-labels'],
+        labels: lang['PLANG']['expectation-labels'],
         require_movement: true,
         //slider_width: 600,
         on_load: slider_percentages,
@@ -775,21 +796,21 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['begin-training-session'],
-      choices: [lang['done-button']],
+      stimulus: lang['PLANG']['begin-training-session'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['explanation-pre-playback'],
-      choices: [lang['done-button']],
+      stimulus: lang['PLANG']['explanation-pre-playback'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     },
     ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['explanation-post-playback'],
-      choices: [lang['done-button']],
+      stimulus: lang['PLANG']['explanation-post-playback'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     },
     ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
@@ -800,8 +821,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     conditional_prior(true),
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['end-of-first-tutorial-sentence'],
-      choices: [lang['done-button']],
+      stimulus: lang['PLANG']['end-of-first-tutorial-sentence'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false,
       require_movement: true
     },
@@ -832,8 +853,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['end-of-tutorial'],
-      choices: [lang['done-button']],
+      stimulus: lang['PLANG']['end-of-tutorial'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false,
       require_movement: true
     }
@@ -888,8 +909,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   const pause = {
     type: HtmlButtonResponsePlugin,
-    stimulus: lang['pause-stimulus'],
-    choices: [lang['done-button']]
+    stimulus: lang['PLANG']['pause-stimulus'],
+    choices: [lang['BUTTONS']['done-button']]
   }
 
   await jsPsych.run([
@@ -905,11 +926,11 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['consent-form'],
-      choices: [lang['consent-button'], lang['no-consent-button']],
+      stimulus: lang['CONSENT_FORM']['consent-form-titration'],
+      choices: [lang['CONSENT_FORM']['consent-button'], lang['CONSENT_FORM']['no-consent-button']],
       on_finish(data) {
         if (data.response == 1) { // Rejected
-          window.alert(lang['did-not-accept-message']);
+          window.alert(lang['CONSENT_FORM']['did-not-accept-message']);
           window.close();
         }
       }
@@ -917,24 +938,24 @@ export async function run({ assetPaths, input, environment, title, version, stim
     make_id_input,
     ...(titration_required ? [{
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['begin-titration'],
-      choices: [lang['done-button']],
+      stimulus: lang['TITRATION']['begin-titration'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     }] : []),
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['begin-technical'],
-      choices: [lang['done-button']],
+      stimulus: lang['TECHNICAL_SETTINGS']['begin-technical'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     },
     ...(input.lang_task ? [configure_microphone] : []),
     configure_speakers,
     { // Speaker intensity
       type: HtmlSliderResponsePlugin,
-      stimulus: lang['speaker-intensity'],
-      button_label: lang['done-button'],
+      stimulus: lang['TECHNICAL_SETTINGS']['speaker-intensity'],
+      button_label: lang['BUTTONS']['done-button'],
       record_data: true,
-      labels: lang['speaker-intensity-labels'],
+      labels: lang['TECHNICAL_SETTINGS']['speaker-intensity-labels'],
       require_movement: true,
       //slider_width: 600,
       on_load: slider_percentages,
@@ -992,10 +1013,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     { // Concentration
       type: HtmlSliderResponsePlugin,
-      stimulus: lang['concentration-question'],
-      button_label: lang['done-button'],
+      stimulus: lang['POST_SURVEY']['concentration-question'],
+      button_label: lang['BUTTONS']['done-button'],
       record_data: true,
-      labels: lang['concentration-labels'],
+      labels: lang['POST_SURVEY']['concentration-labels'],
       require_movement: true,
       //slider_width: 600,
       on_load: slider_percentages,
@@ -1009,8 +1030,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['self-report-random'],
-      choices: [lang["yes-button"], lang["no-button"]],
+      stimulus: lang['POST_SURVEY']['self-report-random'],
+      choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
       on_finish(data) {
         experiment_data.addToAll({ random: data.response == 0 });
 
@@ -1021,8 +1042,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['self-report-honest'],
-      choices: [lang["yes-button"], lang["no-button"]],
+      stimulus: lang['POST_SURVEY']['self-report-honest'],
+      choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
       on_finish(data) {
         experiment_data.addToAll({ honest: data.response == 0 });
 
@@ -1033,8 +1054,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['self-report-headphones'],
-      choices: [lang["yes-button"], lang["no-button"]],
+      stimulus: lang['POST_SURVEY']['self-report-headphones'],
+      choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
       on_finish(data) {
         experiment_data.addToAll({ headphones: data.response == 0 });
 
@@ -1045,10 +1066,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     { // Quietness of environment
       type: HtmlSliderResponsePlugin,
-      stimulus: lang['quietness-question'],
-      button_label: lang['done-button'],
+      stimulus: lang['POST_SURVEY']['quietness-question'],
+      button_label: lang['BUTTONS']['done-button'],
       record_data: true,
-      labels: lang['quietness-labels'],
+      labels: lang['POST_SURVEY']['quietness-labels'],
       require_movement: true,
       //slider_width: 600,
       on_load: slider_percentages,
@@ -1062,10 +1083,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     { // Disruptiveness
       type: HtmlSliderResponsePlugin,
-      stimulus: lang['disruptiveness-question'],
-      button_label: lang['done-button'],
+      stimulus: lang['POST_SURVEY']['disruptiveness-question'],
+      button_label: lang['BUTTONS']['done-button'],
       record_data: true,
-      labels: lang['disruptiveness-labels'],
+      labels: lang['POST_SURVEY']['disruptiveness-labels'],
       require_movement: true,
       //slider_width: 600,
       on_load: slider_percentages,
@@ -1079,8 +1100,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       type: HtmlButtonResponsePlugin,
-      stimulus: lang['end-titration-final'],
-      choices: [lang['done-button']],
+      stimulus: lang['TITRATION']['end-titration-final'],
+      choices: [lang['BUTTONS']['done-button']],
       record_data: false
     }
   ]);

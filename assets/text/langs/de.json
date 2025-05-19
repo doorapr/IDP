@@ -1,100 +1,17 @@
 {
   "title": "Sprachbasierter Task",
-  "browser-exclusion-message": "Dieses Experiment unterstützt Safari nicht. Bitte verwenden Sie einen anderen Browser.",
-  "mic-select-text": "<p><b>Bitte suchen Sie Ihr Mikrofon aus.</b></p><p>Sie werden es gleich testen und können auf diese Seite zurückkehren, falls es nicht funktioniert.</p>",
-  "mic-select-button": "Dieses Mikrofon verwenden",
-  "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
-  "done-button": "Weiter",
-  "word-question": "<p>Welches Wort haben Sie gehört?</p><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p>Es kann auch nur eine <b>Vermutung</b> sein, aber bitte raten Sie nicht.</p><p>Wenn Sie kein Wort verstanden haben, sagen Sie bitte laut und deutlich das Wort \"nichts\".</p>",
-  "word-question-prior-question":"<p>Haben Sie das Wort, was Sie gesagt haben, auch als Satzende erwartet?</p>",
-  "word-question-prior": "<p>Welches Wort haben Sie als Satzende erwartet?</p><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie erwartet haben.</p>",
-  "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
-  "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
-  "expectation-question":"<p>Wie stark haben Sie dieses Wort erwartet?</p>",
-  "expectation-labels": [
-    "Sehr schwach<br>0%", 
-    "<span id='slider-value'>50%</span>", 
-    "Sehr stark<br>100%"
-  ],
-  "clarity-labels": [
-    "Sehr undeutlich<br>0%",
-    "<span id='slider-value'>50%</span>",
-    "Sehr deutlich<br>100%"
-  ],
-  "confidence-labels": [
-    "Sehr unsicher<br>0%",
-    "<span id='slider-value'>50%</span>",
-    "Sehr sicher<br>100%"
-  ],
-  "speaker-intensity-labels": [
-    "0%",
-    "<span id='slider-value'>50%</span>",
-    "100%"
-  ],
-  "concentration-question": "Wie konzentriert waren Sie bei der Bearbeitung des Online-Experiments?",
-  "concentration-labels": [
-    "Sehr unkonzentriert<br>0%",
-    "<span id='slider-value'>50%</span>",
-    "Sehr konzentriert<br>100%"
-  ],
-  "quietness-question": "Wie ruhig war die Umgebung, in der Sie das Online-Experiment durchgeführt haben?",
-  "quietness-labels": [
-    "Sehr unruhig<br>0%",
-    "<span id='slider-value'>50%</span>",
-    "Sehr ruhig<br>100%"
-  ],
-  "disruptiveness-question": "Wie störend war die Umgebung, in der Sie das Online-Experiment durchgeführt haben?",
-  "disruptiveness-labels": [
-    "Sehr störend<br>0%",
-    "<span id='slider-value'>50%</span>",
-    "Gar nicht störend<br>100%"
-  ],
-  "self-report-random": "<p>Haben Sie während der Studie absichtlich zufällig geantwortet?</p>",
-  "self-report-honest": "<p>Waren Sie bei Ihren Antworten ehrlich?</p>",
-  "self-report-headphones": "<p>Haben Sie für die Durchführung des Experiments Kopfhörer verwendet?</p>",
-  "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
-  "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich.</p><p><b>Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</b></p>",
-  "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
-  "end-of-tutorial": "<p><b>Vielen Dank!</b></p><p>Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
-  "ready-for-next-stimulus": "<p>Sind Sie bereit für den nächsten Satz?</p>",
-  "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind, klicken Sie auf \"Weiter\".</p>",
-  "did-not-accept-message": "Sie haben die Einverständniserklärung nicht akzeptiert. Dieser Tab wird sich jetzt schließen.",
-  "consent-form": "Willkommen & Einverständniserklärung",
-  "yes-button": "Ja",
-  "no-button": "Nein",
-  "same-as-last-button": "Ja, dasselbe",
-  "not-understood":"Ich habe nichts verstanden",
-  "mic-test": "<p><b>Bitte sagen Sie ein Wort, um Ihr Mikrofon zu testen.</b></p><p>Sprechen Sie dafür <b>laut</b> und <b>deutlich</b>.</p>",
-  "recording-check": "<p><b>Haben Sie das Wort gehört, das Sie aufgenommen haben?</b></p><p>Wenn Sie die Aufnahme wiederholen wollen, drücken Sie \"Mikrofon ändern\".</p><p>Wenn Sie die Aufnahme nochmal anhören wollen, drücken Sie \"Aufnahme abspielen\".</p><p>Wenn Sie mit der Aufnahme zufrieden sind, drücken Sie \"Weiter\".</p>",
-  "change-microphone-button": "Mikrofon ändern",
-  "listen-again-button": "Aufnahme abspielen",
-  "speaker-check": "<p>Wenn Sie auf \"Weiter\" klicken, wird Ihnen ein Satz vorgespielt.</p><p><b>Bitte stellen Sie die Lautstärke Ihrer Kopfhörer so ein, dass Sie den Satz klar und deutlich verstehen.</b></p>",
-  "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
-  "speaker-intensity": "<p>Bitte geben Sie jetzt an, wie laut die Lautstärke Ihrer Kopfhörer eingestellt ist. </p>",
-  "begin-training-session": "<p><b>Training</b></p><p>Anhand einiger Beispiele werden Sie nun durch den Ablauf des Experiments geführt.</p><p><b>Bitte lesen Sie sich die Instruktionen aufmerksam durch.</b></p>",
-  "begin-technical":"<p><b>Technische Einstellungen</b></p><p>Im nächsten Schritt bitten wir Sie, Ihr Mikrofon auszuwählen und zu testen und die Lautstärke einzustellen.</p><p><b>Bitte führen Sie das Experiment mit Kopfhörern durch.</b></p>",
-  "end-technical":"<p><b>Vielen Dank!</b></p><p>Sie haben die technischen Einstellung erfolgreich abgeschlossen. Klicken Sie auf \"Weiter\", um mit dem Experiment zu beginnen.",
-  "begin-titration": "<p><b>Herzlich Willkommen!</b></p><p>Das Ziel unseres Experiments ist, Ihre individuelle Schwelle zu bestimmen, ab der Sie in einem verrauschten Geräusch Sprache wahrnehmen. Diese Schwelle kann von Person zu Person variieren.</p><p>Unsere Studie besteht aus zwei Teilen und wird circa 1h 15 min Ihrer Zeit in Anspruch nehmen. <b>Bitte beachten Sie, dass es für die Durchführung beider Teile sehr wichtig ist, dass Sie sich in einer ruhigen Umgebung befinden und nicht durch andere Geräusche gestört werden.</p><p>Bitte führen Sie das Experiment mit Kopfhörern durch.</p></b> Klicken Sie auf \"Weiter\", um mit den technischen Einstellungen zu beginnen. </p>",
-  "begin-titration-linear": "<p><b>Instruktion</b></p><p>Zu Beginn jedes Durchgangs ist das Geräusch sehr verrauscht und wird im Verlauf immer deutlicher. Bei jeder Abstufung fragen wir Sie, ob das Geräusch Sprache enhalten hat und anschließend ob das Geräusch ein konkretes Wort enthalten hat.</p><p><b>Beantworten Sie bitte die erste Frage, ob das Geräusch Sprache enthalten hat auch dann mit \"Ja\", wenn Sie ein Gefühl haben, dass das Geräusch ein Wort enthalten könnte, auch wenn Sie noch kein konkretes Wort verstanden haben. Bitte beantworten Sie die zweite Frage, ob das Geräusch ein Wort enthalten hat, nur dann mit \"Ja\", wenn Sie ein konkretes Wort verstanden haben. Bitte raten Sie bei dieser zweiten Frage nicht. </b></p><p><b>Bitte beachten Sie, dass sich mit jedem Durchgang das Geräusch ändert und der Durchgang in seiner Länge variieren kann. </b>Dabei gibt es auch Durchgänge, in denen keine Sprache bzw. kein Wort enthalten ist. Wenn das Geräusch Sprache enthält, handelt es sich immer um ein einzelnes Wort und nicht um Fantasie- oder Fremdwörter. Der Beginn eines neuen Durchgangs wird durch ein Sprechblasensymbol signalisiert.</p><p><b>Bitte hören Sie im Folgenden genau zu und beantworten Sie die Fragen wahrheitsgemäß.</b></p>",
-  "begin-titration-random-sampling": "<p><b>Instruktion</b></p><p>Im Folgenden hören sie in jedem Durchgang unterschiedlich stark verrauschte Geräusche. Nach jedem Durchgang fragen wir Sie, ob das Geräusch Sprache enhalten hat und anschließend ob das Geräusch ein konkretes Wort enthalten hat.</p><p><b>Beantworten Sie bitte die erste Frage, ob das Geräusch Sprache enthalten hat auch dann mit \"Ja\", wenn Sie ein Gefühl haben, dass das Geräusch ein Wort enthalten könnte, auch wenn Sie noch kein konkretes Wort verstanden haben. Bitte beantworten Sie die zweite Frage, ob das Geräusch ein Wort enthalten hat, nur dann mit \"Ja\", wenn Sie ein konkretes Wort verstanden haben. Bitte raten Sie bei dieser zweiten Frage nicht.</p><p><b>Bitte beachten Sie, dass jeder Durchgang ein neues Geräusch enthält. </b>Dabei gibt es auch Durchgänge, in denen keine Sprache bzw. ein Wort enthalten ist. Wenn das Geräusch Sprache enthält, handelt es sich immer um ein einzelnes Wort und nicht um Fantasie- oder Fremdwörter. Der Beginn eines neuen Durchgangs wird durch ein Sprechblasensymbol signalisiert.</p><p><b>Bitte hören Sie im Folgenden genau zu und beantworten Sie die Fragen wahrheitsgemäß.</b></p>",
-  "intermediate-titration": "<p><b>Vielen Dank!</b></p><p>Sie haben den ersten Teil des Experiments geschafft. Klicken Sie auf \"Weiter\", um mit dem Experiment zu beginnen.",
-  "end-titration-part1": "<p><b>Vielen Dank, Sie haben den ersten Teil unseres Experiments abgeschlossen!</b></p><p>Bitte klicken Sie auf \"Weiter\", um den zweiten Teil zu beginnen.</p>",
-  "titration-next-word": "<p><img class=\"main-symbol\" src='assets/images/chat-bubble-icon.svg'></p><p>Beginn eines neuen Durchgangs</p>",
-  "titration-before-first": "<p>Nun hören Sie ein verrauschtes Geräusch.</p>",
-  "titration-word-input-help": "Bitte geben Sie genau ein Wort ein. Leerzeichen, Zahlen und Sonderzeichen sind nicht erlaubt.",
-  "language-detected-question": "<p>Haben Sie in diesem Geräusch Sprache verstanden?</p>",
-  "word-detected-question": "<p>Haben Sie ein konkretes Wort verstanden?</p>",
-  "titration-motivation": "<p>Sehr gut! Sie haben schon $1 von $2 Durchläufen geschafft.</p>",
-  "titration-which-word-question": "Welches Wort haben Sie verstanden?",
-  "titration-typo-question": "<p>Wollten Sie dieses Wort eingeben: ",
-  "end-titration-part2": "<p><b>Vielen Dank!</b></p><p>Sie haben den zweiten Teil unseres Experiments abgeschlossen!</b></p><p>Um sicherzugehen, dass wir Ihre Daten für unsere Auswertung verwenden können, beantworten Sie bitte die folgenden Fragen ehrlich. Ihre Antworten haben keinen Einfluss auf die Vergütung Ihrer Teilnahme.</p>",
-  "end-titration-final": "<p><b>Vielen Dank!</b></p><p>Sie haben unser Online-Experiment erfolgreich abgeschlossen. Für die Vergütung der Studie, melden Sie sich bitte mit Ihrem Versuchspersonencode bei kognitionsstudie.rad@tum.de. Sie können das Browserfenster nun schließen.",
-  "consent-button": "Ich stimme zu",
-  "no-consent-button": "Ich stimme nicht zu",
-  "id": {
+  
+  "CONSENT_FORM": {
+    "consent-form-titration": "Willkommen & Einverständniserklärung",
+    "consent-button": "Ich stimme zu",
+    "no-consent-button": "Ich stimme nicht zu",
+    "did-not-accept-message": "Sie haben die Einverständniserklärung nicht akzeptiert. Dieser Tab wird sich jetzt schließen."
+  },
+
+  "ID": {
     "umlaut":"<p><b>Erstellung eines persönlichen Probandencodes</b></p><p>Bevor das Experiment beginnt, erstellen Sie zunächst einen persönlichen Probandencode. Bitte beachten Sie, dass Umlaute durch den entsprechenden Vokal ersetzt werden (z.B. ä durch ae) und ß durch ss. Groß- und Kleinschreibung spielt keine Rolle.</p>",
     "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an:",
-      "birthMonth": "Wählen Sie Ihren Geburtsmonat:",
+    "birthMonth": "Wählen Sie Ihren Geburtsmonat:",
     "mother": "Geben Sie die ersten zwei Buchstaben des Vornamens Ihrer Mutter an:",
     "birthname": "Geben Sie die letzten zwei Buchstaben Ihres Geburtsnachnamens an:",
       "months": [
@@ -102,5 +19,111 @@
       "07", "08", "09", "10", "11", "12"
       ],
     "placeholder": "Auswählen..."
+  },
+
+  "TECHNICAL_SETTINGS": {
+    "begin-technical":"<p><b>Technische Einstellungen</b></p><p>Im nächsten Schritt bitten wir Sie, Ihr Mikrofon auszuwählen und zu testen und die Lautstärke einzustellen.</p><p><b>Bitte führen Sie das Experiment mit Kopfhörern durch.</b></p>",
+    "end-technical":"<p><b>Vielen Dank!</b></p><p>Sie haben die technischen Einstellung erfolgreich abgeschlossen. Klicken Sie auf \"Weiter\", um mit dem Experiment zu beginnen.",
+    "mic-select-text": "<p><b>Bitte suchen Sie Ihr Mikrofon aus.</b></p><p>Sie werden es gleich testen und können auf diese Seite zurückkehren, falls es nicht funktioniert.</p>",
+    "mic-select-button": "Dieses Mikrofon verwenden",
+    "mic-test": "<p><b>Bitte sagen Sie ein Wort, um Ihr Mikrofon zu testen.</b></p><p>Sprechen Sie dafür <b>laut</b> und <b>deutlich</b>.</p>",
+    "recording-check": "<p><b>Haben Sie das Wort gehört, das Sie aufgenommen haben?</b></p><p>Wenn Sie die Aufnahme wiederholen wollen, drücken Sie \"Mikrofon ändern\".</p><p>Wenn Sie die Aufnahme nochmal anhören wollen, drücken Sie \"Aufnahme abspielen\".</p><p>Wenn Sie mit der Aufnahme zufrieden sind, drücken Sie \"Weiter\".</p>",
+    "change-microphone-button": "Mikrofon ändern",
+    "listen-again-button": "Aufnahme abspielen",
+    "speaker-check": "<p>Wenn Sie auf \"Weiter\" klicken, wird Ihnen ein Satz vorgespielt.</p><p><b>Bitte stellen Sie die Lautstärke Ihrer Kopfhörer so ein, dass Sie den Satz klar und deutlich verstehen.</b></p>",
+    "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
+    "speaker-intensity": "<p>Bitte geben Sie jetzt an, wie laut die Lautstärke Ihrer Kopfhörer eingestellt ist. </p>",
+    "speaker-intensity-labels": [
+      "0%",
+      "<span id='slider-value'>50%</span>",
+      "100%"
+    ]
+  },
+  
+ 
+  "PLANG": {
+    "begin-training-session": "<p><b>Training</b></p><p>Anhand einiger Beispiele werden Sie nun durch den Ablauf des Experiments geführt.</p><p><b>Bitte lesen Sie sich die Instruktionen aufmerksam durch.</b></p>",
+    "explanation-pre-playback": "<p>Sie hören gleich die Stimme einer Frau, die einen Satz vorliest. Das letzte Wort ist etwas undeutlich.</p>",
+    "explanation-post-playback": "<p>Wie Sie sicher gemerkt haben, war das letzte Wort wirklich undeutlich.</p><p><b>Bitte hören Sie sich den Satz noch einmal an. Geben Sie dann an, wie deutlich Sie das Wort gehört haben.</b></p>",
+    "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
+    "end-of-tutorial": "<p><b>Vielen Dank!</b></p><p>Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
+    "ready-for-next-stimulus": "<p>Sind Sie bereit für den nächsten Satz?</p>",
+    "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind, klicken Sie auf \"Weiter\".</p>",
+    "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
+    "word-question": "<p>Welches Wort haben Sie gehört?</p><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p>Es kann auch nur eine <b>Vermutung</b> sein, aber bitte raten Sie nicht.</p><p>Wenn Sie kein Wort verstanden haben, sagen Sie bitte laut und deutlich das Wort \"nichts\".</p>",
+    "word-question-prior-question":"<p>Haben Sie das Wort, was Sie gesagt haben, auch als Satzende erwartet?</p>",
+    "word-question-prior": "<p>Welches Wort haben Sie als Satzende erwartet?</p><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie erwartet haben.</p>",
+    "clarity-question": "<p>Wie deutlich haben Sie das Wort gehört?</p>",
+    "confidence-question": "<p>Wie sicher sind Sie sich mit Ihrer Antwort?</p>",
+    "expectation-question":"<p>Wie stark haben Sie dieses Wort erwartet?</p>",
+    "expectation-labels": [
+      "Sehr schwach<br>0%", 
+      "<span id='slider-value'>50%</span>", 
+      "Sehr stark<br>100%"
+    ],
+    "clarity-labels": [
+      "Sehr undeutlich<br>0%",
+      "<span id='slider-value'>50%</span>",
+      "Sehr deutlich<br>100%"
+    ],
+    "confidence-labels": [
+      "Sehr unsicher<br>0%",
+      "<span id='slider-value'>50%</span>",
+      "Sehr sicher<br>100%"
+    ]
+  },
+
+
+  "TITRATION": {
+    "begin-titration": "<p><b>Herzlich Willkommen!</b></p><p>Das Ziel unseres Experiments ist, Ihre individuelle Schwelle zu bestimmen, ab der Sie in einem verrauschten Geräusch Sprache wahrnehmen. Diese Schwelle kann von Person zu Person variieren.</p><p>Unsere Studie besteht aus zwei Teilen, in denen wir Ihre Schwelle auf zwei unterschiedliche Art und Weisen bestimmen werden, und wird circa 1h 15 min Ihrer Zeit in Anspruch nehmen. <b>Bitte beachten Sie, dass es für die Durchführung beider Teile sehr wichtig ist, dass Sie sich in einer ruhigen Umgebung befinden und nicht durch andere Geräusche gestört werden.</p><p>Bitte führen Sie das Experiment mit Kopfhörern durch.</p></b> Klicken Sie auf \"Weiter\", um mit den technischen Einstellungen zu beginnen. </p>",
+    "begin-titration-linear": "<p><b>Instruktion</b></p><p>Zu Beginn jedes Durchgangs ist das Geräusch sehr verrauscht und wird im Verlauf immer deutlicher. Bei jeder Abstufung fragen wir Sie, ob das Geräusch Sprache enthalten hat und ob Sie ein konkretes Wort verstanden haben.</p><p><b>Beantworten Sie bitte die erste Frage, ob das Geräusch Sprache enthalten hat auch dann mit \"Ja\", wenn Sie ein Gefühl haben, dass das Geräusch ein Wort enthalten haben könnte, auch wenn Sie noch kein konkretes Wort verstanden haben. </p><p> Bitte beantworten Sie die zweite Frage, ob Sie ein konkretes Wort verstanden haben, nur dann mit \"Ja\", wenn Sie auch wirklich ein konkretes Wort wahrgenommen haben. Bitte raten Sie bei dieser zweiten Frage nicht. </b></p><p><b>Bitte beachten Sie, dass sich mit jedem Durchgang das Geräusch ändert und der Durchgang in seiner Länge variieren kann. </b>Dabei gibt es auch Durchgänge, in denen keine Sprache bzw. kein Wort enthalten ist. Wenn das Geräusch Sprache enthält, handelt es sich immer um ein einzelnes Wort und nicht um ein Fantasiewort. Der Beginn eines neuen Durchgangs wird durch ein Sprechblasensymbol signalisiert.</p><p><b>Bitte hören Sie im Folgenden genau zu und beantworten Sie die Fragen wahrheitsgemäß.</b></p>",
+    "begin-titration-random-sampling": "<p><b>Instruktion</b></p><p>Im Folgenden hören sie in jedem Durchgang unterschiedlich stark verrauschte Geräusche. Nach jedem Durchgang fragen wir Sie, ob das Geräusch Sprache enthalten hat und ob Sie ein konkretes Wort verstanden haben.</p><p><b>Beantworten Sie bitte die erste Frage, ob das Geräusch Sprache enthalten hat auch dann mit \"Ja\", wenn Sie ein Gefühl haben, dass das Geräusch ein Wort enthalten haben könnte, auch wenn Sie noch kein konkretes Wort verstanden haben. </p><p> Bitte beantworten Sie die zweite Frage, ob Sie ein konkretes Wort verstanden haben, nur dann mit \"Ja\", wenn Sie auch wirklich ein konkretes Wort wahrgenommen haben. Bitte raten Sie bei dieser zweiten Frage nicht.</p><p><b>Bitte beachten Sie, dass jeder Durchgang ein neues Geräusch enthält. </b>Dabei gibt es auch Durchgänge, in denen keine Sprache bzw. ein Wort enthalten ist. Wenn das Geräusch Sprache enthält, handelt es sich immer um ein einzelnes Wort und nicht um Fantasie- oder Fremdwörter. Der Beginn eines neuen Durchgangs wird durch ein Sprechblasensymbol signalisiert.</p><p><b>Bitte hören Sie im Folgenden genau zu und beantworten Sie die Fragen wahrheitsgemäß.</b></p>",
+    "intermediate-titration": "<p><b>Vielen Dank!</b></p><p>Sie haben den ersten Teil des Experiments geschafft. Klicken Sie auf \"Weiter\", um mit dem Experiment zu beginnen.",
+    "end-titration-part1": "<p><b>Vielen Dank, Sie haben den ersten Teil unseres Experiments abgeschlossen!</b></p><p>Bitte klicken Sie auf \"Weiter\", um den zweiten Teil zu beginnen.</p>",
+    "titration-next-word": "<p><img class=\"main-symbol\" src='assets/images/chat-bubble-icon.svg'></p><p>Beginn eines neuen Durchgangs</p>",
+    "titration-before-first": "<p>Nun hören Sie ein verrauschtes Geräusch.</p>",
+    "titration-word-input-help": "Bitte geben Sie genau ein Wort ein. Leerzeichen, Zahlen und Sonderzeichen sind nicht erlaubt.",
+    "language-detected-question": "<p>Haben Sie in diesem Geräusch Sprache verstanden?</p>",
+    "word-detected-question": "<p>Haben Sie ein konkretes Wort verstanden?</p>",
+    "titration-motivation": "<p>Sehr gut! Sie haben schon $1 von $2 Durchgängen geschafft.</p>",
+    "titration-which-word-question": "Welches Wort haben Sie verstanden?",
+    "titration-typo-question": "<p>Wollten Sie dieses Wort eingeben: ",
+    "end-titration-part2": "<p><b>Vielen Dank!</b></p><p>Sie haben den zweiten Teil unseres Experiments abgeschlossen!</b></p><p>Um sicherzugehen, dass wir Ihre Daten für unsere Auswertung verwenden können, beantworten Sie bitte die folgenden Fragen ehrlich. Ihre Antworten haben keinen Einfluss auf die Vergütung Ihrer Teilnahme.</p>",
+    "end-titration-final": "<p><b>Vielen Dank!</b></p><p>Sie haben unser Online-Experiment erfolgreich abgeschlossen. Für die Vergütung der Studie, melden Sie sich bitte mit Ihrem Versuchspersonencode bei kognitionsstudie.rad@tum.de. Sie können das Browserfenster nun schließen."
+  },
+
+
+  "POST_SURVEY": {
+    "concentration-question": "Wie konzentriert waren Sie bei der Bearbeitung des Online-Experiments?",
+      "concentration-labels": [
+        "Sehr unkonzentriert<br>0%",
+        "<span id='slider-value'>50%</span>",
+        "Sehr konzentriert<br>100%"
+      ],
+    "quietness-question": "Wie ruhig war die Umgebung, in der Sie das Online-Experiment durchgeführt haben?",
+      "quietness-labels": [
+        "Sehr unruhig<br>0%",
+        "<span id='slider-value'>50%</span>",
+        "Sehr ruhig<br>100%"
+      ],
+    "disruptiveness-question": "Wie störend war die Umgebung, in der Sie das Online-Experiment durchgeführt haben?",
+      "disruptiveness-labels": [
+        "Sehr störend<br>0%",
+        "<span id='slider-value'>50%</span>",
+        "Gar nicht störend<br>100%"
+      ],
+    "self-report-random": "<p>Haben Sie während der Studie absichtlich zufällig geantwortet?</p>",
+    "self-report-honest": "<p>Waren Sie bei Ihren Antworten ehrlich?</p>",
+    "self-report-headphones": "<p>Haben Sie für die Durchführung des Experiments Kopfhörer verwendet?</p>"
+  },
+  
+
+  "BUTTONS": {
+    "done-button": "Weiter",
+    "yes-button": "Ja",
+    "no-button": "Nein",
+    "same-as-last-button": "Ja, dasselbe",
+    "not-understood":"Ich habe nichts verstanden"
   }
+  
 }
