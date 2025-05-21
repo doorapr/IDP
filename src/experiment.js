@@ -556,11 +556,11 @@ export async function run({ assetPaths, input, environment, title, version, stim
             name: 'city',
             maskType: "pattern",
             maskSettings: {
-              pattern: "aa"
+              pattern: "a"
             },
 
             isRequired: true,
-            description: "München → mu"
+            description: "München → m"
           },
           {
             type: 'dropdown',
@@ -572,20 +572,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
           },
           {
             type: 'text',
-            title: lang['ID']['mother'],
-            name: 'mother',
-            maskType: "pattern",
-            maskSettings: {
-              pattern: "aa"
-            },
-            isRequired: true,
-            description: "Emma → em"
-          },
-          {
-            type: 'text',
             title: lang['ID']['birthname'],
             name: 'birthname',
-            description: "Mustermann → nn",
+            description: "Lena → la",
             showCommentArea: true,
             maskType: "pattern",
             maskSettings: {
@@ -594,6 +583,17 @@ export async function run({ assetPaths, input, environment, title, version, stim
             },
             isRequired: true,
 
+          },
+          {
+            type: 'text',
+            title: lang['ID']['mother'],
+            name: 'mother',
+            maskType: "pattern",
+            maskSettings: {
+              pattern: "aa"
+            },
+            isRequired: true,
+            description: "Emma → ea"
           }
           ]
       },

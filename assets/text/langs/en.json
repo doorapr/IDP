@@ -51,10 +51,10 @@
   "titration-typo-question": "<p>Is this the word you wanted to enter: ",
   "id": {
     "umlaut":"<p><b>Before the experiment begins, first create a personal test person code. Please note that umlauts are replaced by the corresponding vowel (e.g. ä by ae) and ß by ss. Upper and lower case is not important.</b></p>",
-    "city": "Please provide the first two letters of the city you were born in:",
+    "city": "Please provide the first letter of the city you were born in:",
       "birthMonth": "Enter your birth month:",
-    "mother": "Please provide the first two letters of your Mother's first name:",  
-    "birthname": "Please provide the last two letters of your birth surname (last name):",
+    "mother": "Please provide the first and last letter of your Mother's first name:",  
+    "birthname": "Please provide the first and last letter of your first name:",
       "months": [
       "01", "02", "03", "04", "05", "06",
       "07", "08", "09", "10", "11", "12"

@@ -10,10 +10,10 @@
 
   "ID": {
     "umlaut":"<p><b>Erstellung eines persönlichen Probandencodes</b></p><p>Bevor das Experiment beginnt, erstellen Sie zunächst einen persönlichen Probandencode. Bitte beachten Sie, dass Umlaute durch den entsprechenden Vokal ersetzt werden (z.B. ä durch ae) und ß durch ss. Groß- und Kleinschreibung spielt keine Rolle.</p>",
-    "city": "Geben Sie die ersten zwei Buchstaben Ihrer Geburtsstadt an:",
+    "city": "Geben Sie den ersten Buchstaben Ihrer Geburtsstadt an:",
     "birthMonth": "Wählen Sie Ihren Geburtsmonat:",
-    "mother": "Geben Sie die ersten zwei Buchstaben des Vornamens Ihrer Mutter an:",
-    "birthname": "Geben Sie die letzten zwei Buchstaben Ihres Geburtsnachnamens an:",
+    "mother": "Geben Sie den ersten und letzten Buchstaben des Vornamens Ihrer Mutter an:",
+    "birthname": "Geben Sie den ersten und letzten Buchstaben Ihres Vornamens an:",
       "months": [
       "01", "02", "03", "04", "05", "06",
       "07", "08", "09", "10", "11", "12"
