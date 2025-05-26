@@ -3,7 +3,7 @@
  * @description Language task to assess word recognition in distorted speech, modulated by a prior sentence stimulus. Includes sensory titration and assessment of prior expectation.
  * @version 0.9.0
  *
- * @assets Stimuli/,assets/images,assets/audio,assets/text
+ * @assets Stimuli/,assets/images,assets/audio/training,assets/text
  * 
  */
 
@@ -103,7 +103,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
   const lang = await fetch(`assets/text/langs/${input.selected_language}.json`).then(response => response.json());
 
   let titration_data;
-  const experiment_data = new DataCollection([{ start_time: jsPsych.getStartTime() }]);
+  const experiment_data = new DataCollection([{}]);
   var titration_trial_data = {
     typed_word: "NA",
     entered_words: []
@@ -365,10 +365,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     }
   }
 
-  const titration_sheet = await fetch_csv('assets/text/titration.csv')
-
-  const linear_titration_sheet = linear_titration_required ? titration_sheet : [];
-  const random_titration_sheet = random_titration_required ? titration_sheet : [];
+  const linear_titration_sheet = linear_titration_required ? await fetch_csv('assets/text/titration_linear.csv') : [];
+  const random_titration_sheet = random_titration_required ? await fetch_csv('assets/text/titration_random.csv') : [];
 
   const syllable_groups = random_titration_sheet.reduce((acc, it) => {
     if (!(it.syllables in acc))
@@ -598,7 +596,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
           ]
       },
       on_finish(data) {
-        sub_id = data.response.city + data.response.birthMonth + data.response.mother + data.response.birthname
+        sub_id = data.response.city + data.response.birthMonth + data.response.birthname + data.response.mother
         jsPsych.data.addProperties({
           subject_id: sub_id
         })
@@ -961,6 +959,16 @@ export async function run({ assetPaths, input, environment, title, version, stim
       on_load: slider_percentages,
       on_finish(data) {
         experiment_data.addToAll({ speaker_intensity: data.response })
+
+        if (typeof jatos !== 'undefined') {
+          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+        }
+      }
+    },
+    {
+      type: CallFunctionPlugin,
+      func() {
+        experiment_data.addToAll({ start_time: jsPsych.getStartTime().toISOString() });
 
         if (typeof jatos !== 'undefined') {
           jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
