@@ -60,7 +60,7 @@ function words_match(target_words, understood_word) {
     }
   }
 
-  return target_words.some(it => alternatives.has(it))
+  return target_words.some(it => alternatives.has(it.trim()))
 }
 
 function slider_percentages() {
@@ -81,8 +81,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
   if (!input) {
     input = {
       titration: {
-        linear: [5, 20],
-        random: [5, 10, 15, 20]
+        linear: [10, 20],
+        random: [20]
       },
       selected_language: 'de',
       question_prior: false,
@@ -288,7 +288,12 @@ export async function run({ assetPaths, input, environment, title, version, stim
     const timeline = [];
     for (const [index, it] of timeline_variables.entries()) {
       const { word, channel_list, reversed } = it;
-      const { Target_word, Target_word_sing_plural, syllables, frequency_ZipfSUBTLEX } = word;
+      let { Target_word, Target_word_sing_plural, syllables, frequency_ZipfSUBTLEX } = word;
+      
+      if (Target_word_sing_plural) {
+        Target_word_sing_plural = Target_word_sing_plural.split(",");
+      }
+
       timeline.push([
         {
           type: HtmlKeyboardResponsePlugin,
@@ -327,7 +332,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
                   jatos.uploadResultFile(titration_data.csv(), `titration_results_${variant}.csv`)
                 }
 
-                skip_rest = !reversed && words_match([Target_word, Target_word_sing_plural], titration_trial_data.typed_word);
+                skip_rest = !reversed && words_match([Target_word, ...Target_word_sing_plural], titration_trial_data.typed_word);
                 last_understood_word = titration_trial_data.typed_word;
                 titration_trial_data = {
                   entered_words: [],
