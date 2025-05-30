@@ -26,6 +26,7 @@ import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response
 import Papa from "papaparse";
 import confetti from "canvas-confetti";
 import BrowserCheckPlugin from "@jspsych/plugin-browser-check";
+import FullscreenPlugin from "@jspsych/plugin-fullscreen";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
@@ -937,6 +938,11 @@ export async function run({ assetPaths, input, environment, title, version, stim
           window.close();
         }
       }
+    },
+    {
+      type: FullscreenPlugin,
+      message: lang['TECHNICAL_SETTINGS']['fullscreen-message'],
+      button_label: lang['BUTTONS']['done-button']
     },
     make_id_input,
     ...(titration_required ? [{

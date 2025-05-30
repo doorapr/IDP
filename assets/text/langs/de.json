@@ -33,6 +33,7 @@
     "speaker-check": "<p>Wenn Sie auf \"Weiter\" klicken, wird Ihnen ein Satz vorgespielt.</p><p><b>Bitte stellen Sie die Lautstärke Ihrer Kopfhörer so ein, dass Sie den Satz klar und deutlich verstehen.</b></p>",
     "speaker-check-restart": "<p>Ist die Lautstärke so angenehm für Sie?</p>",
     "speaker-intensity": "<p>Bitte geben Sie jetzt an, wie laut die Lautstärke Ihrer Kopfhörer eingestellt ist. </p>",
+    "fullscreen-message": "<p>Die Online-Studie wechselt in den Vollbildmodus, sobald Sie den untenstehenden Knopf drücken.</p>",
     "speaker-intensity-labels": [
       "0%",
       "<span id='slider-value'>50%</span>",
@@ -89,7 +90,7 @@
     "titration-which-word-question": "Welches Wort haben Sie verstanden?",
     "titration-typo-question": "<p>Wollten Sie dieses Wort eingeben: ",
     "end-titration-part2": "<p><b>Vielen Dank!</b></p><p>Sie haben den zweiten Teil unseres Experiments abgeschlossen!</b></p><p>Um sicherzugehen, dass wir Ihre Daten für unsere Auswertung verwenden können, beantworten Sie bitte die folgenden Fragen ehrlich. Ihre Antworten haben keinen Einfluss auf die Vergütung Ihrer Teilnahme.</p>",
-    "end-titration-final": "<p><b>Vielen Dank!</b></p><p>Sie haben unser Online-Experiment erfolgreich abgeschlossen. Für die Vergütung der Studie, melden Sie sich bitte mit Ihrem Versuchspersonencode bei kognitionsstudie.rad@tum.de. Bitte klicken Sie auf \"Weiter\", um das Experiment zu beenden."
+    "end-titration-final": "<p><b>Vielen Dank!</b></p><p>Sie haben unser Online-Experiment erfolgreich abgeschlossen. Für die Vergütung der Studie, melden Sie sich bitte mit Ihrem Versuchspersonencode bei kognitionsstudie.rad@med.tum.de. Bitte klicken Sie auf \"Weiter\", um das Experiment zu beenden."
   },
 
 
