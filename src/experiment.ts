@@ -1,7 +1,7 @@
 /**
  * @title LangTask
  * @description Language task to assess word recognition in distorted speech, modulated by a prior sentence stimulus. Includes sensory titration and assessment of prior expectation.
- * @version 0.9.0
+ * @version 0.9.9-demo
  *
  * @assets Stimuli/,assets/images,assets/audio/training,assets/text
  * 
@@ -19,26 +19,26 @@ import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
 import { DataCollection, initJsPsych } from "jspsych";
 import survey from '@jspsych/plugin-survey';
-import '@jspsych/plugin-survey/css/survey.css'
+import '@jspsych/plugin-survey/css/survey.css';
 import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 import CallFunctionPlugin from "@jspsych/plugin-call-function";
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
-import Papa from "papaparse";
+import Papa, { ParseResult } from "papaparse";
 import confetti from "canvas-confetti";
 import BrowserCheckPlugin from "@jspsych/plugin-browser-check";
 import FullscreenPlugin from "@jspsych/plugin-fullscreen";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
-async function fetch_csv(csv) {
-  return new Promise(
+async function fetch_csv(csv): Promise<Array<unknown>> {
+  return new Promise<ParseResult<unknown>>(
     (resolve, reject) =>
       Papa.parse(csv, { download: true, header: true, skipEmptyLines: true, complete: resolve, error: reject })
   )
-    .then(results => results.data)
+    .then(results => results.data);
 }
 
-const replacers = [{ from: 'ä', to: 'ae' }, { from: 'ü', to: 'ue' }, { from: 'ö', to: 'oe' }, { from: 'ß', to: 'ss' }]
+const replacers = [{ from: 'ä', to: 'ae' }, { from: 'ü', to: 'ue' }, { from: 'ö', to: 'oe' }, { from: 'ß', to: 'ss' }];
 
 /**
  * Returns true if any of target_words can be constructed from understood_word by lowercasing and replacing umlauts according to the replacement rules replacers.
@@ -61,14 +61,14 @@ function words_match(target_words, understood_word) {
     }
   }
 
-  return target_words.some(it => alternatives.has(it.trim()))
+  return target_words.some(it => alternatives.has(it.trim()));
 }
 
 function slider_percentages() {
   const slider = document.getElementById('jspsych-html-slider-response-response');
   slider.oninput = () => {
     const span = document.getElementById('slider-value');
-    span.textContent = `${slider.value}%`
+    span.textContent = `${slider.value}%`;
   };
 }
 
@@ -81,15 +81,15 @@ function slider_percentages() {
 export async function run({ assetPaths, input, environment, title, version, stimulus, record_data }) {
   if (!input) {
     input = {
-      titration: {
-        linear: [10, 20],
-        random: [20]
-      },
       selected_language: 'de',
       question_prior: false,
-      lang_task: false,
-      lang_task_training: false,
-    }
+      lang_task: true,
+      lang_task_training: true,
+      lang_task_block_length: 5,
+      skip_survey_questions: true,
+      skip_id: true,
+      skip_consent: true
+    };
   }
 
   input.titration = (input.titration || {});
@@ -97,10 +97,11 @@ export async function run({ assetPaths, input, environment, title, version, stim
   input.titration.linear = (input.titration.linear || []);
 
   const jsPsych = initJsPsych();
+
   const linear_titration_required = input.titration.linear.length > 0, random_titration_required = input.titration.random.length > 0;
   const titration_required = linear_titration_required || random_titration_required;
 
-  jsPsych.data.addProperties({ selected_language: input.selected_language })
+  jsPsych.data.addProperties({ selected_language: input.selected_language });
   const lang = await fetch(`assets/text/langs/${input.selected_language}.json`).then(response => response.json());
 
   let titration_data;
@@ -157,7 +158,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     loop_function(data) { // if change microphone is pressed, loop the whole thing
       return data.last(1).values()[0].response == 0;
     }
-  }
+  };
 
   const configure_speakers = {
     timeline: [
@@ -184,7 +185,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     loop_function(data) {
       return data.values()[0].response == 1;
     }
-  }
+  };
 
   function make_titration(stimulus) {
     return [{
@@ -270,7 +271,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
             choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button']],
             on_finish(data) {
               if (data.response == 0) {
-                titration_trial_data.typed_word = jsPsych.data.get().values().toReversed()[1].response.understood_word
+                titration_trial_data.typed_word = jsPsych.data.get().values().toReversed()[1].response.understood_word;
               }
             }
           }]
@@ -282,7 +283,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
       loop_function(data) {
         return data.values().reverse()[0].response == 1;
       }
-    }]
+    }];
   }
 
   function make_titration_cycle(timeline_variables, variant) {
@@ -290,7 +291,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     for (const [index, it] of timeline_variables.entries()) {
       const { word, channel_list, reversed } = it;
       let { Target_word, Target_word_sing_plural, syllables, frequency_ZipfSUBTLEX } = word;
-      
+
       if (Target_word_sing_plural) {
         Target_word_sing_plural = Target_word_sing_plural.split(",");
       }
@@ -330,7 +331,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
                 });
 
                 if (typeof jatos !== 'undefined') {
-                  jatos.uploadResultFile(titration_data.csv(), `titration_results_${variant}.csv`)
+                  jatos.uploadResultFile(titration_data.csv(), `titration_results_${variant}.csv`);
                 }
 
                 skip_rest = !reversed && words_match([Target_word, ...Target_word_sing_plural], titration_trial_data.typed_word);
@@ -353,7 +354,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
           {
             type: CallFunctionPlugin,
             func() {
-              confetti()
+              confetti();
             }
           },
           {
@@ -362,13 +363,13 @@ export async function run({ assetPaths, input, environment, title, version, stim
             choices: [lang['BUTTONS']['done-button']],
             record_data: false
           },
-        )
+        );
       }
     }
 
     return {
       timeline
-    }
+    };
   }
 
   const linear_titration_sheet = linear_titration_required ? await fetch_csv('assets/text/titration_linear.csv') : [];
@@ -392,7 +393,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
           { word: it, reversed: false, channel_list: [input.titration.random[index]] },
           { word: it, reversed: true, channel_list: [input.titration.random[index]] },
         ])),
-    )
+    );
   }
 
   random_titration_data = jsPsych.randomization.shuffle(random_titration_data);
@@ -478,7 +479,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
             },
           ] : []
         )
-      }
+      };
 
       const randomized = jsPsych.randomization.sampleWithoutReplacement(["linear", "random"], 2);
 
@@ -501,7 +502,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
             record_data: false
           },
         ]
-      }
+      };
     } else {
       return { timeline: [] };
     }
@@ -602,16 +603,16 @@ export async function run({ assetPaths, input, environment, title, version, stim
           ]
       },
       on_finish(data) {
-        sub_id = data.response.city + data.response.birthMonth + data.response.birthname + data.response.mother
+        sub_id = data.response.city + data.response.birthMonth + data.response.birthname + data.response.mother;
         jsPsych.data.addProperties({
           subject_id: sub_id
-        })
+        });
         experiment_data.addToAll({
           subject_id: sub_id
-        })
+        });
       }
     }]
-  }
+  };
 
   function make_clarity_question(record_data) {
     return { // Clarity
@@ -625,9 +626,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
       subject_id: sub_id,
       on_load: slider_percentages,
       on_finish(data) {
-        if (!record_data) { return }
-        data.fileName = filename_for_upload
-        data.type = "clarity"
+        if (!record_data) { return; }
+        data.fileName = filename_for_upload;
+        data.type = "clarity";
 
       }
     };
@@ -644,9 +645,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
       //slider_width: 600,
       on_load: slider_percentages,
       on_finish(data) {
-        if (!record_data) { return }
-        data.fileName = filename_for_upload
-        data.type = "confidence"
+        if (!record_data) { return; }
+        data.fileName = filename_for_upload;
+        data.type = "confidence";
       }
     };
   }
@@ -678,7 +679,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
               .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
           } else {
             data.response = filename_for_upload; // Remove response data from RAM, we are in a developer session and don't care
-            console.log(roundIndex)
+            console.log(roundIndex);
           }
         }
       }
@@ -691,7 +692,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
       stimulus: lang['PLANG']['ready-for-next-stimulus'],
       choices: [lang['BUTTONS']['done-button']],
       record_data: false
-    }]
+    }];
   }
 
   function ask_prior(record_data, in_training) { //TODO: check how explain part influences csv
@@ -743,14 +744,14 @@ export async function run({ assetPaths, input, environment, title, version, stim
         on_finish(data) {
           if (record_data) {
             if (typeof jatos !== 'undefined') {
-              var prior_filename_for_upload = "prior_" + filename_for_upload
+              var prior_filename_for_upload = "prior_" + filename_for_upload;
               jatos.uploadResultFile(data.response, prior_filename_for_upload)
                 .then(() => {
                   data.response = prior_filename_for_upload; // Remove response data from RAM, we already saved it to the server.
                   data.fileName = filename_for_upload;
                   data.type = "prior_input";
-                  console.log(data.response)
-                  console.log(prior_filename_for_upload)
+                  console.log(data.response);
+                  console.log(prior_filename_for_upload);
                   console.log("File was successfully uploaded");
                 })
                 .catch(() => console.log("File upload failed")); // Cancel experiment? Try Again?
@@ -772,9 +773,9 @@ export async function run({ assetPaths, input, environment, title, version, stim
         //slider_width: 600,
         on_load: slider_percentages,
         on_finish(data) {
-          if (!record_data) { return }
-          data.fileName = filename_for_upload
-          data.type = "expectation_confidence"
+          if (!record_data) { return; }
+          data.fileName = filename_for_upload;
+          data.type = "expectation_confidence";
         }
       }];
   }
@@ -866,7 +867,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   const selected_randomisation = jsPsych.randomization.randomInt(1, 4);
   console.log("Selected randomisation: ", selected_randomisation);
-  var sub_id
+  var sub_id;
   jsPsych.data.addProperties({
     selected_randomisation
   });
@@ -876,25 +877,25 @@ export async function run({ assetPaths, input, environment, title, version, stim
     fetch_csv(`assets/text/S${selected_randomisation}B.csv`),
     fetch_csv(`assets/text/S${selected_randomisation}C.csv`),
     fetch_csv(`assets/text/S${selected_randomisation}D.csv`),
-  ]))
+  ]));
 
   var roundIndex = 1;
-  const timeline = [];
+  const single_trial_timeline: any[] = [];
 
   // 4 Blöcke â 50 Sätze
   // Preload assets
 
-  timeline.push({
+  single_trial_timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
     audio: () => [jsPsych.evaluateTimelineVariable('sentence'), jsPsych.evaluateTimelineVariable('word')],
     record_data: false,
     show_progress_bar: false
   });
-  timeline.push(ready_next_sentence(true));
-  timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
+  single_trial_timeline.push(ready_next_sentence(true));
+  single_trial_timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
 
-  timeline.push({
+  single_trial_timeline.push({
     timeline: [
       make_clarity_question(true),
       ...make_word_question(true),
@@ -905,7 +906,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
     on_timeline_finish() {
       if (typeof jatos !== 'undefined') {
-        jatos.submitResultData(jsPsych.data.get().json()) // send the whole data every time, it's not that big
+        jatos.submitResultData(jsPsych.data.get().json()); // send the whole data every time, it's not that big
       }
       roundIndex += 1;
     }
@@ -913,22 +914,23 @@ export async function run({ assetPaths, input, environment, title, version, stim
 
   const pause = {
     type: HtmlButtonResponsePlugin,
-    stimulus: lang['PLANG']['pause-stimulus'],
+    stimulus: lang['PLANG']['pause-stimulus'].replace('$1', input.lang_task_block_length),
     choices: [lang['BUTTONS']['done-button']]
-  }
+  };
 
-  await jsPsych.run([
-    {
-      type: BrowserCheckPlugin,
-      on_finish(data) {
-        if (data.brower == 'safari') {
-          window.alert(lang['browser-exclusion-message']);
-          window.close();
-        }
-      },
-      record_data: true
+  const final_timeline: any[] = [];
+  final_timeline.push({
+    type: BrowserCheckPlugin,
+    on_finish(data) {
+      if (data.brower == 'safari') {
+        window.alert(lang['browser-exclusion-message']);
+        window.close();
+      }
     },
-    {
+    record_data: true
+  });
+  if (!input.skip_consent) {
+    final_timeline.push({
       type: HtmlButtonResponsePlugin,
       stimulus: lang['CONSENT_FORM']['consent-form-titration'],
       choices: [lang['CONSENT_FORM']['consent-button'], lang['CONSENT_FORM']['no-consent-button']],
@@ -938,192 +940,213 @@ export async function run({ assetPaths, input, environment, title, version, stim
           window.close();
         }
       }
-    },
-    {
-      type: FullscreenPlugin,
-      message: lang['TECHNICAL_SETTINGS']['fullscreen-message'],
-      button_label: lang['BUTTONS']['done-button']
-    },
-    make_id_input,
-    ...(titration_required ? [{
+    });
+  }
+  final_timeline.push({
+    type: FullscreenPlugin,
+    message: lang['TECHNICAL_SETTINGS']['fullscreen-message'],
+    button_label: lang['BUTTONS']['done-button']
+  });
+  if (!input.skip_id) {
+    final_timeline.push(make_id_input);
+  }
+  if (titration_required) {
+    final_timeline.push({
       type: HtmlButtonResponsePlugin,
       stimulus: lang['TITRATION']['begin-titration'],
       choices: [lang['BUTTONS']['done-button']],
       record_data: false
-    }] : []),
-    {
-      type: HtmlButtonResponsePlugin,
-      stimulus: lang['TECHNICAL_SETTINGS']['begin-technical'],
-      choices: [lang['BUTTONS']['done-button']],
-      record_data: false
-    },
-    ...(input.lang_task ? [configure_microphone] : []),
-    configure_speakers,
-    { // Speaker intensity
-      type: HtmlSliderResponsePlugin,
-      stimulus: lang['TECHNICAL_SETTINGS']['speaker-intensity'],
-      button_label: lang['BUTTONS']['done-button'],
-      record_data: true,
-      labels: lang['TECHNICAL_SETTINGS']['speaker-intensity-labels'],
-      require_movement: true,
-      //slider_width: 600,
-      on_load: slider_percentages,
-      on_finish(data) {
-        experiment_data.addToAll({ speaker_intensity: data.response })
+    });
+  }
+  final_timeline.push({
+    type: HtmlButtonResponsePlugin,
+    stimulus: lang['TECHNICAL_SETTINGS']['begin-technical'],
+    choices: [lang['BUTTONS']['done-button']],
+    record_data: false
+  });
+  if (input.lang_task) {
+    final_timeline.push(configure_microphone);
+  }
+  final_timeline.push(configure_speakers);
+  if (!input.skip_survey_questions) {
+    final_timeline.push(
+      { // Speaker intensity
+        type: HtmlSliderResponsePlugin,
+        stimulus: lang['TECHNICAL_SETTINGS']['speaker-intensity'],
+        button_label: lang['BUTTONS']['done-button'],
+        record_data: true,
+        labels: lang['TECHNICAL_SETTINGS']['speaker-intensity-labels'],
+        require_movement: true,
+        //slider_width: 600,
+        on_load: slider_percentages,
+        on_finish(data) {
+          experiment_data.addToAll({ speaker_intensity: data.response });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
+          }
         }
-      }
-    },
-    {
-      type: CallFunctionPlugin,
-      func() {
-        experiment_data.addToAll({ start_time: jsPsych.getStartTime().toISOString() });
+      });
+  }
+  final_timeline.push({
+    type: CallFunctionPlugin,
+    func() {
+      experiment_data.addToAll({ start_time: jsPsych.getStartTime().toISOString() });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
-        }
+      if (typeof jatos !== 'undefined') {
+        jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
       }
-    },
-    make_sensory_titration(),
-    {
-      type: CallFunctionPlugin,
-      func() {
-        document.getElementsByTagName("html")[0].classList.add("task3");
-      }
-    },
-    {
+    }
+  });
+  final_timeline.push(make_sensory_titration());
+  final_timeline.push({
+    type: CallFunctionPlugin,
+    func() {
+      document.getElementsByTagName("html")[0].classList.add("task3");
+    }
+  });
+  if (input.lang_task_training) {
+    final_timeline.push(explanation);
+  }
+  if (input.lang_task) {
+    final_timeline.push({
       timeline: [
-        ...(input.lang_task_training ? explanation : []),
         {
-          timeline,
-          timeline_variables: blocks[0],
+          timeline: single_trial_timeline,
+          timeline_variables: jsPsych.randomization.sampleWithoutReplacement(blocks[0], input.lang_task_block_length),
           randomize_order: true
         },
         pause,
         {
-          timeline,
-          timeline_variables: blocks[1],
+          timeline: single_trial_timeline,
+          timeline_variables: jsPsych.randomization.sampleWithoutReplacement(blocks[1], input.lang_task_block_length),
           randomize_order: true
         },
         pause,
         {
-          timeline,
-          timeline_variables: blocks[2],
+          timeline: single_trial_timeline,
+          timeline_variables: jsPsych.randomization.sampleWithoutReplacement(blocks[2], input.lang_task_block_length),
           randomize_order: true
         },
         pause,
         {
-          timeline,
-          timeline_variables: blocks[3],
+          timeline: single_trial_timeline,
+          timeline_variables: jsPsych.randomization.sampleWithoutReplacement(blocks[3], input.lang_task_block_length),
           randomize_order: true
         }
-      ],
-      conditional_function() {
-        return input.lang_task;
-      }
-    },
-    {
-      type: CallFunctionPlugin,
-      func() {
-        document.getElementsByTagName("html")[0].classList.remove("task3");
-      }
-    },
-    { // Concentration
-      type: HtmlSliderResponsePlugin,
-      stimulus: lang['POST_SURVEY']['concentration-question'],
-      button_label: lang['BUTTONS']['done-button'],
-      record_data: true,
-      labels: lang['POST_SURVEY']['concentration-labels'],
-      require_movement: true,
-      //slider_width: 600,
-      on_load: slider_percentages,
-      on_finish(data) {
-        experiment_data.addToAll({ concentration: data.response });
+      ]
+    });
+  }
+  final_timeline.push({
+    type: CallFunctionPlugin,
+    func() {
+      document.getElementsByTagName("html")[0].classList.remove("task3");
+    }
+  });
+  if (!input.skip_survey_questions) {
+    final_timeline.push(
+      { // Concentration
+        type: HtmlSliderResponsePlugin,
+        stimulus: lang['POST_SURVEY']['concentration-question'],
+        button_label: lang['BUTTONS']['done-button'],
+        record_data: true,
+        labels: lang['POST_SURVEY']['concentration-labels'],
+        require_movement: true,
+        //slider_width: 600,
+        on_load: slider_percentages,
+        on_finish(data) {
+          experiment_data.addToAll({ concentration: data.response });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
+          }
         }
-      }
-    },
-    {
-      type: HtmlButtonResponsePlugin,
-      stimulus: lang['POST_SURVEY']['self-report-random'],
-      choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
-      on_finish(data) {
-        experiment_data.addToAll({ random: data.response == 0 });
+      });
+    final_timeline.push(
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: lang['POST_SURVEY']['self-report-random'],
+        choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
+        on_finish(data) {
+          experiment_data.addToAll({ random: data.response == 0 });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
+          }
         }
-      }
-    },
-    {
-      type: HtmlButtonResponsePlugin,
-      stimulus: lang['POST_SURVEY']['self-report-honest'],
-      choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
-      on_finish(data) {
-        experiment_data.addToAll({ honest: data.response == 0 });
+      });
+    final_timeline.push(
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: lang['POST_SURVEY']['self-report-honest'],
+        choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
+        on_finish(data) {
+          experiment_data.addToAll({ honest: data.response == 0 });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
+          }
         }
-      }
-    },
-    {
-      type: HtmlButtonResponsePlugin,
-      stimulus: lang['POST_SURVEY']['self-report-headphones'],
-      choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
-      on_finish(data) {
-        experiment_data.addToAll({ headphones: data.response == 0 });
+      });
+    final_timeline.push(
+      {
+        type: HtmlButtonResponsePlugin,
+        stimulus: lang['POST_SURVEY']['self-report-headphones'],
+        choices: [lang['BUTTONS']["yes-button"], lang['BUTTONS']["no-button"]],
+        on_finish(data) {
+          experiment_data.addToAll({ headphones: data.response == 0 });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
+          }
         }
-      }
-    },
-    { // Quietness of environment
-      type: HtmlSliderResponsePlugin,
-      stimulus: lang['POST_SURVEY']['quietness-question'],
-      button_label: lang['BUTTONS']['done-button'],
-      record_data: true,
-      labels: lang['POST_SURVEY']['quietness-labels'],
-      require_movement: true,
-      //slider_width: 600,
-      on_load: slider_percentages,
-      on_finish(data) {
-        experiment_data.addToAll({ quietness: data.response });
+      });
+    final_timeline.push(
+      { // Quietness of environment
+        type: HtmlSliderResponsePlugin,
+        stimulus: lang['POST_SURVEY']['quietness-question'],
+        button_label: lang['BUTTONS']['done-button'],
+        record_data: true,
+        labels: lang['POST_SURVEY']['quietness-labels'],
+        require_movement: true,
+        //slider_width: 600,
+        on_load: slider_percentages,
+        on_finish(data) {
+          experiment_data.addToAll({ quietness: data.response });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
+          }
         }
-      }
-    },
-    { // Disruptiveness
-      type: HtmlSliderResponsePlugin,
-      stimulus: lang['POST_SURVEY']['disruptiveness-question'],
-      button_label: lang['BUTTONS']['done-button'],
-      record_data: true,
-      labels: lang['POST_SURVEY']['disruptiveness-labels'],
-      require_movement: true,
-      //slider_width: 600,
-      on_load: slider_percentages,
-      on_finish(data) {
-        experiment_data.addToAll({ disruptiveness: data.response });
+      });
+    final_timeline.push(
+      { // Disruptiveness
+        type: HtmlSliderResponsePlugin,
+        stimulus: lang['POST_SURVEY']['disruptiveness-question'],
+        button_label: lang['BUTTONS']['done-button'],
+        record_data: true,
+        labels: lang['POST_SURVEY']['disruptiveness-labels'],
+        require_movement: true,
+        //slider_width: 600,
+        on_load: slider_percentages,
+        on_finish(data) {
+          experiment_data.addToAll({ disruptiveness: data.response });
 
-        if (typeof jatos !== 'undefined') {
-          jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv")
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(experiment_data.csv(), "experiment_data.csv");
+          }
         }
-      }
-    },
+      });
+  }
+  final_timeline.push(
     {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['TITRATION']['end-titration-final'],
       choices: [lang['BUTTONS']['done-button']],
       record_data: false
-    }
-  ]);
+    });
+
+  await jsPsych.run(final_timeline);
 
   // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
   // if you handle results yourself, be it here or in `on_finish()`)

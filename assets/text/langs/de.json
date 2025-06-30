@@ -49,7 +49,7 @@
     "end-of-first-tutorial-sentence": "<p>Damit haben Sie nun alle Fragen zu diesem Satz beantwortet. Klicken Sie auf \"Weiter\", um den nächsten Satz zu beginnen.</p>",
     "end-of-tutorial": "<p><b>Vielen Dank!</b></p><p>Sie haben das Training erfolgreich beendet. Jetzt beginnt das Experiment.</p>",
     "ready-for-next-stimulus": "<p>Sind Sie bereit für den nächsten Satz?</p>",
-    "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten 50 Sätze sind, klicken Sie auf \"Weiter\".</p>",
+    "pause-stimulus": "<p>Zeit für eine kurze Pause. Wenn Sie bereit für die nächsten $1 Sätze sind, klicken Sie auf \"Weiter\".</p>",
     "word-response-stimulus": "<p>Welches Wort haben Sie am Ende des Satzes verstanden?</p>",
     "word-question": "<p>Welches Wort haben Sie gehört?</p><p>Drücken Sie \"Weiter\" und sagen Sie dann gleich <b>laut</b> und <b>deutlich</b> das Wort, welches Sie gehört haben.</p><p>Es kann auch nur eine <b>Vermutung</b> sein, aber bitte raten Sie nicht.</p><p>Wenn Sie kein Wort verstanden haben, sagen Sie bitte laut und deutlich das Wort \"nichts\".</p>",
     "word-question-prior-question":"<p>Haben Sie das Wort, was Sie gesagt haben, auch als Satzende erwartet?</p>",
