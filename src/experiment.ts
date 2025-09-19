@@ -17,54 +17,22 @@ import HtmlSliderResponsePlugin from "@jspsych/plugin-html-slider-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import initializeMicrophone from '@jspsych/plugin-initialize-microphone';
 import htmlAudioResponse from '@jspsych/plugin-html-audio-response';
-import { DataCollection, initJsPsych } from "jspsych";
+import { DataCollection, initJsPsych, JsPsych, TrialType, PluginInfo } from "jspsych";
 import survey from '@jspsych/plugin-survey';
 import '@jspsych/plugin-survey/css/survey.css';
 import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 import CallFunctionPlugin from "@jspsych/plugin-call-function";
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
-import Papa, { ParseResult } from "papaparse";
 import confetti from "canvas-confetti";
 import BrowserCheckPlugin from "@jspsych/plugin-browser-check";
 import FullscreenPlugin from "@jspsych/plugin-fullscreen";
+import { fetchCsv, makeSentencePlayback } from "./common";
 
 // TODO: Testen mit verschiedenen Browsern und OSs
 
-async function fetch_csv(csv): Promise<Array<unknown>> {
-  return new Promise<ParseResult<unknown>>(
-    (resolve, reject) =>
-      Papa.parse(csv, { download: true, header: true, skipEmptyLines: true, complete: resolve, error: reject })
-  )
-    .then(results => results.data);
-}
 
-const replacers = [{ from: 'ä', to: 'ae' }, { from: 'ü', to: 'ue' }, { from: 'ö', to: 'oe' }, { from: 'ß', to: 'ss' }];
 
-/**
- * Returns true if any of target_words can be constructed from understood_word by lowercasing and replacing umlauts according to the replacement rules replacers.
- * 
- * @param {Array<string>} target_words Words to match against
- * @param {String} understood_word Word to match
- * @returns {boolean} true if the words match, false otherwise
- */
-function words_match(target_words, understood_word) {
-  if (understood_word === undefined || understood_word === null) {
-    return false;
-  }
-
-  const alternatives = new Set();
-  alternatives.add(understood_word.toLowerCase());
-
-  for (const { from, to } of replacers) {
-    for (const alt of [...alternatives].map(it => it.replaceAll(from, to))) {
-      alternatives.add(alt);
-    }
-  }
-
-  return target_words.some(it => alternatives.has(it.trim()));
-}
-
-function slider_percentages() {
+function addPercentageToSlider(): void {
   const slider = document.getElementById('jspsych-html-slider-response-response');
   slider.oninput = () => {
     const span = document.getElementById('slider-value');
@@ -372,8 +340,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
     };
   }
 
-  const linear_titration_sheet = linear_titration_required ? await fetch_csv('assets/text/titration_linear.csv') : [];
-  const random_titration_sheet = random_titration_required ? await fetch_csv('assets/text/titration_random.csv') : [];
+  const linear_titration_sheet = linear_titration_required ? await fetchCsv('assets/text/titration_linear.csv') : [];
+  const random_titration_sheet = random_titration_required ? await fetchCsv('assets/text/titration_random.csv') : [];
 
   const syllable_groups = random_titration_sheet.reduce((acc, it) => {
     if (!(it.syllables in acc))
@@ -509,39 +477,6 @@ export async function run({ assetPaths, input, environment, title, version, stim
   }
 
   var filename_for_upload;
-  function make_sentence_playback(first_stimulus, second_stimulus) {
-    return [{
-      type: HtmlKeyboardResponsePlugin,
-      stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-      choices: "NO_KEYS",
-      trial_duration: 300,
-      record_data: false
-    }, { // Prior (first part of the sentence)
-      type: AudioKeyboardResponsePlugin,
-      stimulus: first_stimulus,
-      choices: "NO_KEYS",
-      prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-      trial_ends_after_audio: true,
-      record_data: false
-    }, {
-      type: HtmlKeyboardResponsePlugin,
-      stimulus: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-      choices: "NO_KEYS",
-      trial_duration: 300,
-      record_data: false
-    }, { // Stimulus (last word of the sentence + distortion)
-      type: AudioKeyboardResponsePlugin,
-      stimulus: second_stimulus,
-      choices: "NO_KEYS",
-      prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
-      trial_ends_after_audio: true,
-      record_data: false,
-      on_finish() {
-        const path = (typeof second_stimulus === 'string') ? second_stimulus : jsPsych.evaluateTimelineVariable(second_stimulus.name);
-        filename_for_upload = "response_" + path.substr(8).split(".")[0] + ".txt";
-      }
-    }];
-  }
 
   const make_id_input = {
     timeline: [{
@@ -586,6 +521,8 @@ export async function run({ assetPaths, input, environment, title, version, stim
               pattern: "aa",
 
             },
+
+            jsPsych.run()
             isRequired: true,
 
           },
@@ -624,7 +561,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
       require_movement: true,
       //slider_width: 600,
       subject_id: sub_id,
-      on_load: slider_percentages,
+      on_load: addPercentageToSlider,
       on_finish(data) {
         if (!record_data) { return; }
         data.fileName = filename_for_upload;
@@ -643,7 +580,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
       labels: lang['PLANG']['confidence-labels'],
       require_movement: true,
       //slider_width: 600,
-      on_load: slider_percentages,
+      on_load: addPercentageToSlider,
       on_finish(data) {
         if (!record_data) { return; }
         data.fileName = filename_for_upload;
@@ -771,7 +708,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         labels: lang['PLANG']['expectation-labels'],
         require_movement: true,
         //slider_width: 600,
-        on_load: slider_percentages,
+        on_load: addPercentageToSlider,
         on_finish(data) {
           if (!record_data) { return; }
           data.fileName = filename_for_upload;
@@ -785,16 +722,16 @@ export async function run({ assetPaths, input, environment, title, version, stim
       type: PreloadPlugin,
       images: assetPaths.images,
       audio: [
-        'assets/audio/training/t_382p.wav', // Keep these in sync with the files used in the training. Maybe make dynamic?
-        'assets/audio/training/t_382tw.wav',
-        'assets/audio/training/t_380p.wav',
-        'assets/audio/training/t_380tw_6.wav',
-        'assets/audio/training/t_264p.wav',
-        'assets/audio/training/t_264tw_12.wav',
-        'assets/audio/training/t_311p.wav',
-        'assets/audio/training/t_311tw_3.wav',
-        'assets/audio/training/t_313p.wav',
-        'assets/audio/training/t_313tw_6.wav'
+        'assets/audio/training/training1p.wav',
+        'assets/audio/training/training1tw.wav',
+        'assets/audio/training/training2p.wav',
+        'assets/audio/training/training2tw.wav',
+        'assets/audio/training/training3p.wav',
+        'assets/audio/training/training3tw.wav',
+        'assets/audio/training/training4p.wav',
+        'assets/audio/training/training4tw.wav',
+        'assets/audio/training/training5p.wav',
+        'assets/audio/training/training5tw.wav'
       ],
       record_data: false,
       show_progress_bar: false,
@@ -811,14 +748,14 @@ export async function run({ assetPaths, input, environment, title, version, stim
       choices: [lang['BUTTONS']['done-button']],
       record_data: false
     },
-    ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
+    ...makeSentencePlayback('assets/audio/training/training2p.wav', 'assets/audio/training/training2tw.wav', filename => filename_for_upload = filename, jsPsych),
     {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['PLANG']['explanation-post-playback'],
       choices: [lang['BUTTONS']['done-button']],
       record_data: false
     },
-    ...make_sentence_playback('assets/audio/training/t_380p.wav', 'assets/audio/training/t_380tw_6.wav'),
+    ...makeSentencePlayback('assets/audio/training/training2p.wav', 'assets/audio/training/training2tw.wav', filename => filename_for_upload = filename, jsPsych),
     make_clarity_question(false),
     ...make_word_question(false),
     make_confidence_question(false),
@@ -833,7 +770,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     },
     {
       timeline: [
-        ...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')),
+        ...makeSentencePlayback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word'), filename => filename_for_upload = filename, jsPsych),
 
         make_clarity_question(false),
         ...make_word_question(false),
@@ -843,16 +780,16 @@ export async function run({ assetPaths, input, environment, title, version, stim
       ],
       timeline_variables: [
         {
-          sentence: 'assets/audio/training/t_264p.wav',
-          word: 'assets/audio/training/t_264tw_12.wav'
+          sentence: 'assets/audio/training/training3p.wav',
+          word: 'assets/audio/training/training3tw.wav'
         },
         {
-          sentence: 'assets/audio/training/t_311p.wav',
-          word: 'assets/audio/training/t_311tw_3.wav'
+          sentence: 'assets/audio/training/training4p.wav',
+          word: 'assets/audio/training/training4tw.wav'
         },
         {
-          sentence: 'assets/audio/training/t_313p.wav',
-          word: 'assets/audio/training/t_313tw_6.wav'
+          sentence: 'assets/audio/training/training5p.wav',
+          word: 'assets/audio/training/training5tw.wav'
         }
       ]
     },
@@ -873,10 +810,10 @@ export async function run({ assetPaths, input, environment, title, version, stim
   });
 
   const blocks = jsPsych.randomization.shuffle(await Promise.all([
-    fetch_csv(`assets/text/S${selected_randomisation}A.csv`),
-    fetch_csv(`assets/text/S${selected_randomisation}B.csv`),
-    fetch_csv(`assets/text/S${selected_randomisation}C.csv`),
-    fetch_csv(`assets/text/S${selected_randomisation}D.csv`),
+    fetchCsv(`assets/text/S${selected_randomisation}A.csv`),
+    fetchCsv(`assets/text/S${selected_randomisation}B.csv`),
+    fetchCsv(`assets/text/S${selected_randomisation}C.csv`),
+    fetchCsv(`assets/text/S${selected_randomisation}D.csv`),
   ]));
 
   var roundIndex = 1;
@@ -893,7 +830,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
     show_progress_bar: false
   });
   single_trial_timeline.push(ready_next_sentence(true));
-  single_trial_timeline.push(...make_sentence_playback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word')));
+  single_trial_timeline.push(...makeSentencePlayback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word'), filename => filename_for_upload = filename, jsPsych));
 
   single_trial_timeline.push({
     timeline: [
@@ -978,7 +915,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         labels: lang['TECHNICAL_SETTINGS']['speaker-intensity-labels'],
         require_movement: true,
         //slider_width: 600,
-        on_load: slider_percentages,
+        on_load: addPercentageToSlider,
         on_finish(data) {
           experiment_data.addToAll({ speaker_intensity: data.response });
 
@@ -1053,7 +990,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         labels: lang['POST_SURVEY']['concentration-labels'],
         require_movement: true,
         //slider_width: 600,
-        on_load: slider_percentages,
+        on_load: addPercentageToSlider,
         on_finish(data) {
           experiment_data.addToAll({ concentration: data.response });
 
@@ -1110,7 +1047,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         labels: lang['POST_SURVEY']['quietness-labels'],
         require_movement: true,
         //slider_width: 600,
-        on_load: slider_percentages,
+        on_load: addPercentageToSlider,
         on_finish(data) {
           experiment_data.addToAll({ quietness: data.response });
 
@@ -1128,7 +1065,7 @@ export async function run({ assetPaths, input, environment, title, version, stim
         labels: lang['POST_SURVEY']['disruptiveness-labels'],
         require_movement: true,
         //slider_width: 600,
-        on_load: slider_percentages,
+        on_load: addPercentageToSlider,
         on_finish(data) {
           experiment_data.addToAll({ disruptiveness: data.response });
 

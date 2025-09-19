@@ -83,6 +83,15 @@ To start the project, use the following command in the terminal:
 
 The project will be available at http://localhost:3000/ in your browser by default.
 
+## Customizing the experiment
+
+If you want to provide your participants with a training, the required files have to be in ....
+
+They have to be called training1p, training1tw through training5p, training5tw.
+The files ending in ...p are the prior sentences, the ones ending in ...tw the noisy words.
+
+You also have to provide a file that describes which stimuli have to be used and what (if any) blocks with breaks in between there will be in the experiment.
+
 ## Creating a .jzip for Jatos
 
 Create a .jzip that can be imported with a JATOS server:
