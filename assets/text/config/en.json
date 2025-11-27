@@ -1,0 +1,53 @@
+{
+    "translation": "assets/text/langs/en.json",
+    "randomisations": [
+        [
+            "assets/text/Mini_CB1_1.csv",
+            "assets/text/Midi_CB1_1.csv",
+            "assets/text/Maxi_CB1_1.csv"
+        ],
+        [
+            "assets/text/Mini_CB1_2.csv",
+            "assets/text/Midi_CB1_2.csv",
+            "assets/text/Maxi_CB1_2.csv"
+        ],
+        [
+            "assets/text/Mini_CB1_3.csv",
+            "assets/text/Midi_CB1_3.csv",
+            "assets/text/Maxi_CB1_3.csv"
+        ],
+        [
+            "assets/text/Mini_CB1_4.csv",
+            "assets/text/Midi_CB1_4.csv",
+            "assets/text/Maxi_CB1_4.csv"
+        ],
+        [
+            "assets/text/Mini_CB2_1.csv",
+            "assets/text/Midi_CB2_1.csv",
+            "assets/text/Maxi_CB2_1.csv"
+        ],
+        [
+            "assets/text/Mini_CB2_2.csv",
+            "assets/text/Midi_CB2_2.csv",
+            "assets/text/Maxi_CB2_2.csv"
+        ],
+        [
+            "assets/text/Mini_CB2_3.csv",
+            "assets/text/Midi_CB2_3.csv",
+            "assets/text/Maxi_CB2_3.csv"
+        ],
+        [
+            "assets/text/Mini_CB2_4.csv",
+            "assets/text/Midi_CB2_4.csv",
+            "assets/text/Maxi_CB2_4.csv"
+        ]
+    ],
+    "training": [
+        {"prior": "assets/audio/training/e_el_158p.wav", "word": "assets/audio/training/e_el_158tw_12.wav"},
+        {"prior": "assets/audio/training/e_em_434p.wav", "word": "assets/audio/training/e_em_hc_434tw_6.wav"},
+        {"prior": "assets/audio/training/e_el_477p.wav", "word": "assets/audio/training/e_el_477tw_3.wav"},
+        {"prior": "assets/audio/training/e_em_147p.wav", "word": "assets/audio/training/e_em_hc_147tw_6.wav"},
+        {"prior": "assets/audio/training/e_el_488p.wav", "word": "assets/audio/training/e_el_488tw_12.wav"}
+    ],
+    "audio_test": "assets/audio/training/audio_test.wav"
+}
