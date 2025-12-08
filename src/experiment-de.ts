@@ -1,7 +1,7 @@
 /**
  * @title LangTask
  * @description Language task to assess word recognition in distorted speech, modulated by a prior sentence stimulus. Includes assessment of prior expectation.
- * @version 0.9.9-german-prior-demo
+ * @version 0.9.9-german-demo
  *
  * @assets Stimuli/,assets/images,assets/audio/training,assets/text
  * 
