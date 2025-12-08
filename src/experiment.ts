@@ -77,9 +77,9 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     selected_randomisation
   });
 
-  const blocks: any[][] = await Promise.all(selected_randomisation.map((block: string) => fetch(`${block}`).then(response => response.text()).then(csv => Papa.parse(csv, {header: true, skipEmptyLines: true}).data)));
+  const blocks: any[][] = await Promise.all(selected_randomisation.map((block: string) => fetch(`${block}`).then(response => response.text()).then(csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data)));
 
-  console.log(blocks); 
+  console.log(blocks);
 
   var roundIndex = 1;
   const single_trial_timeline: any[] = [];
@@ -91,11 +91,11 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     type: PreloadPlugin,
     images: assetPaths.images,
     audio: () => {
-        
-      console.log(['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)])
-      return ['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)]
 
-      },
+      console.log(['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)]);
+      return ['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)];
+
+    },
     record_data: false,
     show_progress_bar: false
   });
@@ -137,6 +137,15 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     },
     record_data: true
   });
+  if ('WELCOME_PAGE' in lang) {
+    final_timeline.push({
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['WELCOME_PAGE']['welcome'],
+      choices: [lang['BUTTONS']['done-button']],
+      on_load: focusButton,
+      record_data: false
+    });
+  }
   if (input?.consent) {
     final_timeline.push({
       type: HtmlButtonResponsePlugin,

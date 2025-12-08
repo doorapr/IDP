@@ -37,6 +37,16 @@ export function getTrainingTimeline(jsPsych: JsPsych, lang: TranslationMap, conf
     ...makeSentencePlayback(config.training[0].prior, config.training[0].word, () => { }, jsPsych),
     makeClarityQuestion(false, lang, () => ""),
     ...makeWordQuestion(false, lang, () => "", () => 0),
+    {
+      timeline: [{
+        type: HtmlButtonResponsePlugin,
+        stimulus: lang['PLANG']['begin-training-session'],
+        choices: [lang['BUTTONS']['done-button']],
+        on_load: focusButton,
+        record_data: false,
+      }],
+      conditional_function: () => 'explanation-post-recording' in lang['PLANG']
+    },
     makeConfidenceQuestion(false, lang, () => ""),
     ...askPrior(true, true, jsPsych, lang, () => ""),
     {
