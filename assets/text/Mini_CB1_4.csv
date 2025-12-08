@@ -1,0 +1,61 @@
+Sentence Number,condition,Comments,Sentence,Besonderheit,Answer,WordPrediction,wn,nwords,nprt,nw,sn,cloze,entropy,recording_prior,recording_tw
+_337,el,,"She didn't give him a long kiss, just a",,peck,91,1,5,103,10,916,0.883495145631068,0.4574160145494481,e_el_337p.wav,e_el_337tw_12.wav
+_055,el,,All of the wild dogs stayed together in a,,pack,98,1,4,104,10,104,0.9423076923076923,0.270621761120261,e_el_055p.wav,e_el_055tw_12.wav
+_339,el,,She received the acceptance letter in the,,mail,101,1,4,104,8,922,0.9711538461538461,0.1623988587474572,e_el_339p.wav,e_el_339tw_12.wav
+_398,el,,The child's blood pressure was taken by the,,nurse,70,1,2,103,9,1081,0.6796116504854369,0.6271618380175097,e_el_398p.wav,e_el_398tw_1.wav
+_572,el,,The stable was home to Rick's favorite,Name,horse,93,1,9,105,8,1516,0.8857142857142857,0.5865610138934056,e_el_572p.wav,e_el_572tw_1.wav
+_022,el,,"After driving over sharp glass, Ronald had a flat",Name,tire,104,1,1,104,10,41,1.0,0.0,e_el_022p.wav,e_el_022tw_1.wav
+_532,el,,The new family enclosed their yard with a,,fence,102,1,2,104,9,1390,0.9807692307692307,0.09503011725564635,e_el_532p.wav,e_el_532tw_3.wav
+_466,el,,The gentleman on the bus offered the child his,,seat,94,1,11,104,10,1241,0.9038461538461539,0.5379513843973306,e_el_466p.wav,e_el_466tw_3.wav
+_509,el,,The little girl was excited to lose her first,,tooth,103,1,2,104,10,1327,0.9903846153846154,0.0542266127216372,e_el_509p.wav,e_el_509tw_3.wav
+_427,el,,The eager shoppers left no clothes on the,,racks,95,1,4,105,9,1151,0.9047619047619048,0.3908558729522047,e_el_427p.wav,e_el_427tw_6.wav
+_417,el,,The daughter felt guilty after telling her parents a,,lie,97,1,5,104,10,1131,0.9326923076923077,0.3325726670072154,e_el_417p.wav,e_el_417tw_6.wav
+_384,el,,The camper's food attracted a large mother,,bear,100,1,5,104,8,1048,0.9615384615384616,0.2163426433835924,e_el_384p.wav,e_el_384tw_6.wav
+_408,em_hc,,The comedy show filled the women with,,laughter,46,1,16,105,8,1100,0.4380952380952381,1.814697844063698,e_em_408p.wav,e_em_hc_408tw_12.wav
+_556,em_hc,,The rotten fruit had turned into a soft,,mush,73,1,17,103,9,1471,0.7087378640776699,1.354951904439346,e_em_556p.wav,e_em_hc_556tw_12.wav
+_421,em_hc,,The determined student was not discouraged by his bad,,grades,80,1,14,104,10,1136,0.7692307692307693,1.095283152869895,e_em_421p.wav,e_em_hc_421tw_12.wav
+_032,em_hc,,After missing lunch Harry badly needed some,Name,food,88,1,12,105,8,56,0.8380952380952381,0.8091060625201764,e_em_032p.wav,e_em_hc_032tw_1.wav
+_436,em_hc,,The end of the day was signaled by the,,bell,37,1,16,105,10,1161,0.3523809523809524,1.917519503979171,e_em_436p.wav,e_em_hc_436tw_1.wav
+_665,em_hc,,Unfortunately the cake had stuck to the,,pan,71,1,13,104,8,1758,0.6826923076923077,1.22273027283124,e_em_665p.wav,e_em_hc_665tw_1.wav
+_656,em_hc,,Today the cheer squad really needed more,,pep,42,1,21,105,8,1739,0.4,2.065083744812984,e_em_656p.wav,e_em_hc_656tw_3.wav
+_603,em_hc,,The unstable beam struck the construction worker on the,,head,71,1,18,104,10,1590,0.6826923076923077,1.436178492477888,e_em_603p.wav,e_em_hc_603tw_3.wav
+_470,em_hc,,The grandfather's estate was divided among his,,heirs,34,1,14,105,8,1249,0.3238095238095238,1.782633115079588,e_em_470p.wav,e_em_hc_470tw_3.wav
+_083,em_hc,,Barb pulled her sleeve back to reveal a big,Name,bruise,41,1,14,104,10,183,0.3942307692307692,1.635239224447237,e_em_083p.wav,e_em_hc_083tw_6.wav
+_552,em_hc,,The rampaging giant squashed their car like a,,bug,80,1,12,103,9,1456,0.7766990291262136,1.029325627154792,e_em_552p.wav,e_em_hc_552tw_6.wav
+_670,em_hc,,"While concentrating, the accountant always bit her",,lip,74,1,7,102,8,1816,0.7254901960784313,0.9520180633773165,e_em_670p.wav,e_em_hc_670tw_6.wav
+_351,eh,,The angry waiter couldn't believe the customer's,,complaint,18,1,24,104,8,978,0.1730769230769231,2.745586596815235,e_eh_351p.wav,e_eh_351tw_12.wav
+_229,eh,,Joe used extra scrap wood to fashion a makeshift,Name,table,15,1,46,102,10,622,0.1470588235294118,3.43655641099913,e_eh_229p.wav,e_eh_229tw_12.wav
+_168,eh,,Everyone admired the boss due to his constant,,praise,9,1,54,104,9,375,0.08653846153846154,3.719239359726012,e_eh_168p.wav,e_eh_168tw_12.wav
+_193,eh,,His favorite thing at the new diner was the,,steak,10,1,42,105,10,498,0.09523809523809523,3.453141718725502,e_eh_193p.wav,e_eh_193tw_1.wav
+_561,eh,,The school teacher's clothing had stains from the,,coffee,18,1,44,104,9,1487,0.1730769230769231,3.287702788218127,e_eh_561p.wav,e_eh_561tw_1.wav
+_617,eh,,The young boy's favorite animal was the,,tiger,13,1,40,103,8,1635,0.1262135922330097,3.301207456198838,e_eh_617p.wav,e_eh_617tw_1.wav
+_200,eh,,"In order to work, the machine needed a copper",,wire,33,1,31,103,10,531,0.3203883495145631,2.615915661809832,e_eh_200p.wav,e_eh_200tw_3.wav
+_441,eh,,The fancy house had an entrance with a,,gate,18,1,36,104,9,1185,0.1730769230769231,3.047034155784653,e_eh_441p.wav,e_eh_441tw_3.wav
+_632,eh,,This suspicious man was found hiding in a,,bush,24,1,33,104,9,1679,0.2307692307692308,2.921236382542941,e_eh_632p.wav,e_eh_632tw_3.wav
+_002,eh,,A common herb from the parsley family is,,cilantro,28,1,25,105,9,3,0.2666666666666667,2.502360404450131,e_eh_002p.wav,e_eh_002tw_6.wav
+_386,eh,,The canoers admired the beauty of the nearby,,lake,23,1,30,103,9,1050,0.2233009708737864,2.860374267328311,e_eh_386p.wav,e_eh_386tw_6.wav
+_345,eh,,Susan's favorite part of her garden was the new,Name,roses,19,1,39,103,10,954,0.1844660194174757,3.154867112657206,e_eh_345p.wav,e_eh_345tw_6.wav
+_298,el_mm,,"On sunny days, Jake visits the park to walk his",Name,bike,0,1,2,105,11,806,0.0,0.05380174529368756,e_el_298p.wav,e_el_mm_298tw_12.wav
+_400,el_mm,,The children slid down the snow bank on a,,wok,0,1,6,105,10,1083,0.0,0.3749875657831643,e_el_400p.wav,e_el_mm_400tw_12.wav
+_624,el_mm,,Their water source on the farm was the old,,sink,0,1,10,105,10,1655,0.0,0.5865610138934056,e_el_624p.wav,e_el_mm_624tw_12.wav
+_237,el_mm,,Karen lost lots of money after losing a foolish,Name,race,0,1,4,104,10,641,0.0,0.1623988587474572,e_el_237p.wav,e_el_mm_237tw_1.wav
+_546,el_mm,,The police lured the robbers by using jewelry as,,gifts,0,1,5,103,10,1431,0.0,0.2180603944109522,e_el_546p.wav,e_el_mm_546tw_1.wav
+_456,el_mm,,The fisherman easily put the bait on the,,ice,0,1,6,105,9,1216,0.0,0.343268447531615,e_el_456p.wav,e_el_mm_456tw_1.wav
+_018,el_mm,,"After collecting the pollen, the bee returned to his",,queen,0,1,4,104,10,39,0.0,0.4526993771418081,e_el_018p.wav,e_el_mm_018tw_3.wav
+_661,el_mm,,Ultrasounds allow us to see babies still in the,,egg,0,1,5,105,10,1755,0.0,0.2548811791105802,e_el_661p.wav,e_el_mm_661tw_3.wav
+_410,el_mm,,The committed scientist spent hours working in the,,mine,0,1,6,103,9,1101,0.0,0.5130337574101598,e_el_410p.wav,e_el_mm_410tw_3.wav
+_672,el_mm,,"While cooking, Luke accidentally cut himself with a",Name,spoon,0,1,3,103,9,1817,0.0,0.1092224620066532,e_el_672p.wav,e_el_mm_672tw_6.wav
+_605,el_mm,,The urban teachers taught children not to join a,,band,0,1,6,104,10,1591,0.0,0.6934110963938312,e_el_605p.wav,e_el_mm_605tw_6.wav
+_102,el_mm,,Breaking a mirror will get you years of bad,,dreams,0,1,1,104,10,221,0.0,0.0,e_el_102p.wav,e_el_mm_102tw_6.wav
+_044,em_lc,,After the concert the boys each bought a,,coke,1,14,22,105,9,76,0.009523809523809525,1.641449473685581,e_em_044p.wav,e_em_lc_044tw_12.wav
+_012,em_lc,,"A village was discovered between the mountains, in a",,jungle,1,11,16,100,10,20,0.01,1.066473364356484,e_em_012p.wav,e_em_lc_012tw_12.wav
+_626,em_lc,,Theo got in trouble for stealing from his mom's,Name,jar,1,6,10,103,10,1656,0.009708737864077669,1.190352342020005,e_em_626p.wav,e_em_lc_626tw_12.wav
+_007,em_lc,,A plant's roots can extract nutrients from the,,bark,1,6,6,105,9,16,0.009523809523809525,0.833789925242061,e_em_007p.wav,e_em_lc_007tw_1.wav
+_285,em_lc,,No one could buy the book because of the,,mold,1,12,26,103,10,788,0.009708737864077669,1.822508215238329,e_em_285p.wav,e_em_lc_285tw_1.wav
+_412,em_lc,,The committee members were divided over the prom's,,king,1,16,16,104,9,1102,0.009615384615384616,1.506707526458325,e_em_412p.wav,e_em_lc_412tw_1.wav
+_475,em_lc,,The guests shouted to hear each other over the,,neighbors,1,17,19,105,10,1257,0.009523809523809525,1.925454175362622,e_em_475p.wav,e_em_lc_475tw_3.wav
+_150,em_lc,,Elle let out her frustration in a big,Name,yawn,1,11,11,105,9,341,0.009523809523809525,1.420824154142585,e_em_150p.wav,e_em_lc_150tw_3.wav
+_394,em_lc,,The chef received an award for his signature,,cake,1,9,11,105,9,1067,0.009523809523809525,0.9611828650709545,e_em_394p.wav,e_em_lc_394tw_3.wav
+_205,em_lc,,"In the city alley, there lives a large",,fox,1,19,19,104,9,543,0.009615384615384616,1.714847126285066,e_em_205p.wav,e_em_lc_205tw_6.wav
+_040,em_lc,,"After standing all day, all he wanted was a",,bath,2,11,15,104,10,69,0.01923076923076923,2.088071725469278,e_em_040p.wav,e_em_lc_040tw_6.wav
+_496,em_lc,,The kid received a goldfish as his first,,meal,1,10,12,104,9,1296,0.009615384615384616,1.324154409674914,e_em_496p.wav,e_em_lc_496tw_6.wav

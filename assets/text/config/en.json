@@ -43,11 +43,13 @@
         ]
     ],
     "training": [
-        {"prior": "assets/audio/training/e_el_158p.wav", "word": "assets/audio/training/e_el_158tw_12.wav"},
-        {"prior": "assets/audio/training/e_em_434p.wav", "word": "assets/audio/training/e_em_hc_434tw_6.wav"},
-        {"prior": "assets/audio/training/e_el_477p.wav", "word": "assets/audio/training/e_el_477tw_3.wav"},
-        {"prior": "assets/audio/training/e_em_147p.wav", "word": "assets/audio/training/e_em_hc_147tw_6.wav"},
-        {"prior": "assets/audio/training/e_el_488p.wav", "word": "assets/audio/training/e_el_488tw_12.wav"}
+        {"prior": "Stimuli/e_el_158p.wav", "word": "Stimuli/e_el_158tw_12.wav"},
+        {"prior": "Stimuli/e_em_434p.wav", "word": "Stimuli/e_em_hc_434tw_6.wav"},
+        {"prior": "Stimuli/e_el_477p.wav", "word": "Stimuli/e_el_477tw_3.wav"},
+        {"prior": "Stimuli/e_em_147p.wav", "word": "Stimuli/e_em_hc_147tw_6.wav"},
+        {"prior": "Stimuli/e_el_488p.wav", "word": "Stimuli/e_el_488tw_12.wav"}
     ],
-    "audio_test": "assets/audio/training/audio_test.wav"
+    "audio_test": "assets/audio/training/Volume.wav",
+    "prior_stimulus_column": "recording_prior",
+    "word_stimulus_column": "recording_tw"
 }

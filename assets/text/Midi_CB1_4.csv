@@ -1,0 +1,61 @@
+Sentence Number,condition,Comments,Sentence,Besonderheit,Answer,WordPrediction,wn,nwords,nprt,nw,sn,cloze,entropy,prior_recording,tw_recording
+_137,el,,"During happy hour, the employees visited the",,bar,92,1,7,102,8,304,0.9019607843137255,0.4785412358910244,e_el_137p.wav,e_el_137tw_12.wav
+_368,el,,The belt was too small for the customer's,,waist,96,1,4,105,9,1007,0.9142857142857143,0.3511146604022903,e_el_368p.wav,e_el_368tw_12.wav
+_581,el,,The student spent every recess with his best,,friend,98,1,3,105,9,1532,0.9333333333333333,0.2722711146805293,e_el_581p.wav,e_el_581tw_12.wav
+_452,el,,The fields of corn flourished due to the fertile,,soil,86,1,7,104,10,1205,0.8269230769230769,0.6756740496741798,e_el_452p.wav,e_el_452tw_1.wav
+_615,el,,The writer was known for his satire and sharp,,wit,86,1,5,104,10,1632,0.8269230769230769,0.5924008563189191,e_el_615p.wav,e_el_615tw_1.wav
+_642,el,,"To celebrate his promotion, Eric's friends threw him a",Name,party,101,1,2,102,10,1699,0.9901960784313726,0.05509857601988668,e_el_642p.wav,e_el_642tw_1.wav
+_077,el,,"At the show, all the animals jumped through a",,hoop,99,1,5,104,10,174,0.9519230769230769,0.2568605190986391,e_el_077p.wav,e_el_077tw_3.wav
+_223,el,,Jared covered the scratch on his leg with a,Name,bandage,48,1,6,54,10,595,0.8888888888888888,0.5222443635142993,e_el_223p.wav,e_el_223tw_3.wav
+_212,el,,In the evening grandpa smokes using his,,pipe,101,1,4,104,8,548,0.9711538461538461,0.1623988587474572,e_el_212p.wav,e_el_212tw_3.wav
+_003,el,,A gas lamp is always a good source of,,light,93,1,4,104,10,8,0.8942307692307693,0.4179141726239555,e_el_003p.wav,e_el_003tw_6.wav
+_117,el,,Cory opened the door after pulling with all his,Name,might,96,1,5,105,10,272,0.9142857142857143,0.3784557482881842,e_el_117p.wav,e_el_117tw_6.wav
+_364,el,,The baseball player always used his lucky catcher's,,mitt,95,1,4,103,9,1001,0.9223300970873787,0.3301769346624541,e_el_364p.wav,e_el_364tw_6.wav
+_539,em_hc,,The penguins enjoyed sliding down the slope of a,,hill,39,1,14,100,10,1418,0.39,1.841575668691412,e_em_539p.wav,e_em_hc_539tw_12.wav
+_402,em_hc,,The clumsy boy always spilled juice on his,,shirt,60,1,12,104,9,1093,0.5769230769230769,1.472998522021851,e_em_402p.wav,e_em_hc_402tw_12.wav
+_164,em_hc,,Every night the woman looked up at the,,stars,51,1,7,105,9,371,0.4857142857142857,1.230382958055161,e_em_164p.wav,e_em_hc_164tw_12.wav
+_343,em_hc,,Some animals carry their offspring in their,,pouch,65,1,6,104,8,934,0.625,0.8692204689367017,e_em_343p.wav,e_em_hc_343tw_1.wav
+_429,em_hc,,The earrings came in a beautiful red velvet,,box,43,1,21,104,9,1152,0.4134615384615384,1.851677790753515,e_em_429p.wav,e_em_hc_429tw_1.wav
+_439,em_hc,,The family's couch and TV were both in the,,room,37,1,11,86,10,1181,0.4302325581395349,1.330172062061643,e_em_439p.wav,e_em_hc_439tw_1.wav
+_330,em_hc,,Samantha enjoyed the smell of her new,,car,53,1,23,104,8,891,0.5096153846153846,1.880487985533911,e_em_330p.wav,e_em_hc_330tw_3.wav
+_490,em_hc,,The incubated egg soon hatched into a baby,,chick,54,1,17,104,9,1287,0.5192307692307693,1.582615475540972,e_em_490p.wav,e_em_hc_490tw_3.wav
+_352,em_hc,,The assistant shouted in pain after stepping on a,,nail,53,1,16,105,10,988,0.5047619047619047,1.679056017698813,e_em_352p.wav,e_em_hc_352tw_3.wav
+_069,em_hc,,At the beach Sammy's sandwich was snatched by a,Name,seagull,59,1,16,105,10,158,0.5619047619047619,1.641378859743062,e_em_069p.wav,e_em_hc_069tw_6.wav
+_654,em_hc,,"To warm up, Richard enjoyed a bowl of",Name,soup,71,1,10,104,9,1738,0.6826923076923077,1.104005240971445,e_em_654p.wav,e_em_hc_654tw_6.wav
+_354,em_hc,,The athlete spent a long time training for the high,,jump,82,1,15,102,11,991,0.803921568627451,0.9871783152106628,e_em_354p.wav,e_em_hc_354tw_6.wav
+_381,eh,,The bridge was closed in order to repair the,,road,30,1,28,103,10,1039,0.2912621359223301,2.679911869010608,e_eh_381p.wav,e_eh_381tw_12.wav
+_079,eh,,"At the store, the cook purchased a container of",,rice,8,1,43,103,10,175,0.07766990291262135,3.441181721565836,e_eh_079p.wav,e_eh_079tw_12.wav
+_524,eh,,The man trembled at the thought of a,,spider,12,1,56,105,9,1344,0.1142857142857143,3.651778202457992,e_eh_524p.wav,e_eh_524tw_12.wav
+_263,eh,,Melanie's favorite part of the house decor was the,Name,wallpaper,10,1,45,104,10,727,0.09615384615384616,3.474039734909909,e_eh_263p.wav,e_eh_263tw_1.wav
+_196,eh,,"In exchange for loyalty, the peasant was given a",,coin,12,1,38,102,10,521,0.1176470588235294,3.205882992599975,e_eh_196p.wav,e_eh_196tw_1.wav
+_185,eh,,He threw the ball over the fence with a,,grunt,9,1,40,104,10,462,0.08653846153846154,3.336781553336484,e_eh_185p.wav,e_eh_185tw_1.wav
+_244,eh,,Kevin found his keys hidden underneath the,Name,couch,27,1,26,104,8,658,0.2596153846153846,2.575756442874677,e_eh_244p.wav,e_eh_244tw_3.wav
+_596,eh,,The trainer was worried about his runner's,,health,13,1,34,104,8,1577,0.125,3.08531572343649,e_eh_596p.wav,e_eh_596tw_3.wav
+_612,eh,,The woman told her daughter to respect the,,law,18,1,32,103,9,1619,0.1747572815533981,2.970820917623801,e_eh_612p.wav,e_eh_612tw_3.wav
+_414,eh,,The cowboy enjoyed looking into the distance at the,,sunset,37,1,30,105,10,1119,0.3523809523809524,2.515892230136451,e_eh_414p.wav,e_eh_414tw_6.wav
+_660,eh,,Tom was thrilled to be appointed the new,Name,manager,14,1,27,104,9,1746,0.1346153846153846,2.830075058395073,e_eh_660p.wav,e_eh_660tw_6.wav
+_091,eh,,"Before leaving the house, the woman grabbed one more",,thing,14,1,33,105,10,199,0.1333333333333333,3.114041572196134,e_eh_091p.wav,e_eh_091tw_6.wav
+_014,el_mm,,"According to the Bible, murder is a",,curse,0,1,4,104,8,25,0.0,0.1623988587474572,e_el_014p.wav,e_el_mm_014tw_12.wav
+_049,el_mm,,Alex waited for the jury to decide his,Name,charge,0,1,6,104,9,94,0.0,0.4843901162380034,e_el_049p.wav,e_el_mm_049tw_12.wav
+_652,el_mm,,"To stay warm in cold weather, wear a winter",,skirt,0,1,4,104,10,1735,0.0,0.6048011216339682,e_el_652p.wav,e_el_mm_652tw_12.wav
+_520,el_mm,,The man introduced himself by stating his,,pride,0,1,4,104,8,1341,0.0,0.2384995334747502,e_el_520p.wav,e_el_mm_520tw_1.wav
+_583,el_mm,,The swim team's performance improved after hiring a new,,scout,0,1,4,104,10,1537,0.0,0.2789202824409855,e_el_583p.wav,e_el_mm_583tw_1.wav
+_640,el_mm,,"To capture butterflies, he set out with a",,rope,0,1,6,103,9,1698,0.0,0.4102930746805982,e_el_640p.wav,e_el_mm_640tw_1.wav
+_423,el_mm,,The disruptive students were given a warning by the,,plumber,0,1,7,104,10,1139,0.0,0.4878302291546308,e_el_423p.wav,e_el_mm_423tw_3.wav
+_579,el_mm,,The strong winds prevented Jillian from flying her,Name,broom,0,1,4,105,9,1529,0.0,0.3652529448489473,e_el_579p.wav,e_el_mm_579tw_3.wav
+_501,el_mm,,The lion wasn't full-grown but only a,,toy,0,1,6,104,8,1319,0.0,0.5468506502291637,e_el_501p.wav,e_el_mm_501tw_3.wav
+_450,el_mm,,The feud between the countries could turn into a,,trade,0,1,4,104,10,1204,0.0,0.1623988587474572,e_el_450p.wav,e_el_mm_450tw_6.wav
+_216,el_mm,,"In the past, the military only enlisted",,saints,0,1,11,104,8,554,0.0,0.6440698170499022,e_el_216p.wav,e_el_mm_216tw_6.wav
+_141,el_mm,,During the hike Lila's feet hurt more with each,Name,mile,0,1,2,104,10,315,0.0,0.0542266127216372,e_el_141p.wav,e_el_mm_141tw_6.wav
+_322,em_lc,,"Running low on cookies, the bakery needed a new",,cook,1,15,16,101,10,879,0.009900990099009901,1.630242888827233,e_em_322p.wav,e_em_lc_322tw_12.wav
+_143,em_lc,,"During the meeting, the intern constantly checked his",,list,1,5,10,105,9,316,0.009523809523809525,1.072497017977849,e_em_143p.wav,e_em_lc_143tw_12.wav
+_092,em_lc,,Before placing each brick he applied a glob of,,powder,1,6,8,103,10,200,0.009708737864077669,1.212016607880092,e_em_092p.wav,e_em_lc_092tw_12.wav
+_305,em_lc,,Our walk was illuminated by the light of the,,sky,1,6,13,104,10,830,0.009615384615384616,0.8368069926768265,e_em_305p.wav,e_em_lc_305tw_1.wav
+_468,em_lc,,The girl got in trouble trying to pass a,,guard,1,19,19,103,10,1242,0.009708737864077669,1.748358223222841,e_em_468p.wav,e_em_lc_468tw_1.wav
+_318,em_lc,,Rick always felt truly better after doing a good,Name,cleanse,1,11,11,104,10,866,0.009615384615384616,1.519789445805019,e_em_318p.wav,e_em_lc_318tw_1.wav
+_303,em_lc,,"Opal's new, short haircut barely covered her",Name,mole,1,12,13,105,8,827,0.009523809523809525,1.768358182975881,e_em_303p.wav,e_em_lc_303tw_3.wav
+_473,em_lc,,The guard told them to wait patiently by the,,curb,1,11,15,104,10,1256,0.009615384615384616,1.398811354279037,e_em_473p.wav,e_em_lc_473tw_3.wav
+_230,em_lc,,Josie drank a large glass of milk every,Name,hour,1,5,5,101,9,630,0.009900990099009901,0.9528255813498958,e_em_230p.wav,e_em_lc_230tw_3.wav
+_170,em_lc,,"For Father's Day, the children got their father a",,saw,1,14,14,101,10,383,0.009900990099009901,1.686304877323858,e_em_170p.wav,e_em_lc_170tw_6.wav
+_272,em_lc,,Most blue food gets its coloring from chemical,,gel,1,17,21,104,9,752,0.009615384615384616,2.053295826760944,e_em_272p.wav,e_em_lc_272tw_6.wav
+_057,em_lc,,All the old cow ever did was chew its,,feet,1,11,13,104,10,107,0.009615384615384616,1.292242485936594,e_em_057p.wav,e_em_lc_057tw_6.wav

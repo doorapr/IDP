@@ -1,0 +1,81 @@
+Sentence Number,condition,Comments,Sentence,Besonderheit,Answer,WordPrediction,wn,nwords,nprt,nw,sn,cloze,entropy,prior_recording,tw_recording
+_486,el,,The house on the hill seemed haunted by a,,ghost,86,1,6,104,10,1275,0.8269230769230769,0.6270399040844348,e_el_486p.wav,e_el_486tw_12.wav
+_396,el,,The chef sprayed the cooking spray onto the,,pan,96,1,7,103,9,1068,0.9320388349514563,0.3671200489866049,e_el_396p.wav,e_el_396tw_12.wav
+_575,el,,The storewide clearance event attracted a huge,,crowd,97,1,7,104,8,1523,0.9326923076923077,0.3642634061034108,e_el_575p.wav,e_el_575tw_12.wav
+_663,el,rerecorded,Under her pillow the little girl placed her,,tooth,98,1,6,105,9,1756,0.9333333333333333,0.3482517631865155,e_el_663p.wav,e_el_663tw_12.wav
+_454,el,,The fish did not breathe properly due to a damaged,,gill,91,1,5,105,11,1213,0.8666666666666667,0.5333039228151273,e_el_454p.wav,e_el_454tw_1.wav
+_094,el,,Before you take a bath you should clean the,,tub,90,1,9,104,10,203,0.8653846153846154,0.6519853318209144,e_el_094p.wav,e_el_094tw_1.wav
+_507,el,,The little girl knew her friend had told a,,lie,93,1,4,105,10,1324,0.8857142857142857,0.4603460716737935,e_el_507p.wav,e_el_507tw_1.wav
+_513,el,,The lotion made Annie break out in a,Name,rash,90,1,4,105,9,1331,0.8571428571428571,0.5143836340002829,e_el_513p.wav,e_el_513tw_1.wav
+_406,el,,The color most associated with anger is,,red,101,1,2,103,8,1097,0.9805825242718447,0.09576329345209114,e_el_406p.wav,e_el_406tw_3.wav
+_042,el,rerecorded,"After submitting the paper, Gwen realized she made a",Name,mistake,100,1,3,104,10,72,0.9615384615384616,0.184651904287397,e_el_042p.wav,e_el_042tw_3.wav
+_109,el,,Chocolate is made from the roasted cacao,,bean,88,1,7,104,8,249,0.8461538461538461,0.6340399593710604,e_el_109p.wav,e_el_109tw_3.wav
+_100,el,,Bill couldn't fix the car without having the right,Name,tools,87,1,4,103,10,213,0.8446601941747572,0.541052066031489,e_el_100p.wav,e_el_100tw_3.wav
+_358,el,,The award-winning pizza had a delicious and soft,,crust,96,1,5,104,9,995,0.9230769230769231,0.3644976473479905,e_el_358p.wav,e_el_358tw_6.wav
+_517,el,,The man bought his girlfriend a diamond,,ring,98,1,5,104,8,1335,0.9423076923076923,0.2922500359132921,e_el_517p.wav,e_el_517tw_6.wav
+_415,el,,The criminal was nervous to appear before the,,judge,80,1,4,104,9,1122,0.7692307692307693,0.6197268150279738,e_el_415p.wav,e_el_415tw_6.wav
+_326,el,,"Sally froze upon seeing the snake, crippled by",Name,fear,101,1,5,105,9,887,0.9619047619047619,0.2146539482435499,e_el_326p.wav,e_el_326tw_6.wav
+_562,em_hc,,The sick child enjoyed eating the bowl of,,soup,64,1,11,99,9,1493,0.6464646464646465,1.316165975585405,e_em_562p.wav,e_em_hc_562tw_12.wav
+_296,em_hc,,"On a stormy night, the ship captain hit a",,rock,44,1,20,102,10,802,0.4313725490196079,2.027242434152705,e_em_296p.wav,e_em_hc_296tw_12.wav
+_289,em_hc,,None of the witnesses could describe the suspect's,,face,52,1,12,104,9,794,0.5,1.597596237447487,e_em_289p.wav,e_em_hc_289tw_12.wav
+_160,em_hc,,"Every morning, Jeff poured his coffee into a",Name,mug,72,1,5,104,9,366,0.6923076923076923,0.8920721570827146,e_em_160p.wav,e_em_hc_160tw_12.wav
+_051,em_hc,,Alexander placed the car key in the,Name,ignition,54,1,26,104,8,97,0.5192307692307693,2.036641783427134,e_em_051p.wav,e_em_hc_051tw_1.wav
+_589,em_hc,rerecorded,The thief was disappointed to open an empty,,safe,81,1,12,104,9,1551,0.7788461538461539,0.9984525568921909,e_em_589p.wav,e_em_hc_589tw_1.wav
+_599,em_hc,,The ugly bird had trouble finding a,,mate,60,1,10,104,8,1586,0.5769230769230769,1.366794355361221,e_em_599p.wav,e_em_hc_599tw_1.wav
+_419,em_hc,,The detectives found their suspect after pursuing a,,lead,63,1,15,103,9,1135,0.6116504854368932,1.548283253477303,e_em_419p.wav,e_em_hc_419tw_1.wav
+_375,em_hc,,The boy was nervous to ask Lily for a,Name,date,77,1,13,105,10,1028,0.7333333333333333,1.109266141474757,e_em_375p.wav,e_em_hc_375tw_3.wav
+_232,em_hc,,Julia couldn't return the dress due to the missing,Name,tag,53,1,8,105,10,631,0.5047619047619047,1.265102908896248,e_em_232p.wav,e_em_hc_232tw_3.wav
+_028,em_hc,,"After hours doing yard work, Jude was covered in",Name,dirt,51,1,10,105,10,52,0.4857142857142857,1.475413058792533,e_em_028p.wav,e_em_hc_028tw_3.wav
+_312,em_hc,,Rain water leaked through the big cracks on the,,roof,63,1,15,105,10,855,0.6,1.511623357597178,e_em_312p.wav,e_em_hc_312tw_3.wav
+_569,em_hc,,The soldier would be away from home for a,,year,54,1,13,104,10,1508,0.5192307692307693,1.359682569071421,e_em_569p.wav,e_em_hc_569tw_6.wav
+_366,em_hc,,The beautiful view was obscured by the,,trees,41,1,19,104,8,1005,0.3942307692307692,2.004961752407217,e_em_366p.wav,e_em_hc_366tw_6.wav
+_447,em_hc,rerecorded,The farmer's pigs were quickly running out of,,food,52,1,13,104,9,1195,0.5,1.701971017914822,e_em_447p.wav,e_em_hc_447tw_6.wav
+_009,em_hc,,A stray baseball smacked an unsuspecting walker in the,,head,47,1,20,104,10,17,0.4519230769230769,1.877768734205209,e_em_009p.wav,e_em_hc_009tw_6.wav
+_531,eh,,The movie director was very displeased with the,,actors,18,1,28,105,9,1375,0.1714285714285714,2.922498987424897,e_eh_531p.wav,e_eh_531tw_12.wav
+_309,eh,,Paul waited patiently for hours to see the,Name,doctor,22,1,37,103,9,844,0.2135922330097087,3.017930807061922,e_eh_309p.wav,e_eh_309tw_12.wav
+_538,eh,,The pencil stayed put due to the desk's small,,size,17,1,38,103,10,1417,0.1650485436893204,3.222563557124949,e_eh_538p.wav,e_eh_538tw_12.wav
+_209,eh,,In the end scene the monster released its,,venom,16,1,31,105,9,546,0.1523809523809524,2.892045925529111,e_eh_209p.wav,e_eh_209tw_12.wav
+_080,eh,,At the street corner there was a beautiful,,woman,18,1,34,103,9,176,0.1747572815533981,2.949654712677846,e_eh_080p.wav,e_eh_080tw_1.wav
+_280,eh,rerecorded,Nathan's last stop on his road trip was the,Name,museum,13,1,42,98,10,774,0.1326530612244898,3.376847726748,e_eh_280p.wav,e_eh_280tw_1.wav
+_316,eh,,Recurring problems caused the leader to install a,,camera,36,1,35,103,9,861,0.3495145631067961,2.759726876861195,e_eh_316p.wav,e_eh_316tw_1.wav
+_001,eh,,A common business accessory is a nice,,briefcase,28,1,29,105,8,2,0.2666666666666667,2.600312451636037,e_eh_001p.wav,e_eh_001tw_1.wav
+_618,eh,,The young child stubbornly refused to taste the,,vegetables,15,1,35,104,9,1637,0.1442307692307692,3.054581072303977,e_eh_618p.wav,e_eh_618tw_3.wav
+_349,eh,,That holiday season the town lacked its usual,,cheer,12,1,43,104,9,963,0.1153846153846154,3.389434976177229,e_eh_349p.wav,e_eh_349tw_3.wav
+_184,eh,rerecorded,"Having opened the safe, Richard found a",Name,gun,17,1,30,105,8,447,0.1619047619047619,3.03518737688888,e_eh_184p.wav,e_eh_184tw_3.wav
+_108,eh,,Children laughing was the grumpy old man's,,weakness,9,1,42,90,8,248,0.1,3.454646947813587,e_eh_108p.wav,e_eh_108tw_3.wav
+_220,eh,,Jane remembered the man for his distinctive,Name,voice,23,1,28,104,8,592,0.2211538461538461,2.809083351148602,e_eh_220p.wav,e_eh_220tw_6.wav
+_525,eh,,The man underneath the crane operated the,,machine,22,1,31,104,8,1345,0.2115384615384615,2.85841917079552,e_eh_525p.wav,e_eh_525tw_6.wav
+_623,eh,,The zoo used the donations to build a new,,exhibit,21,1,24,105,10,1650,0.2,2.506223886336859,e_eh_623p.wav,e_eh_623tw_6.wav
+_267,eh,,Michael took a large pill to help treat his,Name,headache,25,1,30,103,10,737,0.2427184466019418,2.875530581926168,e_eh_267p.wav,e_eh_267tw_6.wav
+_186,el_mm,,He was down twenty dollars after losing the,,plant,0,1,6,103,9,468,0.0,0.3890936879463775,e_el_186p.wav,e_el_mm_186tw_12.wav
+_066,el_mm,,"At halftime, the team received a speech from the",,prince,0,1,7,103,10,151,0.0,0.6317276101267856,e_el_066p.wav,e_el_mm_066tw_12.wav
+_587,el_mm,rerecorded,The thief ran away after taking the woman's,,bow,0,1,7,104,9,1550,0.0,0.4395790152069918,e_el_587p.wav,e_el_mm_587tw_12.wav
+_488,el_mm,,The impatient man kept glancing at his,,pants,0,1,4,101,8,1285,0.0,0.2078605240100909,e_el_488p.wav,e_el_mm_488tw_12.wav
+_113,el_mm,,Claire moved into her apartment soon after signing the,Name,bill,0,1,3,104,10,258,0.0,0.2465639522963097,e_el_113p.wav,e_el_mm_113tw_1.wav
+_198,el_mm,rerecorded,"In many sentences, the noun is followed by a",,pause,0,1,6,104,10,528,0.0,0.4612401527326331,e_el_198p.wav,e_el_mm_198tw_1.wav
+_335,el_mm,,Sharing combs with infected people gave Lorie,Name,curls,0,1,8,100,8,907,0.0,0.3898526573555632,e_el_335p.wav,e_el_mm_335tw_1.wav
+_278,el_mm,,Napa Valley in California is known for making,,masks,0,1,6,104,9,765,0.0,0.2701902725709456,e_el_278p.wav,e_el_mm_278tw_1.wav
+_462,el_mm,,The fraternal twins were as different as day and,,dawn,0,1,1,104,10,1228,0.0,0.0,e_el_462p.wav,e_el_mm_462tw_3.wav
+_166,el_mm,,"Every weekend, Michelle and her family attended",Name,school,0,1,7,105,8,372,0.0,0.5980985891390231,e_el_166p.wav,e_el_mm_166tw_3.wav
+_257,el_mm,,Martha covered the boiling pot with a,Name,book,0,1,6,104,8,710,0.0,0.5000426828623458,e_el_257p.wav,e_el_mm_257tw_3.wav
+_610,el_mm,,The waitress wiped the table with a damp,,scarf,0,1,4,105,9,1601,0.0,0.6284508478691331,e_el_610p.wav,e_el_mm_610tw_3.wav
+_529,el_mm,,"The mother was against swearing, calling it a",,crime ,0,1,11,102,9,1370,0.0,0.6676441859360345,e_el_529p.wav,e_el_mm_529tw_6.wav
+_026,el_mm,,"After filling the bowl with cereal, Josh added",Name,rum,0,1,4,103,9,46,0.0,0.4558980727687,e_el_026p.wav,e_el_mm_026tw_6.wav
+_674,el_mm,,"With clothes scattered everywhere, her room was a",,show,0,1,4,105,9,1841,0.0,0.3652529448489473,e_el_674p.wav,e_el_mm_674tw_6.wav
+_544,el_mm,,The polar opposite brothers often got into a,,game,0,1,6,103,9,1429,0.0,0.4506004757389251,e_el_544p.wav,e_el_mm_544tw_6.wav
+_564,em_lc,,The sitcom repeatedly used the same running,,shoes,1,12,15,102,8,1496,0.00980392156862745,1.708480636309886,e_em_564p.wav,e_em_lc_564tw_12.wav
+_511,em_lc,,The lonely stallion needed the company of a,,lamb,1,12,14,104,9,1330,0.009615384615384616,1.342312448234489,e_em_511p.wav,e_em_lc_511tw_12.wav
+_360,em_lc,,The baby played with his rubber duck in the,,rain,1,7,7,105,10,997,0.009523809523809525,1.232700504378698,e_em_360p.wav,e_em_lc_360tw_12.wav
+_460,em_lc,,The fisherman trapped hundreds of sharks in their,,sleep,1,11,11,104,9,1219,0.009615384615384616,0.8509912772728023,e_em_460p.wav,e_em_lc_460tw_12.wav
+_591,em_lc,,The toddler covered the walls with her mother's,,paintings,1,12,19,104,9,1561,0.009615384615384616,1.883093955375777,e_em_591p.wav,e_em_lc_591tw_1.wav
+_250,em_lc,,Lindsay stored her homemade lemonade in a,Name,kettle,1,8,14,104,8,679,0.009615384615384616,1.686375890103765,e_em_250p.wav,e_em_lc_250tw_1.wav
+_182,em_lc,,Harrison didn't want to clip the wings of his,Name,plane,1,8,14,105,10,445,0.009523809523809525,1.162632406485965,e_em_182p.wav,e_em_lc_182tw_1.wav
+_125,em_lc,,"Descending the steps, the old man clutched the",,bible,1,15,15,104,9,287,0.009615384615384616,1.232893489758128,e_em_125p.wav,e_em_lc_125tw_1.wav
+_333,em_lc,,Sarah threw the dirty towel in the,Name,dumpster,1,8,10,102,8,898,0.00980392156862745,1.728943777710908,e_em_333p.wav,e_em_lc_333tw_3.wav
+_492,em_lc,rerecorded,The injured man got stitches to close a large,,vein,1,6,8,105,10,1288,0.009523809523809525,1.214242422172101,e_em_492p.wav,e_em_lc_492tw_3.wav
+_484,em_lc,rerecorded,The house filled with smells of the freshly baked,,fish,1,6,8,104,10,1274,0.009615384615384616,0.9257962391989955,e_em_484p.wav,e_em_lc_484tw_3.wav
+_527,em_lc,,The minor damage to their car was from,,cones,1,12,24,98,9,1364,0.01020408163265306,1.616565389602129,e_em_527p.wav,e_em_lc_527tw_3.wav
+_522,em_lc,,The man said he fainted because of the,,pain,1,13,19,104,9,1343,0.009615384615384616,1.579403343429079,e_em_522p.wav,e_em_lc_522tw_6.wav
+_638,em_lc,,To blow off steam Adam usually goes to the,Name,mall,1,7,10,105,10,1696,0.009523809523809525,1.078583590784563,e_em_638p.wav,e_em_lc_638tw_6.wav
+_377,em_lc,,The brain surgery entailed removing an entire,,bone,1,19,20,104,8,1035,0.009615384615384616,2.024739391769009,e_em_377p.wav,e_em_lc_377tw_6.wav
+_270,em_lc,,"Months before the gala, Avery bought an expensive",Name,wine,1,18,20,104,9,748,0.009615384615384616,1.862410512270041,e_em_270p.wav,e_em_lc_270tw_6.wav

@@ -33,5 +33,7 @@
         {"prior": "assets/audio/training/t_311p.wav", "word": "assets/audio/training/t_311tw_3.wav"},
         {"prior": "assets/audio/training/t_313p.wav", "word": "assets/audio/training/t_313tw_6.wav"}
     ],
-    "audio_test": "assets/audio/training/audio_test.wav"
+    "audio_test": "assets/audio/training/audio_test.wav",
+    "prior_stimulus_column": "Web_Audio",
+    "word_stimulus_column": "Single_Word"
 }

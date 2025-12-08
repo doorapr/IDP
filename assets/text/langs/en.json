@@ -1,64 +1,70 @@
 {
   "title": "Language Task",
-  "mic-select-text": "<p>Please select your microphone.<br>You will test it right away and can return to this page if it does not work.</p>",
-  "mic-select-button": "Use this microphone",
-  "word-response-stimulus": "<p>Which word did you hear at the end of the sentence?</p>",
-  "done-button": "Next",
-  "word-question": "<p>Which word did you hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you heard. It can also just be a GUESS, but please don't guess randomly. If you didn't understand anything, please loudly say the word \"NOTHING\".</p>",
-  "word-question-prior-question":"<p>Is the word you said the one you expected to be the end of the sentence?</p>",
-  "word-question-prior": "<p>Which word did you expect to hear?</p><br><p>Press \"Next\" and then <b>clearly</b> and <b>loudly</b> say the word you expected to hear.</p>",
-  "clarity-question": "<p>How clearly did you hear the last word?</p>",
-  "clarity-labels": [
-    "Very unclear<br>0%",
-    "<span id='slider-value'>50%</span>",
-    "Very clear<br>100%"
-  ],
-  "confidence-labels": [
-    "Very unconfident<br>0%",
-    "<span id='slider-value'>50%</span>",
-    "Very confident<br>100%"
-  ],
-  "expectation-labels": [
-    "Not at all<br>0%", 
-    "<span id='slider-value'>50%</span>", 
-    "Very strongly<br>100%"
-  ],
-  "confidence-question": "<p>How confident are you in your answer?</p>",
-  "expectation-question":"<p>How strongly did you expect this word?</p>",
-  "explanation-pre-playback": "<p>You will hear a woman reading a sentence in which the last word will be somewhat unclear. Please press \"Next\" to hear the sentence.</p>",
-  "explanation-post-playback": "<p>As you surely noticed, the last word was really unclear. Please listen to the sentence again. Then indicate how clearly you heard the last word.</p>",
-  "end-of-first-tutorial-sentence": "<p>With that you've answered all questions regarding this sentence. Click \"Next\" to continue with the next sentence.</p>",
-  "end-of-tutorial": "<p>Thank you very much! You've successfully completed the tutorial. The experiment will now begin.</p>",
-  "ready-for-next-stimulus": "<p>Ready for the next sentence?</p>",
-  "pause-stimulus": "<p>Time for a short break. Click \"Next\" when you're ready for the next 50 sentences.</p>",
-  "did-not-accept-message": "You did not accept the consent form. This tab will now close.",
-  "consent-form": "Welcome & Consent Form",
-  "yes-button": "Yes",
-  "no-button": "No",
-  "not-understood":"I didn't understand anything",
-  "mic-test": "<p>Please say a word to test your microphone. Speak <b>loudly</b> and <b>clearly</b>.</p>",
-  "recording-check": "<p>Did you hear the word you recorded? If you want to try recording again press \"Change microphone\". If you want to hear the recording again press \"Listen again\". If you're finished setting up press \"Next\".</p>",
-  "listen-again-button": "Listen again",
-  "change-microphone-button": "Change microphone",
-  "speaker-check": "<p>When you click on \"Next\", a sentence will be played to you. Please adjust the volume of your headphones so that you can hear the sentence clearly.</p>",
-  "speaker-check-restart": "<p>Is the volume comfortable for you?</p>",
-  "begin-training-session": "<p><b>Training</b><br>You will now be guided through the experiment using a few examples.<br>Please read the instructions carefully.</p>",
-  "begin-technical":"<p><b>Technical setting</b><br>In the next step, we ask you to select and test your microphone and adjust the volume. Please carry out the experiment with headphones.</p>",
-  "begin-titration": "<p>We will now configure the experiment for your sensory threshold.</p><p>You will hear a sound which may or may not contain a word. Please answer the questions to the best of your ability.</p>",
-  "language-detected-question": "<p>Did you hear language in the sample?</p>",
-  "word-detected-question": "<p>Did you hear a specific word?</p>",
-  "titration-which-word-question": "Which word did you hear?",
-  "titration-typo-question": "<p>Is this the word you wanted to enter: ",
-  "id": {
-    "umlaut":"<p><b>Before the experiment begins, first create a personal test person code. Please note that umlauts are replaced by the corresponding vowel (e.g. ä by ae) and ß by ss. Upper and lower case is not important.</b></p>",
-    "city": "Please provide the first letter of the city you were born in:",
-      "birthMonth": "Enter your birth month:",
-    "mother": "Please provide the first and last letter of your Mother's first name:",  
-    "birthname": "Please provide the first and last letter of your first name:",
-      "months": [
-      "01", "02", "03", "04", "05", "06",
-      "07", "08", "09", "10", "11", "12"
-      ],
-    "placeholder": "Select..."
+  
+"WElCOME_PAGE": {
+    "welcome":"<p><b>Welcome to our study!</b></p><p>Thanks for taking part.</b></p>"
+  },
+
+
+  "TECHNICAL_SETTINGS": {
+    "begin-technical":"<p><b>Technical settings</b></p><p>In the next step, we ask you to select and test your microphone and adjust the volume.</p><p><b>Please perform the experiment using headphones.</b></p>",
+    "end-technical":"<p><b>Thank you!</b></p><p>You have successfully completed the technical settings. Click \"Continue\" to begin the experiment.",
+    "mic-select-text": "<p><b>Please select your microphone.</b></p><p>You will test it shortly and can return to this page if it does not work.</p>",
+    "mic-select-button": "Use this microphone",
+    "mic-test": "<p><b>Please say a word out loud to test your microphone.</b></p><p>Speak <b>loudly</b> and <b>clearly</b>.</p>",
+    "recording-check": "<p><b>Did you hear the word you recorded?</b></p><p>If you want to repeat the recording, press \"Change microphone\".</p><p>If you want to listen again, press \"Play recording\".</p><p>If you are satisfied with the recording, press \"Continue\".</p>",
+    "change-microphone-button": "Change microphone",
+    "listen-again-button": "Play recording",
+    "speaker-check": "<p>When you click \"Continue\", a sentence will be played.</p><p><b>Please adjust the volume of your headphones so that you can clearly understand the sentence.</b></p>",
+    "speaker-check-restart": "<p>Is the volume loud enough but still comfortable?</p>",
+    "speaker-intensity": "<p>Please indicate how loud your headphones are set.</p>",
+    "fullscreen-message": "<p>The online study will switch to fullscreen mode once you press the button below.</p>",
+    "speaker-intensity-labels": [
+      "0%",
+      "<span id='slider-value'>50%</span>",
+      "100%"
+    ]
+  },
+  
+  "PLANG": {
+    "begin-training-session": "<p><b>Training</b></p><p>You will now be guided through the language task using some example sentences.</p><p><b>Please read the instructions carefully and answer accordingly.</b></p>",
+    "explanation-pre-playback": "<p>You will hear a woman’s voice saying a sentence. The last word will be unclear.</p>",
+    "explanation-post-playback": "<p>As you have probably noticed, the last word was indeed unclear.</p><p><b>Please listen to the sentence again. Then indicate how you would rate the clarity of the word from very unclear (0%) to very clear (100%).</b></p>",
+    "end-of-first-tutorial-sentence": "<p>You have now answered all questions about this sentence. Click \"Continue\" to start the next sentence.</p>",
+    "end-of-tutorial": "<p><b>Thank you!</b></p><p>You have successfully completed the training. The experiment will now begin.</p>",
+    "ready-for-next-stimulus": "<p>Are you ready for the next sentence?</p>",
+    "pause-stimulus": "<p>Time for a short break. When you are ready for the next $1 sentences, click \"Continue\".</p>",
+    "word-response-stimulus": "<p>Which word did you understand at the end of the sentence?</p>",
+    "word-question": "<p>Which word did you hear?</p><p>Now say <b>loudly</b> and <b>clearly</b> the word you heard.</p><p>It may also just be a <b>presumption</b>, but please do not guess.</p><p>If you did not understand a word, please say loudly and clearly the word \"nothing\". </p><p>Once you have said the word you heard, click \"Continue\".</p>",
+    "explanation-post-recording": "<p>Now, please indicate how confident you are in your answer from very unsure (0%) to very sure (100%).</p><p>In case you understood nothing, please also indicate how confident you are in having heard nothing from very unsure (0%) to very sure (100%).</b></p>",
+    "clarity-question": "<p>How clearly did you hear the word?</p>",
+    "confidence-question": "<p>How confident are you in your answer?</p>",
+    "clarity-labels": [
+      "Very unclear<br>0%",
+      "<span id='slider-value'>50%</span>",
+      "Very clear<br>100%"
+    ],
+    "confidence-labels": [
+      "Very unsure<br>0%",
+      "<span id='slider-value'>50%</span>",
+      "Very sure<br>100%"
+    ],
+    "word-question-prior-question":"<p>Was the word you said also the word you expected at the end of the sentence?</p>",
+    "word-question-prior": "<p>Which word did you expect at the end of the sentence?</p><p>Click \"Continue\" and then say <b>loudly</b> and <b>clearly</b> the word you expected.</p>",
+    "expectation-question":"<p>How strongly did you expect this word?</p>",
+    "expectation-labels": [
+      "Very weak<br>0%", 
+      "<span id='slider-value'>50%</span>", 
+      "Very strong<br>100%"
+    ]
+  },
+
+  
+  "BUTTONS": {
+    "done-button": "Continue",
+    "yes-button": "Yes",
+    "no-button": "No",
+    "same-as-last-button": "Yes, the same",
+    "not-understood":"I did not understand anything"
   }
 }
