@@ -14,9 +14,11 @@ type TimelineVariable = ReturnType<typeof JsPsych.prototype.timelineVariable>;
 export type Configuration = {
   translation: string;
   randomisations: string[][]; // Array of block file names, e.g. [["block1a.csv", "block1b.csv"], ["block2a.csv", "block2b.csv"]]
-  training: {prior: string, word: string}[];
+  training: { prior: string, word: string; }[];
   audio_test: string;
-}
+  prior_stimulus_column: string;
+  word_stimulus_column: string;
+};
 
 export function makeSentencePlayback(firstStimulus: TimelineVariable | string, secondStimulus: TimelineVariable | string, setFilenameFunction: (filename: string) => void, jsPsych: JsPsych): Array<TrialType<any>> {
   return [{
@@ -27,7 +29,7 @@ export function makeSentencePlayback(firstStimulus: TimelineVariable | string, s
     record_data: false
   }, { // Prior (first part of the sentence)
     type: AudioKeyboardResponsePlugin,
-    stimulus: firstStimulus,
+    stimulus: typeof firstStimulus === 'string' ? firstStimulus : () => 'Stimuli/' + jsPsych.evaluateTimelineVariable(firstStimulus.name),
     choices: "NO_KEYS",
     prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
@@ -40,7 +42,7 @@ export function makeSentencePlayback(firstStimulus: TimelineVariable | string, s
     record_data: false
   }, { // Stimulus (last word of the sentence + distortion)
     type: AudioKeyboardResponsePlugin,
-    stimulus: secondStimulus,
+    stimulus: typeof secondStimulus === 'string' ? secondStimulus : () => 'Stimuli/' + jsPsych.evaluateTimelineVariable(secondStimulus.name),
     choices: "NO_KEYS",
     prompt: "<img class=\"main-symbol\" src='assets/images/volume.png'>",
     trial_ends_after_audio: true,
@@ -110,17 +112,13 @@ export function makeConfidenceQuestion(recordData: boolean, lang: TranslationMap
 }
 
 export function makeWordQuestion(recordData: boolean, lang: TranslationMap, getFilenameForUpload: () => string, getRoundIndex: () => number) {
-  return [{
-    type: HtmlButtonResponsePlugin,
-    stimulus: lang['PLANG']['word-question'],
-    choices: [lang['BUTTONS']['done-button']],
-    record_data: false
-  }, { // Which word was understood?
+  return [{ // Which word was understood?
     type: HtmlAudioResponsePlugin,
-    stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+    stimulus: lang['PLANG']['word-question'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
     recording_duration: 7500,
     show_done_button: true,
     done_button_label: lang['BUTTONS']['done-button'],
+    on_load: focusButtonByMutationObserver,
     record_data: recordData,
     on_finish(data: any) {
       if (recordData) {
@@ -151,7 +149,30 @@ export function addPercentageToSlider(): void {
     return;
   }
 
-  slider.oninput = () => {
+  const button = document.querySelector<HTMLButtonElement>('.jspsych-btn');
+  if (!button) {
+    console.error("Expected a button with class 'jspsych-btn', but found none. RUH ROH.");
+    return;
+  }
+
+  const listener = (event: KeyboardEvent) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowRight") {
+      slider.stepUp();
+      slider.dispatchEvent(new Event('change'));
+      button.focus();
+    } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
+      slider.stepDown();
+      slider.dispatchEvent(new Event('change'));
+      button.focus();
+    }
+  };
+
+  window.addEventListener('keydown', listener);
+
+  button.onclick = () => window.removeEventListener('keydown', listener);
+  button.focus();
+
+  slider.onchange = () => {
     const span = document.getElementById('slider-value');
 
     if (span == null) {
@@ -164,54 +185,56 @@ export function addPercentageToSlider(): void {
 }
 
 function makeWordQuestionPrior(recordData: boolean, lang: TranslationMap, getFilenameForUpload: () => string) {
-    return [
-      {
-        type: HtmlButtonResponsePlugin,
-        stimulus: lang['PLANG']['word-question-prior'],
-        choices: [lang['BUTTONS']['done-button']],
-        record_data: false,
-      }, { // Which word was understood?
-        type: HtmlAudioResponsePlugin,
-        stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
-        recording_duration: 7500,
-        show_done_button: true,
-        done_button_label: lang['BUTTONS']['done-button'],
-        record_data: recordData,
-        on_finish(data: any) {
-          if (recordData) {
-            const priorFilename = "prior_" + getFilenameForUpload();
-            if (typeof jatos !== 'undefined') {
-              jatos.uploadResultFile(data.response, priorFilename)
-                .then(() => {
-                  data.response = priorFilename; // Remove response data from RAM, we already saved it to the server.
-                  data.fileName = getFilenameForUpload();
-                  data.type = "prior_input";
-                })
-                .catch();
-            } else {
-              data.response = priorFilename; // Remove response data from RAM, we are in a developer session and don't care
-              data.fileName = getFilenameForUpload();
-              data.type = "prior_input";
-            }
+  return [
+    {
+      type: HtmlButtonResponsePlugin,
+      stimulus: lang['PLANG']['word-question-prior'],
+      choices: [lang['BUTTONS']['done-button']],
+      on_load: focusButton,
+      record_data: false,
+    }, { // Which word was understood?
+      type: HtmlAudioResponsePlugin,
+      stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+      recording_duration: 7500,
+      show_done_button: true,
+      on_load: focusButtonByMutationObserver,
+      done_button_label: lang['BUTTONS']['done-button'],
+      record_data: recordData,
+      on_finish(data: any) {
+        if (recordData) {
+          const priorFilename = "prior_" + getFilenameForUpload();
+          if (typeof jatos !== 'undefined') {
+            jatos.uploadResultFile(data.response, priorFilename)
+              .then(() => {
+                data.response = priorFilename; // Remove response data from RAM, we already saved it to the server.
+                data.fileName = getFilenameForUpload();
+                data.type = "prior_input";
+              })
+              .catch();
+          } else {
+            data.response = priorFilename; // Remove response data from RAM, we are in a developer session and don't care
+            data.fileName = getFilenameForUpload();
+            data.type = "prior_input";
           }
         }
-      },
-      { // Expectation confidence
-        type: HtmlSliderResponsePlugin,
-        stimulus: lang['PLANG']['expectation-question'],
-        button_label: lang['BUTTONS']['done-button'],
-        record_data: recordData,
-        labels: lang['PLANG']['expectation-labels'],
-        require_movement: true,
-        //slider_width: 600,
-        on_load: addPercentageToSlider,
-        on_finish(data: any) {
-          if (!recordData) { return; }
-          data.fileName = getFilenameForUpload();
-          data.type = "expectation_confidence";
-        }
-      }];
-  }
+      }
+    },
+    { // Expectation confidence
+      type: HtmlSliderResponsePlugin,
+      stimulus: lang['PLANG']['expectation-question'],
+      button_label: lang['BUTTONS']['done-button'],
+      record_data: recordData,
+      labels: lang['PLANG']['expectation-labels'],
+      require_movement: true,
+      //slider_width: 600,
+      on_load: addPercentageToSlider,
+      on_finish(data: any) {
+        if (!recordData) { return; }
+        data.fileName = getFilenameForUpload();
+        data.type = "expectation_confidence";
+      }
+    }];
+}
 
 export function askPrior(recordData: boolean, isInTraining: boolean, jsPsych: JsPsych, lang: TranslationMap, getFilenameForUpload: () => string): any[] {
   return [{
@@ -219,6 +242,7 @@ export function askPrior(recordData: boolean, isInTraining: boolean, jsPsych: Js
     stimulus: lang['PLANG']['word-question-prior-question'],
     choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button'], lang['BUTTONS']['not-understood']],
     record_data: recordData,
+    on_load: makeFocusButtons([lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button'], lang['BUTTONS']['not-understood']]),
     on_finish(data: any) {
       data.type = "prior_expectation";
       data.fileName = getFilenameForUpload();
@@ -227,7 +251,7 @@ export function askPrior(recordData: boolean, isInTraining: boolean, jsPsych: Js
       }
     }
   },
-  { 
+  {
     timeline: makeWordQuestionPrior(recordData, lang, getFilenameForUpload),
     record_data: true,
     conditional_function: function () {
@@ -239,4 +263,77 @@ export function askPrior(recordData: boolean, isInTraining: boolean, jsPsych: Js
       }
     }
   }];
+}
+
+export function focusButton(): void {
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.jspsych-btn');
+  if (buttons.length == 1) {
+    buttons[0].focus();
+  } else {
+    console.error(`Expected 1 button, but found ${buttons.length}. RUH ROH.`);
+  }
+}
+
+export function focusButtonByMutationObserver(): void {
+  const container = document.querySelector<HTMLElement>('.jspsych-content');
+  
+  if (container == null) {
+    console.error("Expected a container with class 'jspsych-content', but found none. RUH ROH.");
+    return;
+  }
+
+  const observer = new MutationObserver(event => {
+    event.find(e => {
+      if (e.addedNodes.length > 0) {
+        const buttons = document.querySelectorAll<HTMLButtonElement>('.jspsych-btn');
+        if (buttons.length == 1) {
+          buttons[0].focus();
+        } else {
+          console.error(`Expected 1 button, but found ${buttons.length}. RUH ROH.`);
+        }
+        return true;
+      }
+    });
+
+    observer.disconnect();
+  });
+
+  observer.observe(container, { childList: true });
+}
+
+export function makeFocusButtons(buttonLabels: string[]): () => void {
+  return function focusSpecificButton(): void {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.jspsych-btn');
+    if (buttons.length != buttonLabels.length && buttons.length > 1) {
+      console.error(`Expected ${buttonLabels.length} buttons, but found ${buttons.length}. RUH ROH.`);
+      return;
+    }
+
+    const buttonsInOrder = buttonLabels.map(label => {
+      for (let i = 0; i < buttons.length; i++) {
+        if (buttons[i].innerText === label) {
+          return buttons[i];
+        }
+      }
+      console.error(`Expected a button with label "${label}", but found none. RUH ROH.`);
+      return null;
+    });
+
+    buttonsInOrder[0]?.focus();
+
+    buttonsInOrder.forEach((button, index) => {
+      if (button == null) {
+        return;
+      }
+
+      button.onkeydown = (event: KeyboardEvent) => {
+        if (event.key === "ArrowLeft" && index > 0) {
+          buttonsInOrder[index - 1]?.focus();
+        }
+        if (event.key === "ArrowRight" && index < buttonsInOrder.length - 1) {
+          buttonsInOrder[index + 1]?.focus();
+        }
+      };
+    });
+  };
 }

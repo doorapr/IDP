@@ -4,7 +4,7 @@ import HtmlAudioResponsePlugin from "@jspsych/plugin-html-audio-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
 import InitializeMicrophonePlugin from "@jspsych/plugin-initialize-microphone";
 import { JsPsych } from "jspsych";
-import { Configuration, TranslationMap } from "./common";
+import { Configuration, focusButton, focusButtonByMutationObserver, makeFocusButtons, TranslationMap } from "./common";
 
 export function makeConfigureSpeakersTimeline(lang: TranslationMap, config: Configuration) {
   return {
@@ -13,6 +13,7 @@ export function makeConfigureSpeakersTimeline(lang: TranslationMap, config: Conf
         type: HtmlButtonResponsePlugin,
         stimulus: lang['TECHNICAL_SETTINGS']['speaker-check'],
         choices: [lang['BUTTONS']['done-button']],
+        on_load: makeFocusButtons([lang['BUTTONS']['done-button']]),
         record_data: false
       },
       { // Prior (first part of the sentence)
@@ -26,7 +27,8 @@ export function makeConfigureSpeakersTimeline(lang: TranslationMap, config: Conf
       {
         type: HtmlButtonResponsePlugin,
         stimulus: lang['TECHNICAL_SETTINGS']['speaker-check-restart'],
-        choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button']]
+        choices: [lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button']],
+        on_load: makeFocusButtons([lang['BUTTONS']['yes-button'], lang['BUTTONS']['no-button']]),
       }
     ],
     loop_function(data: any) {
@@ -42,12 +44,14 @@ export function makeConfigureMicrophoneTimeline(jsPsych: JsPsych, lang: Translat
         type: InitializeMicrophonePlugin,
         button_label: lang['TECHNICAL_SETTINGS']['mic-select-button'],
         device_select_message: lang['TECHNICAL_SETTINGS']['mic-select-text'],
+        on_start: focusButtonByMutationObserver,
         record_data: false
       },
       {
         type: HtmlAudioResponsePlugin,
         stimulus: lang['TECHNICAL_SETTINGS']['mic-test'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'>",
         done_button_label: lang['BUTTONS']['done-button'],
+        on_start: focusButtonByMutationObserver,
         recording_duration: 7500,
         record_data: true,
         save_audio_url: true
@@ -62,6 +66,7 @@ export function makeConfigureMicrophoneTimeline(jsPsych: JsPsych, lang: Translat
           on_load() {
             const content = document.getElementById('jspsych-content');
             content?.replaceChildren(content.children[1], content.children[0]); // make the text appear on top of the buttons, this only works in this specific case. YAGNI.
+            makeFocusButtons([lang['TECHNICAL_SETTINGS']['change-microphone-button'], lang['TECHNICAL_SETTINGS']['listen-again-button'], lang['BUTTONS']['done-button']])();
           },
           prompt: lang['TECHNICAL_SETTINGS']['recording-check'],
           choices: [lang['TECHNICAL_SETTINGS']['change-microphone-button'], lang['TECHNICAL_SETTINGS']['listen-again-button'], lang['BUTTONS']['done-button']]

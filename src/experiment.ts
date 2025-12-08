@@ -18,7 +18,7 @@ import '@jspsych/plugin-survey/css/survey.css';
 import CallFunctionPlugin from "@jspsych/plugin-call-function";
 import BrowserCheckPlugin from "@jspsych/plugin-browser-check";
 import FullscreenPlugin from "@jspsych/plugin-fullscreen";
-import { addPercentageToSlider, askPrior, fetchCsv, initializeJsPsychAndLanguage, makeClarityQuestion, makeConfidenceQuestion, makeSentencePlayback, makeWordQuestion } from "./common";
+import { addPercentageToSlider, askPrior, fetchCsv, focusButton, initializeJsPsychAndLanguage, makeClarityQuestion, makeConfidenceQuestion, makeSentencePlayback, makeWordQuestion } from "./common";
 import { RunFunction } from "jspsych-builder";
 import { getTrainingTimeline } from "./training";
 import { makeConfigureMicrophoneTimeline, makeConfigureSpeakersTimeline } from "./technical-setup";
@@ -32,6 +32,19 @@ declare global {
 }
 
 /**
+ * If jatos is defined, upload the experiment data as a CSV file
+ * to "experiment_data.csv".
+ * 
+ * @param experimentData 
+ */
+function updateExperimentData(experimentData: DataCollection) {
+  if (typeof jatos !== 'undefined') {
+    jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
+  }
+}
+
+
+/**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
  * 
@@ -40,9 +53,10 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
   if (!input) {
     input = {
       selected_language: 'de',
-      training: false,
+      training: true,
     };
   }
+
   const { lang, jsPsych, config } = await initializeJsPsychAndLanguage(input);
 
   const experimentData = new DataCollection([{}]);
@@ -53,6 +67,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     type: HtmlButtonResponsePlugin,
     stimulus: lang['PLANG']['ready-for-next-stimulus'],
     choices: [lang['BUTTONS']['done-button']],
+    on_load: focusButton,
     record_data: false
   }];
 
@@ -75,12 +90,17 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
   single_trial_timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
-    audio: () => [jsPsych.evaluateTimelineVariable('sentence'), jsPsych.evaluateTimelineVariable('word')],
+    audio: () => {
+        
+      console.log(['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)])
+      return ['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)]
+
+      },
     record_data: false,
     show_progress_bar: false
   });
   single_trial_timeline.push(readyNextSentence);
-  single_trial_timeline.push(...makeSentencePlayback(jsPsych.timelineVariable('sentence'), jsPsych.timelineVariable('word'), filename => filenameForUpload = filename, jsPsych));
+  single_trial_timeline.push(...makeSentencePlayback(jsPsych.timelineVariable(config.prior_stimulus_column), jsPsych.timelineVariable(config.word_stimulus_column), filename => filenameForUpload = filename, jsPsych));
 
   single_trial_timeline.push({
     timeline: [
@@ -133,12 +153,14 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
   final_timeline.push({
     type: FullscreenPlugin,
     message: lang['TECHNICAL_SETTINGS']['fullscreen-message'],
-    button_label: lang['BUTTONS']['done-button']
+    button_label: lang['BUTTONS']['done-button'],
+    on_load: focusButton,
   });
   final_timeline.push({
     type: HtmlButtonResponsePlugin,
     stimulus: lang['TECHNICAL_SETTINGS']['begin-technical'],
     choices: [lang['BUTTONS']['done-button']],
+    on_load: focusButton,
     record_data: false
   });
   final_timeline.push(makeConfigureSpeakersTimeline(lang, config));
@@ -157,23 +179,19 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
         on_finish(data: any) {
           experimentData.addToAll({ speaker_intensity: data.response });
 
-          if (typeof jatos !== 'undefined') {
-            jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-          }
+          updateExperimentData(experimentData);
         }
       });
   }
   if (input?.training) {
-    final_timeline.push(...getTrainingTimeline(jsPsych, lang, config, assetPaths.images));
+    final_timeline.push(...getTrainingTimeline(jsPsych, lang, config, assetPaths.images, true));
   }
   final_timeline.push({
     type: CallFunctionPlugin,
     func() {
       experimentData.addToAll({ start_time: jsPsych.getStartTime().toISOString() });
 
-      if (typeof jatos !== 'undefined') {
-        jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-      }
+      updateExperimentData(experimentData);
     }
   });
   final_timeline.push({
@@ -217,9 +235,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
         on_finish(data: any) {
           experimentData.addToAll({ concentration: data.response });
 
-          if (typeof jatos !== 'undefined') {
-            jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-          }
+          updateExperimentData(experimentData);
         }
       });
     final_timeline.push(
@@ -230,9 +246,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
         on_finish(data: any) {
           experimentData.addToAll({ random: data.response == 0 });
 
-          if (typeof jatos !== 'undefined') {
-            jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-          }
+          updateExperimentData(experimentData);
         }
       });
     final_timeline.push(
@@ -243,9 +257,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
         on_finish(data: any) {
           experimentData.addToAll({ honest: data.response == 0 });
 
-          if (typeof jatos !== 'undefined') {
-            jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-          }
+          updateExperimentData(experimentData);
         }
       });
     final_timeline.push(
@@ -256,9 +268,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
         on_finish(data: any) {
           experimentData.addToAll({ headphones: data.response == 0 });
 
-          if (typeof jatos !== 'undefined') {
-            jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-          }
+          updateExperimentData(experimentData);
         }
       });
     final_timeline.push(
@@ -274,9 +284,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
         on_finish(data: any) {
           experimentData.addToAll({ quietness: data.response });
 
-          if (typeof jatos !== 'undefined') {
-            jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-          }
+          updateExperimentData(experimentData);
         }
       });
     final_timeline.push(
@@ -292,20 +300,10 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
         on_finish(data: any) {
           experimentData.addToAll({ disruptiveness: data.response });
 
-          if (typeof jatos !== 'undefined') {
-            jatos.uploadResultFile(experimentData.csv(), "experiment_data.csv");
-          }
+          updateExperimentData(experimentData);
         }
       });
   }
-  final_timeline.push(
-    {
-      type: HtmlButtonResponsePlugin,
-      stimulus: lang['TITRATION']['end-titration-final'],
-      choices: [lang['BUTTONS']['done-button']],
-      record_data: false
-    }
-  );
 
   await jsPsych.run(final_timeline);
 
