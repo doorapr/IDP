@@ -1,105 +1,141 @@
 # Predictive Language Task
 
-## About the Project
+## About
 
-This project uses [jsPsych](https://www.jspsych.org/), a JavaScript library for creating experiments in behavioral research. The project is designed as a web application and can be run locally.
+This project uses [jsPsych](https://www.jspsych.org/) for browser-based behavioral experiments and is packaged for JATOS via `jspsych-builder`.
 
-## Creating a study using this template
+## Quick start (non-technical)
 
-Download a .jzip from the Releases page or build it yourself (see instructions below).
-Go to your JATOS server, click the `Studies` button at the top left, then the blue plus at the top and click "Import Study".
-Choose the .jzip you aquired previously.
-After import is complete, change study name and description to your liking. Before the experiment works, you have to configure it by providing a `Study input`.
-Below, you can see an example Study input.
-```
-{
-  "titration": {
-    "linear": [
-      1,
-      5,
-      10,
-      20
-    ],
-    "random": [
-      1,
-      5,
-      20
-    ]
-  },
-  "selected_language": "de",
-  "lang_task": false,
-  "lang_task_training": false,
-  "question_prior": true
-}
-```
+If you just want to run and deploy the experiment:
 
-Available options: 
+1. Install Node.js from [nodejs.org](https://nodejs.org/).
+2. Open this project folder in a terminal.
+3. Run `npm install` once.
+4. Start one experiment locally with `npm start <experiment-file>` (examples below).
+5. Build a JATOS package with `npm run jatos <experiment-file>`.
+6. Import the created `.jzip` into JATOS.
 
-| Key  | Possible Values | Description | Example |
-| ------------- | ------------- | ------------ | --------- |
-| `selected_language`  | `de`  | Sets the selected language. Currently only german is supported. | `"selected_language": "de"` |
-| `lang_task`  | `true`, `false` | Should the lang task be included? | `"lang_task": true` |
-| `lang_task_training` | `true`, `false` | Should the lang task training be included? | `"lang_task_training": true` |
-| `question_prior` | `true`, `false` | Should the explicit prior question be included? This only has an effect if `lang_task` is `true`. | `"question_prior": false` |
-| `titration` | Nothing, or an object containing titration configuration | This is a container for all titration settings. | `"titration": {} |
-| `titration.linear` | Nothing, or an array of channel numbers | If this option is present, linear titration will be included with the given channels. | `"titration: { "linear": [5, 10, 15, 20] }` |
-| `titration.random` | Nothing, or an array of channel numbers | If this option is present, random titration will be included with the given channels. | `"titration: { "random": [5, 10, 15, 20] }` |
+## Which experiment files to use
 
+Use one of these module entrypoints directly:
+
+- `src/experiment-de.ts`
+- `src/experiment-de-prior.ts`
+- `src/experiment-en.ts`
+- `src/experiment-en-prior.ts`
+
+`src/experiment.ts` is the shared base implementation and should not be used directly as a study module.
+
+### Module behavior
+
+The module files above enforce these settings in code:
+
+| Module | Language | Prior question |
+| --- | --- | --- |
+| `experiment-de.ts` | `de` | `false` |
+| `experiment-de-prior.ts` | `de` | `true` |
+| `experiment-en.ts` | `en` | `false` |
+| `experiment-en-prior.ts` | `en` | `true` |
+
+## JATOS setup
+
+### Importing
+
+1. Build a `.jzip` (see commands below) or download one from Releases.
+2. In JATOS: **Studies** → **+** → **Import Study**.
+3. Select the generated `.jzip`.
+
+No mandatory JATOS `Study input` configuration is required for normal usage of the module entrypoints.
+
+### Optional Study input keys
+
+If provided, these optional flags are read by `experiment.ts`:
+
+| Key | Values | Effect |
+| --- | --- | --- |
+| `consent` | `true` / `false` | Shows consent form when `true`. |
+| `survey_questions` | `true` / `false` | Enables pre/post survey questions when `true`. |
+
+Keys such as `lang_task`, `lang_task_training`, `question_prior`, `titration.*`, and `selected_language` are not needed for these modules.
 
 ## Prerequisites
 
-Before you start the project, make sure the following software is installed:
+- [Node.js](https://nodejs.org/) (includes npm)
+- Python 3 (only needed for `export_participant_csv.py`)
 
-- [Node.js](https://nodejs.org/) 
-- npm (installed with Node.js)
+## Install
 
-## Installing Node.js and npm
+```sh
+npm install
+```
 
-If Node.js and npm are not installed, follow these steps:
+## Run locally
 
-1. Visit the official [Node.js website](https://nodejs.org/).
-2. Download the current LTS version for your operating system.
-3. Install Node.js by following the instructions in the installation wizard.
-4. After installation, you can check if Node.js and npm were successfully installed by typing the following commands in the terminal:
-   ```sh
-   node -v  # Shows the installed Node.js version
-   npm -v   # Shows the installed npm version
+You can start a specific experiment directly:
 
-## Installing the Project
-1. Clone the repository or download the files:
-    ```sh
-    git clone <repository-url>
-    cd <project-directory>
-2. Install the dependencies:
-    ```sh
-    npm install
+```sh
+npm start experiment-en
+npm start experiment-en-prior
+npm start experiment-de
+npm start experiment-de-prior
+```
 
-## Running the Project
+If you want the equivalent explicit `jspsych` call:
 
-To start the project, use the following command in the terminal:
-    ```
-    npm start
-    ```
+```sh
+npm run jspsych -- run <experiment-file>
+```
 
-The project will be available at http://localhost:3000/ in your browser by default.
+## Create `.jzip` for JATOS
 
-## Customizing the experiment
+Use:
 
-If you want to provide your participants with a training, the required files have to be in ....
+```sh
+npm run jatos <experiment-file>
+```
 
-They have to be called training1p, training1tw through training5p, training5tw.
-The files ending in ...p are the prior sentences, the ones ending in ...tw the noisy words.
+Examples:
 
-You also have to provide a file that describes which stimuli have to be used and what (if any) blocks with breaks in between there will be in the experiment.
+```sh
+npm run jatos experiment-en
+npm run jatos experiment-en-prior
+npm run jatos experiment-de
+npm run jatos experiment-de-prior
+```
 
-## Creating a .jzip for Jatos
+`npm run jatos` (without an experiment file) builds the base `experiment` entrypoint.
 
-Create a .jzip that can be imported with a JATOS server:
-    ```
-    npm run jatos
-    ```
->[!NOTE]
->If you use sensory titration, you will have to manually copy the audio assets for that to the .jzip file. To do that open the .jzip file using an archive manager, then copy the `assets/audio/titration` folder into the .jzip file under `experiment\assets\audio\titration`.
+## Additional HTML modules/assets
+
+The experiment entrypoints include `html` in their `@assets` list.
+
+- Create an `html/` folder at project root.
+- Every file in that folder is included in the generated `.jzip`.
+- In JATOS, you can use these HTML files as additional components in your study.
+- Example: add a participant-ID questionnaire component before the jsPsych timeline by adding an HTML file in `html/` and selecting it as a component HTML file in JATOS.
+
+If `html/` does not exist, `jspsych` build/run commands for these module entrypoints fail.
+
+## Participant CSV export
+
+Use `export_participant_csv.py` to create one CSV per participant.
+
+1. In JATOS, download results via **Export as Jatos Results Archive**.
+2. Extract the archive to a folder containing `study_result_*` directories.
+3. Run the exporter from repository root, for example:
+
+```sh
+python export_participant_csv.py --results <extracted-results-folder>
+```
+
+Optional with transcription:
+
+```sh
+pip install -r requirements-stt.txt
+python export_participant_csv.py --results <extracted-results-folder> --transcribe both --stt-backend local-whisper --stt-model small --stt-device cpu
+```
+
+For full options and output details, see `EXPORT_PARTICIPANT_CSV.md`.
 
 
 
