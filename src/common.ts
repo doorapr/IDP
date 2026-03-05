@@ -21,6 +21,11 @@ export type Configuration = {
   word_stimulus_column: string;
 };
 
+function getAudioStem(path: string): string {
+  const fileName = path.split(/[\\/]/).pop() ?? path;
+  return fileName.replace(/\.[^/.]+$/, "");
+}
+
 export function makeSentencePlayback(firstStimulus: TimelineVariable | string, secondStimulus: TimelineVariable | string, setFilenameFunction: (filename: string) => void, jsPsych: JsPsych): Array<TrialType<any>> {
   return [{
     type: HtmlKeyboardResponsePlugin,
@@ -50,7 +55,7 @@ export function makeSentencePlayback(firstStimulus: TimelineVariable | string, s
     record_data: false,
     on_finish() {
       const path = (typeof secondStimulus === 'string') ? secondStimulus : jsPsych.evaluateTimelineVariable(secondStimulus.name);
-      setFilenameFunction("response_" + path.substr(8).split(".")[0] + ".txt");
+      setFilenameFunction("response_" + getAudioStem(path) + ".txt");
     }
   }];
 }
