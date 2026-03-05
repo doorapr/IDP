@@ -1,10 +1,12 @@
 {
   "title": "Language Task",
   
-"WELCOME_PAGE": {
-    "welcome":"<p><b>Welcome to our study!</b></p><p>Thanks for taking part.</b></p>"
-  },
+  "WELCOME_PAGE": {
+      "welcome":"<p><b>Welcome to our study!</b></p><p>Thanks for taking part.</b></p>"
+    },
 
+  "timeout-warning": "The experiment will end in one minute due to inactivity for four minutes.",
+  "timeout-exceeded": "The experiment will now end due to inactivity for five minutes.",
 
   "TECHNICAL_SETTINGS": {
     "begin-technical":"<p><b>Technical settings</b></p><p>In the next step, we ask you to select and test your microphone and adjust the volume.</p><p><b>Please perform the experiment using headphones.</b></p>",
@@ -31,11 +33,12 @@
     "explanation-pre-playback": "<p>You will hear a woman’s voice saying a sentence. The last word will be unclear.</p>",
     "explanation-post-playback": "<p>As you have probably noticed, the last word was indeed unclear.</p><p><b>Please listen to the sentence again. Then indicate how you would rate the clarity of the word from very unclear (0%) to very clear (100%).</b></p>",
     "end-of-first-tutorial-sentence": "<p>You have now answered all questions about this sentence. Click \"Continue\" to start the next sentence.</p>",
-    "end-of-tutorial": "<p><b>Thank you!</b></p><p>You have successfully completed the training. The experiment will now begin.</p>",
+    "end-of-tutorial": "<p><b>Thank you!</b></p><p>You have successfully completed the training. Click \"continue\" to start the <b>full experiment</b>.</p>",
     "ready-for-next-stimulus": "<p>Are you ready for the next sentence?</p>",
     "pause-stimulus": "<p>Time for a short break. When you are ready for the next $1 sentences, click \"Continue\".</p>",
     "word-response-stimulus": "<p>Which word did you understand at the end of the sentence?</p>",
-    "word-question": "<p>Which word did you hear?</p><p>Now say <b>loudly</b> and <b>clearly</b> the word you heard.</p><p>It may also just be a <b>presumption</b>, but please do not guess.</p><p>If you did not understand a word, please say loudly and clearly the word \"nothing\". </p><p>Once you have said the word you heard, click \"Continue\".</p>",
+    "word-question": "<p>Which word did you hear?</p> <p>Click “Continue” and then say the word you heard <b>loudly</b> and <b>clearly</b>.</p> <p>If you are not entirely sure, say the word you think you heard — but please avoid random guessing.</p> <p>If you did not understand anything, please say the word <b>“nothing”</b> loudly and clearly.</p>",
+    "word-question-short": "<p><b>Now</b> say <b>loudly</b> and <b>clearly</b> the <b>word</b> you think <b>you heard</b>. Say the word \"nothing\" if you did not understand anything. Click \"Continue\" <b>after</b> the recording.</p>",
     "explanation-post-recording": "<p>Now, please indicate how confident you are in your answer from very unsure (0%) to very sure (100%).</p><p>In case you understood nothing, please also indicate how confident you are in having heard nothing from very unsure (0%) to very sure (100%).</b></p>",
     "clarity-question": "<p>How clearly did you hear the word?</p>",
     "confidence-question": "<p>How confident are you in your answer?</p>",

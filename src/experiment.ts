@@ -13,16 +13,17 @@ import "../styles/main.scss";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import HtmlSliderResponsePlugin from "@jspsych/plugin-html-slider-response";
 import HtmlButtonResponsePlugin from "@jspsych/plugin-html-button-response";
-import { DataCollection } from "jspsych";
+import { DataCollection, initJsPsych } from "jspsych";
 import '@jspsych/plugin-survey/css/survey.css';
 import CallFunctionPlugin from "@jspsych/plugin-call-function";
 import BrowserCheckPlugin from "@jspsych/plugin-browser-check";
 import FullscreenPlugin from "@jspsych/plugin-fullscreen";
-import { addPercentageToSlider, askPrior, fetchCsv, focusButton, initializeJsPsychAndLanguage, makeClarityQuestion, makeConfidenceQuestion, makeSentencePlayback, makeWordQuestion } from "./common";
+import { addPercentageToSlider, askPrior, fetchCsv, focusButton, getReadyNext, initializeJsPsych, initializeJsPsychAndLanguage, initializeLanguage, makeClarityQuestion, makeConfidenceQuestion, makeSentencePlayback, makeWordQuestion } from "./common";
 import { RunFunction } from "jspsych-builder";
 import { getTrainingTimeline } from "./training";
 import { makeConfigureMicrophoneTimeline, makeConfigureSpeakersTimeline } from "./technical-setup";
 import Papa from "papaparse";
+import AudioButtonResponsePlugin from "@jspsych/plugin-audio-button-response";
 
 declare global {
   const jatos: {
@@ -43,7 +44,6 @@ function updateExperimentData(experimentData: DataCollection) {
   }
 }
 
-
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
@@ -57,19 +57,36 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     };
   }
 
-  const { lang, jsPsych, config } = await initializeJsPsychAndLanguage(input);
+  // timeout handling
+  let warningHandler: number | undefined = undefined;
+  let killHandler: number | undefined = undefined;
+
+  const { lang, config } = await initializeLanguage(input);
+
+  const settings = {
+    on_trial_start() {
+      // set a 4 minute timeout
+      warningHandler = window.setTimeout(() => {
+        window.alert(lang['timeout-warning']);
+      }, 4 * 60 * 1000);
+      killHandler = window.setTimeout(() => {
+        window.alert(lang['timeout-exceeded']);
+        window.close();
+      }, 5 * 60 * 1000);
+    },
+    on_trial_finish() {
+      window.clearTimeout(warningHandler);
+      warningHandler = undefined;
+      window.clearTimeout(killHandler);
+      killHandler = undefined;
+    },
+  }
+
+  const jsPsych = await initializeJsPsych(input, settings);
 
   const experimentData = new DataCollection([{}]);
 
   let filenameForUpload: string;
-
-  const readyNextSentence = [{
-    type: HtmlButtonResponsePlugin,
-    stimulus: lang['PLANG']['ready-for-next-stimulus'],
-    choices: [lang['BUTTONS']['done-button']],
-    on_load: focusButton,
-    record_data: false
-  }];
 
   const selected_randomisation: string[] = jsPsych.randomization.sampleWithoutReplacement(config.randomisations, 1)[0];
   console.log("Selected randomisation: ", selected_randomisation);
@@ -90,16 +107,11 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
   single_trial_timeline.push({
     type: PreloadPlugin,
     images: assetPaths.images,
-    audio: () => {
-
-      console.log(['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)]);
-      return ['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)];
-
-    },
+    audio: () => ['Stimuli/' + jsPsych.evaluateTimelineVariable(config.prior_stimulus_column), 'Stimuli/' + jsPsych.evaluateTimelineVariable(config.word_stimulus_column)],
     record_data: false,
     show_progress_bar: false
   });
-  single_trial_timeline.push(readyNextSentence);
+  single_trial_timeline.push(getReadyNext(lang));
   single_trial_timeline.push(...makeSentencePlayback(jsPsych.timelineVariable(config.prior_stimulus_column), jsPsych.timelineVariable(config.word_stimulus_column), filename => filenameForUpload = filename, jsPsych));
 
   single_trial_timeline.push({
@@ -107,7 +119,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
       makeClarityQuestion(true, lang, () => filenameForUpload),
       ...makeWordQuestion(true, lang, () => filenameForUpload, () => roundIndex),
       makeConfidenceQuestion(true, lang, () => filenameForUpload),
-      ...askPrior(true, false, jsPsych, lang, () => filenameForUpload),
+      ...(input.prior ? askPrior(true, false, jsPsych, lang, () => filenameForUpload) : []),
     ],
 
     on_timeline_finish() {
@@ -122,7 +134,8 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     return {
       type: HtmlButtonResponsePlugin,
       stimulus: lang['PLANG']['pause-stimulus'].replace('$1', nextBlockSize),
-      choices: [lang['BUTTONS']['done-button']]
+      choices: [lang['BUTTONS']['done-button']],
+      on_load: focusButton
     };
   };
 
@@ -139,10 +152,20 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
   });
   if ('WELCOME_PAGE' in lang) {
     final_timeline.push({
-      type: HtmlButtonResponsePlugin,
-      stimulus: lang['WELCOME_PAGE']['welcome'],
+      type: AudioButtonResponsePlugin,
+      stimulus: config.audio_welcome,
+      prompt: lang['WELCOME_PAGE']['welcome'],
       choices: [lang['BUTTONS']['done-button']],
-      on_load: focusButton,
+      on_load() {
+        const content = document.getElementById('jspsych-content');
+        const rest = []
+        for (let i = 1; i < (content?.children.length ?? 0); i++) {
+          if (content?.children[i])
+            rest.push(content.children[i]);
+        }
+        content?.replaceChildren(...rest, content.children[0]); // make the text appear on top of the buttons, this only works in this specific case. YAGNI.
+        focusButton();
+      },
       record_data: false
     });
   }
@@ -193,7 +216,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
       });
   }
   if (input?.training) {
-    final_timeline.push(...getTrainingTimeline(jsPsych, lang, config, assetPaths.images, true));
+    final_timeline.push(...getTrainingTimeline(jsPsych, lang, config, assetPaths.images, input.prior));
   }
   final_timeline.push({
     type: CallFunctionPlugin,

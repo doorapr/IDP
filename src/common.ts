@@ -16,6 +16,7 @@ export type Configuration = {
   randomisations: string[][]; // Array of block file names, e.g. [["block1a.csv", "block1b.csv"], ["block2a.csv", "block2b.csv"]]
   training: { prior: string, word: string; }[];
   audio_test: string;
+  audio_welcome: string;
   prior_stimulus_column: string;
   word_stimulus_column: string;
 };
@@ -62,8 +63,21 @@ export async function fetchCsv(csvUrl: string): Promise<Array<unknown>> {
     .then(results => results.data);
 }
 
-export async function initializeJsPsychAndLanguage({ selected_language }: { selected_language: string; }): Promise<{ lang: TranslationMap; jsPsych: JsPsych; config: Configuration; }> {
-  const jsPsych = initJsPsych();
+export async function initializeLanguage({ selected_language }: { selected_language: string; }): Promise<TranslationMap> {
+  const config: Configuration = await fetch(`assets/text/config/${selected_language}.json`).then(response => response.json());
+  const lang = await fetch(config.translation).then(response => response.json());
+  return { lang, config };
+}
+
+export async function initializeJsPsych({ selected_language }: { selected_language: string; }, jspsych_settings?: any): Promise<JsPsych> {
+  const jsPsych = initJsPsych(jspsych_settings);
+
+  jsPsych.data.addProperties({ selected_language });
+  return jsPsych;
+}
+
+export async function initializeJsPsychAndLanguage({ selected_language }: { selected_language: string; }, jspsych_settings?: any): Promise<{ lang: TranslationMap; jsPsych: JsPsych; config: Configuration; }> {
+  const jsPsych = initJsPsych(jspsych_settings);
 
   jsPsych.data.addProperties({ selected_language });
   const config: Configuration = await fetch(`assets/text/config/${selected_language}.json`).then(response => response.json());
@@ -112,13 +126,46 @@ export function makeConfidenceQuestion(recordData: boolean, lang: TranslationMap
 }
 
 export function makeWordQuestion(recordData: boolean, lang: TranslationMap, getFilenameForUpload: () => string, getRoundIndex: () => number) {
-  return [{ // Which word was understood?
+  return [{
+    type: HtmlButtonResponsePlugin,
+    stimulus: lang['PLANG']['word-question'],
+    choices: [lang['BUTTONS']['done-button']],
+    record_data: false
+  }, { // Which word was understood?
     type: HtmlAudioResponsePlugin,
-    stimulus: lang['PLANG']['word-question'] + "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
-    recording_duration: 7500,
+    stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
+    recording_duration: null,
     show_done_button: true,
     done_button_label: lang['BUTTONS']['done-button'],
-    on_load: focusButtonByMutationObserver,
+    on_start: () => {
+      const container = document.querySelector<HTMLElement>('.jspsych-content');
+
+      if (container == null) {
+        console.error("Expected a container with class 'jspsych-content', but found none. RUH ROH.");
+        return;
+      }
+
+      const observer = new MutationObserver(event => {
+        event.find(e => {
+          if (e.addedNodes.length > 0) {
+            const buttons = document.querySelectorAll<HTMLButtonElement>('.jspsych-btn');
+            if (buttons.length == 1) {
+              buttons[0].disabled = true;
+              setTimeout(() => {
+                buttons[0].disabled = false;
+              }, 2500);
+            } else {
+              console.error(`Expected 1 button, but found ${buttons.length}. RUH ROH.`);
+            }
+            return true;
+          }
+        });
+
+        observer.disconnect();
+      });
+
+      observer.observe(container, { childList: true });
+    },
     record_data: recordData,
     on_finish(data: any) {
       if (recordData) {
@@ -149,28 +196,28 @@ export function addPercentageToSlider(): void {
     return;
   }
 
-  const button = document.querySelector<HTMLButtonElement>('.jspsych-btn');
-  if (!button) {
-    console.error("Expected a button with class 'jspsych-btn', but found none. RUH ROH.");
-    return;
-  }
+  // const button = document.querySelector<HTMLButtonElement>('.jspsych-btn');
+  // if (!button) {
+  //   console.error("Expected a button with class 'jspsych-btn', but found none. RUH ROH.");
+  //   return;
+  // }
 
-  const listener = (event: KeyboardEvent) => {
-    if (event.key === "ArrowUp" || event.key === "ArrowRight") {
-      slider.stepUp();
-      slider.dispatchEvent(new Event('change'));
-      button.focus();
-    } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
-      slider.stepDown();
-      slider.dispatchEvent(new Event('change'));
-      button.focus();
-    }
-  };
+  // const listener = (event: KeyboardEvent) => {
+  //   if (event.key === "ArrowUp" || event.key === "ArrowRight") {
+  //     slider.stepUp();
+  //     slider.dispatchEvent(new Event('change'));
+  //     button.focus();
+  //   } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
+  //     slider.stepDown();
+  //     slider.dispatchEvent(new Event('change'));
+  //     button.focus();
+  //   }
+  // };
 
-  window.addEventListener('keydown', listener);
+  // window.addEventListener('keydown', listener);
 
-  button.onclick = () => window.removeEventListener('keydown', listener);
-  button.focus();
+  // button.onclick = () => window.removeEventListener('keydown', listener);
+  // button.focus();
 
   slider.onchange = () => {
     const span = document.getElementById('slider-value');
@@ -197,9 +244,51 @@ function makeWordQuestionPrior(recordData: boolean, lang: TranslationMap, getFil
       stimulus: "<img class=\"main-symbol\" src='assets/images/microphone2.png'></img>",
       recording_duration: 7500,
       show_done_button: true,
-      on_load: focusButtonByMutationObserver,
+      // on_load: focusButtonByMutationObserver,
       done_button_label: lang['BUTTONS']['done-button'],
       record_data: recordData,
+      on_start: () => {
+        const container = document.querySelector<HTMLElement>('.jspsych-content');
+
+        if (container == null) {
+          console.error("Expected a container with class 'jspsych-content', but found none. RUH ROH.");
+          return;
+        }
+
+        const button = document.querySelector<HTMLButtonElement>('.jspsych-btn');
+        if (button) {
+          button.disabled = true;
+          setTimeout(() => {
+            button.disabled = false;
+          }, 2500);
+          return;
+        } else {
+          console.error("Expected a button with class 'jspsych-btn', but found none. Falling back to observer strategy.");
+        }
+
+        const observer = new MutationObserver(event => {
+          event.find(e => {
+            if (e.addedNodes.length > 0) {
+              const buttons = document.querySelectorAll<HTMLButtonElement>('.jspsych-btn');
+              if (buttons.length == 1) {
+                buttons[0].disabled = true;
+                setTimeout(() => {
+                  buttons[0].disabled = false;
+                }, 2500);
+              } else {
+                console.error(`Expected 1 button, but found ${buttons.length}. RUH ROH.`);
+              }
+              return true;
+            } else {
+              console.log("Event " + event + " did not add nodes.");
+            }
+          });
+
+          observer.disconnect();
+        });
+
+        observer.observe(container, { childList: true });
+      },
       on_finish(data: any) {
         if (recordData) {
           const priorFilename = "prior_" + getFilenameForUpload();
@@ -266,6 +355,8 @@ export function askPrior(recordData: boolean, isInTraining: boolean, jsPsych: Js
 }
 
 export function focusButton(): void {
+  return; 
+
   const buttons = document.querySelectorAll<HTMLButtonElement>('.jspsych-btn');
   if (buttons.length == 1) {
     buttons[0].focus();
@@ -275,8 +366,9 @@ export function focusButton(): void {
 }
 
 export function focusButtonByMutationObserver(): void {
+  return; 
   const container = document.querySelector<HTMLElement>('.jspsych-content');
-  
+
   if (container == null) {
     console.error("Expected a container with class 'jspsych-content', but found none. RUH ROH.");
     return;
@@ -303,6 +395,7 @@ export function focusButtonByMutationObserver(): void {
 
 export function makeFocusButtons(buttonLabels: string[]): () => void {
   return function focusSpecificButton(): void {
+    return;
     const buttons = document.querySelectorAll<HTMLButtonElement>('.jspsych-btn');
     if (buttons.length != buttonLabels.length && buttons.length > 1) {
       console.error(`Expected ${buttonLabels.length} buttons, but found ${buttons.length}. RUH ROH.`);
@@ -336,4 +429,14 @@ export function makeFocusButtons(buttonLabels: string[]): () => void {
       };
     });
   };
+}
+
+export function getReadyNext(lang: TranslationMap): object[] {
+  return [{
+    type: HtmlButtonResponsePlugin,
+    stimulus: lang['PLANG']['ready-for-next-stimulus'],
+    choices: [lang['BUTTONS']['done-button']],
+    on_load: focusButton,
+    record_data: false
+  }];
 }

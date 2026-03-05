@@ -50,6 +50,7 @@
         {"prior": "Stimuli/e_el_488p.wav", "word": "Stimuli/e_el_488tw_12.wav"}
     ],
     "audio_test": "assets/audio/training/Volume.wav",
+    "audio_welcome": "assets/audio/training/Welcome.wav",
     "prior_stimulus_column": "recording_prior",
     "word_stimulus_column": "recording_tw"
 }
