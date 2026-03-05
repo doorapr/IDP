@@ -57,6 +57,8 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     };
   }
 
+  input.training = false;
+
   // timeout handling
   let warningHandler: number | undefined = undefined;
   let killHandler: number | undefined = undefined;
@@ -94,7 +96,11 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     selected_randomisation
   });
 
-  const blocks: any[][] = await Promise.all(selected_randomisation.map((block: string) => fetch(`${block}`).then(response => response.text()).then(csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data)));
+  let blocks: any[][] = await Promise.all(selected_randomisation.map((block: string) => fetch(`${block}`).then(response => response.text()).then(csv => Papa.parse(csv, { header: true, skipEmptyLines: true }).data)));
+
+  if (config.randomize_blocks) {
+    blocks = jsPsych.randomization.shuffle(blocks);
+  }
 
   console.log(blocks);
 
@@ -232,6 +238,7 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
       document.getElementsByTagName("html")[0].classList.add("task3");
     }
   });
+  
   final_timeline.push({
     timeline: [
       ...(blocks.map((block, index) => (

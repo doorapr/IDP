@@ -1,5 +1,6 @@
 {
     "translation": "assets/text/langs/en.json",
+    "randomize_blocks": false,
     "randomisations": [
         [
             "assets/text/Mini_CB1_1.csv",

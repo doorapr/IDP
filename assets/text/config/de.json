@@ -1,5 +1,6 @@
 {
     "translation": "assets/text/langs/de.json",
+    "randomize_blocks": true,
     "randomisations": [
         [
             "assets/text/S1A.csv",

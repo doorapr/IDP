@@ -86,7 +86,6 @@ json_decoder = json.decoder.JSONDecoder()
 
 transcription_map = {}
 for fileName in files:
-    start = time.time()
     file = open(os.path.join(base_dir, fileName), 'r')
     binPath = os.path.join(base_dir, fileName.replace('.txt', '.bin'))
     wavPath = os.path.join(base_dir, fileName.replace('.txt', '.wav'))
@@ -94,27 +93,36 @@ for fileName in files:
     binFile.write(base64.b64decode(file.read()))
     binFile.close()
     subprocess.run([ffmpeg, '-i', binPath, "-ar", "16000", "-ac", "1", wavPath, '-y'])
+    if fileName.startswith("prior_"): 
+        og_filename = fileName[len("prior_"):]
+    else: 
+        og_filename = fileName
+    transcription_map[og_filename] = { "transcription": "N/A" }
     file.close()
-    with sr.AudioFile(wavPath) as source:
-        audio_data = recognizer.record(source)
-        result = json_decoder.decode(recognizer.recognize_vosk(audio_data, 'de'))['text']
-        filename = os.path.basename(wavPath)
-        if filename.startswith("prior_"): 
-            og_filename = filename[len("prior_"):]
-            if og_filename not in transcription_map:
-                transcription_map[og_filename] = {"transcription_prior": result}
-            else:
-                transcription_map[og_filename]["transcription_prior"] = result
-        else:        
-            if filename not in transcription_map:
-                transcription_map[filename] = {"transcription": result}
-            else:
-                transcription_map[filename]["transcription"] = result
-        end = time.time()
-        print("Recognized word " + result + " for file " + wavPath + " in " + str(end - start) + " seconds.")
+
+# for fileName in files:
+#     start = time.time()
+#     wavPath = os.path.join(base_dir, fileName.replace('.txt', '.wav'))
+#     with sr.AudioFile(wavPath) as source:
+#         audio_data = recognizer.record(source)
+#         result = json_decoder.decode(recognizer.recognize_vosk(audio_data, 'de'))['text']
+#         filename = os.path.basename(wavPath)
+#         if filename.startswith("prior_"): 
+#             og_filename = filename[len("prior_"):]
+#             if og_filename not in transcription_map:
+#                 transcription_map[og_filename] = {"transcription_prior": result}
+#             else:
+#                 transcription_map[og_filename]["transcription_prior"] = result
+#         else:        
+#             if filename not in transcription_map:
+#                 transcription_map[filename] = {"transcription": result}
+#             else:
+#                 transcription_map[filename]["transcription"] = result
+#         end = time.time()
+#         print("Recognized word " + result + " for file " + wavPath + " in " + str(end - start) + " seconds.")
     
-overall_end = time.time()
-print("Recognized " + str(len(files)) + " words in " + str(overall_end - overall_start) + " seconds, "  + str(len(files) / (overall_end - overall_start)) + " per second.")
+# overall_end = time.time()
+# print("Recognized " + str(len(files)) + " words in " + str(overall_end - overall_start) + " seconds, "  + str(len(files) / (overall_end - overall_start)) + " per second.")
 
 study_data = open(data_file, "r").read()
 
@@ -127,6 +135,8 @@ for x in range(0, len(json_object)):
         if json_object[x].get("training") == "true":
             continue
         key = json_object[x]["fileName"].replace('.txt', '.wav')
+        if (key not in transcription_map):
+            continue
         transcription_map[key]["subject_id"]= subject_id
         transcription_map[key]["randomisation"]= randomisation
         if json_object[x]["type"] == "clarity":

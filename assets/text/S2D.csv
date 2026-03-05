@@ -1,4 +1,4 @@
-Sentence,Target_word,WordPredictions,wn,nwords,nprt,nw,sn,cloze,entropy,condition,sn_rand,sn_0,Prior,Sentences,Target_word.1,randomization,Web_Audio,Single_word,sentence,word,randomize_2
+Sentence,Target_word,WordPredictions,wn,nwords,nprt,nw,sn,cloze,entropy,condition,sn_rand,sn_0,Prior,Sentences,Target_word.1,randomization,Web_Audio,Single_Word,sentence,word,randomize_2
 Nach den vielen Stufen war sie außer,atem,53,1.0,4,66,8,309,0.803030303030303,0.6017408114348417,el,368,368,el,s_el_368p.wav,s_el_368tw,0.5069282215798083,s_el_368p.wav,s_el_368tw_12.wav,Stimuli/s_el_368p.wav,Stimuli/s_el_368tw_12.wav,0.7592652211091665
 In der Menschenmenge erkannte mich meine,chefin,1,1.0,16,67,7,260,0.01492537313432836,1.958237694603065,em_lc,313,313,em,s_em_313p.wav,s_em_lc_313tw,0.7546819605470017,s_em_313p.wav,s_em_lc_313tw_1.wav,Stimuli/s_em_313p.wav,Stimuli/s_em_lc_313tw_1.wav,0.7630576973760331
 Beim Kochen schnitt sich Onur in den,finger,61,3.0,5,68,8,57,0.8970588235294118,0.4629571619158683,el,50,50,el,s_el_050p.wav,s_el_050tw,0.9844461188451467,s_el_050p.wav,s_el_050tw_1.wav,Stimuli/s_el_050p.wav,Stimuli/s_el_050tw_1.wav,0.7716295563598773

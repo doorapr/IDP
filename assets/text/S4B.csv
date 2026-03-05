@@ -1,4 +1,4 @@
-Sentence,Target_word,WordPredictions,wn,nwords,nprt,nw,sn,cloze,entropy,condition,sn_rand,sn_0,Prior,Sentences,Target_word.1,randomization,Web_Audio,Single_word,sentence,word,randomize_4
+Sentence,Target_word,WordPredictions,wn,nwords,nprt,nw,sn,cloze,entropy,condition,sn_rand,sn_0,Prior,Sentences,Target_word.1,randomization,Web_Audio,Single_Word,sentence,word,randomize_4
 In der Nachbarsstadt gibt es die größte Messe für,bücher,7,13.0,49,66,10,261,0.1060606060606061,3.706383995402767,eh,315,315,eh,s_eh_315p.wav,s_eh_315tw,0.9312937117307023,s_eh_315p.wav,s_eh_315tw_6.wav,Stimuli/s_eh_315p.wav,Stimuli/s_eh_315tw_6.wav,0.2448415477607213
 Ich schreibe einen langen Brief an meine,cousine,1,2.0,10,66,8,211,0.01515151515151515,1.673681629766757,em_lc,251,251,em,s_em_251p.wav,s_em_lc_251tw,0.3051902722753459,s_em_251p.wav,s_em_lc_251tw_12.wav,Stimuli/s_em_251p.wav,Stimuli/s_em_lc_251tw_12.wav,0.2548616828617237
 Ungeduldig schaut Toni auf ihre,kuh,0,5.0,5,76,6,22,0.0,0.3742793427934435,el_mm,415,415,el,s_el_415p.wav,s_el_mm_415tw,0.005993606038986354,s_el_415p.wav,s_el_mm_415tw_12.wav,Stimuli/s_el_415p.wav,Stimuli/s_el_mm_415tw_12.wav,0.2692478224054081

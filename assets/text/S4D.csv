@@ -1,4 +1,4 @@
-Sentence,Target_word,WordPredictions,wn,nwords,nprt,nw,sn,cloze,entropy,condition,sn_rand,sn_0,Prior,Sentences,Target_word.1,randomization,Web_Audio,Single_word,sentence,word,randomize_4
+Sentence,Target_word,WordPredictions,wn,nwords,nprt,nw,sn,cloze,entropy,condition,sn_rand,sn_0,Prior,Sentences,Target_word.1,randomization,Web_Audio,Single_Word,sentence,word,randomize_4
 Der Tod seines Hundes erfüllte ihn mit großer ,Trauer,41,,3,43,9,9,0.9534883720930233,0.220352331161548,el,145,145,el,s_el_145p.wav,s_el_145tw,0.13738981369599523,s_el_145p.wav,s_el_145tw_12.wav,Stimuli/s_el_145p.wav,Stimuli/s_el_145tw_12.wav,0.7043860462579714
 Sie kam mit den Beinen kaum bis auf den ,Kessel,0,,4,45,10,35,0.0,0.3923791765259529,el_mm,396,396,el,s_el_396p.wav,s_el_mm_396tw,0.4195835840945974,s_el_396p.wav,s_el_mm_396tw_1.wav,Stimuli/s_el_396p.wav,Stimuli/s_el_mm_396tw_1.wav,0.7158351799818293
 Auf der Straße repariert der Bauarbeiter ein,tor,1,17.0,17,65,8,33,0.01538461538461539,2.083047986725922,em_lc,28,28,em,s_em_028p.wav,s_em_lc_028tw,0.7409783990766099,s_em_028p.wav,s_em_lc_028tw_6.wav,Stimuli/s_em_028p.wav,Stimuli/s_em_lc_028tw_6.wav,0.7279004039829905
