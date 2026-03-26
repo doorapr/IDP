@@ -57,8 +57,6 @@ export const run: RunFunction = async function run({ assetPaths, input, environm
     };
   }
 
-  input.training = false;
-
   // timeout handling
   let warningHandler: number | undefined = undefined;
   let killHandler: number | undefined = undefined;
